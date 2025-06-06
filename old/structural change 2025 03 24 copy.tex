@@ -1,0 +1,614 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{xcolor}
+\usepackage{booktabs} % For a better table layout
+\usepackage{rotating} % For rotating the table
+\usepackage{comment}
+\usepackage{subcaption} % For subfigures#
+
+\usepackage{float}
+\usepackage[toc,page]{appendix}
+\usepackage{natbib} 
+\bibliographystyle{apalike}
+\setcitestyle{authoryear,open={(},close={)}}
+%\addbibresource{bibliography.bib} %Import the bibliography file
+
+
+\setlength{\parskip}{10pt}
+
+\textheight 23 true cm
+\textwidth 15.8 true cm
+\oddsidemargin 0 true cm
+\evensidemargin 0 true cm
+\topmargin -0.8 true cm
+
+\thispagestyle{empty}
+
+\renewcommand{\arraystretch}{1.2}
+
+\renewcommand\baselinestretch{1.35}
+\baselineskip=1.35\normalbaselineskip
+\footnotesep=1.10\normalbaselineskip
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{acknowledgement}{Acknowledgement}
+\newtheorem{algorithm}{Algorithm}
+\newtheorem{assumption}{Assumption}
+\newtheorem{case}{Case}
+\newtheorem{claim}{Claim}
+\newtheorem{conclusion}{Conclusion}
+\newtheorem{condition}{Condition}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{corollary}{Corollary}
+\newtheorem{criterion}{Criterion}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{exercise}{Exercise}
+\newtheorem{lemma}{Lemma}
+\newtheorem{notation}{Notation}
+\newtheorem{problem}{Problem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\newtheorem{solution}{Solution}
+\newtheorem{summary}{Summary}
+
+\def\x{x}  % Change here the symbol for investment if you must
+
+\def\equiv{\doteq}  % Change here the symbol for 'equal by definition'
+
+
+\begin{document}
+
+\title{Chained Indices Unchained: \\ {\Large On the Welfare Foundations of Income Growth Measurement II}}
+
+\author{
+Omar Licandro%
+\footnote{The author expresses gratitude to Ariel Burstein for a highly beneficial discussion held during a visit to UCLA in April 2024.} \\ {\small U. of Leicester and BSE} 
+\and
+Juan Ignacio Vizcaino \\ {\small University of Nottingham}}
+
+\date{April 2025}
+
+
+
+\maketitle
+{\small
+\begin{abstract}
+\vspace*{-.5em}
+{\footnotesize
+\noindent 
+
+
+\medskip\noindent {\sc Keywords}: Chained quantity indexes, GDP, equivalent variation, Divisia index, Fisher-ideal index and Fisher-Shell index.
+
+\medskip\noindent {\sc JEL classification numbers}: E01, O47, C43, O41.
+}
+\end{abstract}
+}
+\thispagestyle{empty}
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%
+\section{Introduction}
+%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%
+\section{Structural Change Model} \label{sec:LBD}
+%%%%%%%%%%%%%
+
+This section fundamentally follows Herrendorf et al.~(2021).
+
+%%%%%%%%%%%%%
+\paragraph{Description of technology.}
+%%%%%%%%%%%%%
+
+Let's assume there are two sectors, goods and services.
+Value added in both sectors is produced according to the Cobb–Douglas production technologies
+\begin{equation}\label{eq:Yj}
+Y_{jt} = A_{jt} K_{jt}^{\theta} L_{jt}^{1-\theta} ,
+\end{equation}
+ where \( j \in \{g,s\} \) indexes the goods and services sectors, respectively.
+These production functions share the same capital intensity, represented by \( \theta\in(0,1) \), but may have different total factor productivities, \( A_{jt} \). Production in each sector relies on homogeneous production factors, capital \( K_{jt} \) and labor \( L_{jt} \), which can move freely between sectors. 
+Consequently,
+\[
+K_{gt} + K_{st} = K_t, \quad L_{gt} + L_{st} = L_t ,
+\]
+where $K_t$ and $L_t$ represent total capital and total labor, respectively.
+
+
+Investment is produced using the CES technology
+\[
+I_t = A_{xt} \left( \omega^{\frac{1}{\varepsilon}} X_{gt}^{\frac{\varepsilon - 1}{\varepsilon}} + (1 - \omega)^{\frac{1}{\varepsilon}} X_{st}^{\frac{\varepsilon - 1}{\varepsilon}} \right)^{\frac{\varepsilon}{\varepsilon - 1}} ,
+\]
+where $X_{gt}$ and $X_{st}$ represent goods and services inputs, respectively, \( \varepsilon \) is the elasticity of substitution between them, and \( \omega \in(0,1) \) determines the weight of sectorial inputs. 
+The state of investment-specific technology is neutral with respect to inputs and represented by the investment specific productivity, \( A_{xt} \).
+
+%A representative household has an initial capital stock \( K_0 > 0 \) and is endowed with one unit of time per period, which is supplied inelastically. 
+Capital depreciates at a rate \( \delta >0 \), following the law of motion:
+\begin{equation}\label{eq:K}
+\dot{K}_t = I_t - \delta K_t.
+\end{equation}
+At equilibrium, the feasibility conditions impose the following constraints:
+\[
+C_{gt} + X_{gt} = Y_{gt}, \quad C_{st} + X_{st} = Y_{st},
+\]
+where \( C_{gt} \) and \( C_{st} \) are the consumption of goods and services, respectively. 
+
+
+%%%%%%%%%%%%%
+\paragraph{Equilibrium prices.}
+%%%%%%%%%%%%%
+
+Let us adopt the investment good as numeraire. It is easy to show that the price of goods, $P_{gt}$, relative to the price of services, $P_{st}$, 
+\[
+\frac{P_{gt}}{P_{st}} = \frac{A_{st}}{A_{gt}}  ,
+\]
+is equal to the inverse of the relative sectorial TFPs. 
+Notice that a dupla of production factors $(K,L)$ that produces $K^\theta L^{1-\theta} = 1$ has the same value in the goods and service sectors, since $P_{gt} A_{gt}= P_{st} A_{st}$.
+
+Moreover, since we have adopted the investment good as numeraire, the prices of goods and services, relative to the investment good, read
+\begin{equation}\label{eq:Pj}
+\boxed{
+P_{jt} = \frac{{\cal A}_{t}}{ A_{jt}}, \quad j \in \{g,s\}.
+}
+\end{equation}
+where 
+\begin{equation}\label{eq:calA}
+\boxed{
+{\cal A}_{t} = A_{xt} \left( \omega A_{gt}^{\varepsilon - 1} + (1 - \omega) A_{st}^{\varepsilon - 1} \right)^{\frac{1}{\varepsilon - 1}} .
+}
+\end{equation}
+As shown below, ${\cal A}_{t} $ is the productivity of the investment sector.
+
+In the investment sector, at equilibrium, the ratio of expenditure shares and input quantities on goods and services are, respectively, given by
+\[
+\frac{P_{gt} X_{gt}}{P_{st} X_{st}} = \frac{\omega}{1 - \omega} \left( \frac{A_{st}}{A_{gt}} \right)^{1 - \varepsilon} 
+\ \ \ \ \text{and}\ \ \ \ 
+\frac{X_{gt}}{X_{st}} =  \frac{\omega}{1 - \omega} \left( \frac{A_{gt}}{A_{st}} \right)^{ \varepsilon} 
+.
+\]
+Notice that if goods and services are complementary in the investment technology, i.e. $\varepsilon\in(0,1)$, and technical progress is faster in the production of goods, relative to services, then the value added of the goods sector shrinks while real production increases, relative to the service sector.
+
+In the following, we assume that $A_{gt} = A_{g0}\, \text{e}^{\gamma_g t}$, $A_{st} = A_{s0}\, \text{e}^{\gamma_s t}$, and ${\cal A}_{t} = {\cal A}_{0}\, \text{e}^{\gamma_{\cal A} t}$, $\gamma_x> \gamma_g > \gamma_s$.%
+\footnote{In (\ref{eq:calA}), $A_{xt}$ accommodates for this assumption to be true.}
+As a consequence, the growth rate of $P_{gt}$ and $P_{st}$ are $g_{P_g}$ and $g_{P_s}$, respectively, with $0 < g_{P_g} = \gamma_x - \gamma_g < \gamma_x - \gamma_s = g_{P_s}$.
+Notice that $ A_{xt}$ is residually given by equation (\ref{eq:calA}).
+
+%%%%%%%%%%%%%
+\paragraph{Aggregate investment technology.}
+%%%%%%%%%%%%%
+
+At equilibrium, from Lemma 1 in Herrendorf et al. (2021),  the aggregate investment technology is
+\begin{equation}\label{eq:investment}
+I_t =  {\cal A}_{t} \left( \frac{X_{gt}}{A_{gt}} + \frac{X_{st}}{A_{st}} \right)
+= {\cal A}_{t} K_{xt}^{\theta} L_{xt}^{1-\theta} , 
+\end{equation}
+where $L_{xt}$ and $K_{xt}$ are defined as
+\[
+L_{xt} = \lambda_{t} L_t
+\ \ \ \ \text{and}\ \ \ \ 
+K_{xt} = \lambda_{t} K_t ,
+\ \ \ \ \text{with}\ \ \ \
+\lambda_{t} = \frac{X_{gt}}{A_{gt} K_t^{\theta}} + \frac{X_{st}}{A_{st} K_t^{\theta}} .
+\]
+Let's think on $\lambda\in(0,1)$ as the fraction of employment and capital allocated to produce inputs for the investment sector. (check this!)
+
+%%%%%%%%%%%%%
+\paragraph{Aggregate production technology.}
+%%%%%%%%%%%%%
+
+Let us define aggregate final output, measured in units of final investment, as:  
+\begin{equation}\label{eq:identity}
+{
+Y_t = P_{gt} C_{gt} + P_{st} C_{st} + I_t  .
+}
+\end{equation}
+It can be easily shown that the aggregate production technology, as measured in units of the investment good, is
+\begin{equation}\label{eq:output}
+{
+Y_t = {\cal A}_{t} K_t^{\theta} L_t^{1-\theta}.
+}
+\end{equation}
+(check it!)
+%The fraction $L_{xt}$ is allocated to investment and the complement to consumption.
+%Equilibrium factor prices are given by:  
+%\[
+%R_t = \theta {\cal A}_{t} K_t^{\theta - 1},
+%\]
+%\[
+%W_t = (1 - \theta) {\cal A}_{t} K_t^{\theta}.
+%\]
+
+%%%%%%%%%%%%%
+\paragraph{Aggregate dynamics.}
+%%%%%%%%%%%%%
+
+From the equations (\ref{eq:K}), (\ref{eq:identity}) and (\ref{eq:output}), for $t\geq 0$,  given the exogenous path of ${\cal A}_{t}$ and an initial stock of capital $K_0 > 0$, the law of motion for capital reads
+\[
+\dot{K}_t = \underbrace{{\cal A}_{t} K_t^{\theta} L_t^{1-\theta}- E_t}_{I_t} - \delta K_t.
+\]
+where 
+\begin{equation}\label{eq:E}
+E_t = P_{gt} C_{gt} + P_{st} C_{st} 
+\end{equation}
+is total consumption expenditure in units of the investment good. 
+%Notice also that, from the dethe investment rate $L_{xt}$ is determined by the saving behaviour of the representative household. HOW?
+
+
+%%%%%%%%%%%%%
+\paragraph{Non-homothetic preferences.}
+%%%%%%%%%%%%%
+
+Population is a mass $N_t$ growing at rate $n>0$. At any time $t$, each individual offers $h_t$ units of human capital, exogenously growing at the rate $\gamma_h >0$.
+Households inelastically supply $L_t = h_t N_t$.
+
+The economy features an infinitely lived representative household which preferences are represented by the following intertemporal utility function 
+\[
+\int_{0}^{\infty} U(c_{gt}, c_{st}) \, \text{e}^{(n-\rho) t}\, \text{d}t .
+\]
+\noindent The discount rate is given by \( \rho > n \). 
+The instantaneous utility function \( U(\cdot, \cdot) \) is assumed to be a price-independent-generalized-linear indirect
+utility (PIGL henceforth).
+It depends on per capita consumption $c_{gt}=C_{gt}/N_t$ and $c_{st}=C_{st}/N_t$.
+Since the PIGL class generally lacks a known direct utility representation, we work with its indirect utility formulation $V(e_t, P_{gt}, P_{st}) $, where $e_t = E_t/N_t$ is per capita  consumption expenditure. Following Boppart (2014), let us assume
+\begin{assumption}\label{ass:IUF}
+The instantaneous utility function $U(c_{gt}, c_{st})$ is PIGL with indirect utility representation
+\begin{equation}\label{eq:IUF}
+V(e_t, P_{gt}, P_{st}) = \frac{1}{\chi}  \left( \frac{e_t}{P_{st}} \right)^\chi - \frac{\eta}{\gamma} \left( \frac{P_{gt}}{P_{st}} \right)^\gamma  - \frac{1}{\chi} + \frac{\eta}{\gamma},
+\end{equation}
+where \(e_t\) is consumption expenditure per capita, \( \eta > 0 \) and \( 1 > \gamma > \chi > 0 \). 
+\end{assumption}
+
+%%%%%%%%%%%%%
+\paragraph{Intertemporal problem and intratemporal allocation.}
+%%%%%%%%%%%%%
+
+Under Assumption~\ref{ass:IUF}, the representative household choses a path $\{e_t,k_t\}$, for consumption expenditure  and capital per capita, that solves the following dynamic problem
+\[
+v(k_t) = \max \int_{0}^{\infty}  \frac{e_t^\chi}{\chi} \, \Gamma_t \, dt 
+\]
+subject to
+\begin{equation}\label{eq:K2}
+\dot k_t = \widehat{\cal A}_{t} k_t^\theta - e_t - (\delta+n) k_t ,
+\end{equation}
+where $k_t = K_t/N_t$ and $ \widehat{\cal A}_{t} =  {\cal A}_{t}h_t^{1-\theta}$.
+The discount factor, $\Gamma_t = P_{st}^{-\chi} \text{e}^{(n-\rho) t}$, is smaller than one and declining over time since $P_{st}$, as in the data, is assumed to be increasing over time.
+Preferences are then CIES on the path of consumption expenditure, with elasticity of substitution larger than one.%
+\footnote{Notice that in this framework, the intertemporal elasticity of substitution is $\frac{1}{1-\chi}$.}
+All other terms in (\ref{eq:IUF}) are excluded as they are additive; their discounted integral remains independent of control and state variables, having no impact on the determination of the optimal path.
+
+The Euler equation associated to the household problem above is
+\begin{equation}\label{eq:Euler}
+\frac{\dot e_t}{e_t} = \frac{1}{1-\chi} \left(\theta \widehat{\cal A}_t k_t^{\theta - 1} - \rho - \delta - \chi \frac{\dot P_{st}}{P_{st}}\right) .
+\end{equation}
+The equilibrium path solves then (\ref{eq:K2}) and (\ref{eq:Euler}), given $k_0$.
+
+The intratemporal allocation of $e_t$ to $c_{gt}$ and $c_{st}$ results from the use of  Roy’s Identity to derive the expenditure share of goods:
+\begin{equation}\label{eq:Roy}
+\frac{P_{gt} c_{gt}}{e_t} = \eta \left( \frac{e_t}{P_{st}} \right)^{-\chi} \left( \frac{P_{gt}}{P_{st}} \right)^\gamma.
+\end{equation}
+The last equation solves for $c_{gt}$ and then $c_{st}$ can be obtained inverting the definition of consumption expenditure $e_t$.
+
+%%%%%%%%%%%%%
+\paragraph{Aggregate Balanced Growth Path (ABGP).}
+%%%%%%%%%%%%%
+
+At the ABGP, per capita aggregates $\{k_t,e_t,y_t\}$, they all grow at the constant rate $g_k = \frac{\gamma_{\cal A}}{1-\theta} + \gamma_h$.
+From the Euler equation (\ref{eq:Euler}), the stock of capital follows
+\begin{equation}\label{eq:kSS}
+k_t^{*} = \kappa^{\frac{1}{\theta-1}} \widehat{\cal A}_t^{\frac{1}{1-\theta}}
+\ \ \ \ \text{where}\ \ \ \ \
+\kappa \equiv \frac{\rho + \delta + \chi g_{P_{s}} + (1-\chi)g_{k}}{\theta}
+\end{equation}
+is the user cost of capital divided by $\theta$.
+From  (\ref{eq:K2}), consumption expenditure follows
+\begin{equation}
+e^*_t  =  (\kappa- \delta -n - g_{k}) k^*_t .
+\end{equation}
+From (\ref{eq:output}), gross nominal income per capita is
+\begin{equation}
+y^*_t = \widehat{\cal A}_{t} k_t^{*\,\theta} = \kappa k_t^{*}.
+\end{equation}
+The last equality directly derives from (\ref{eq:kSS}).
+Notice that the consumption share of gross income is
+\[
+\frac{e^*_t}{y^*_t} = \frac{\kappa - \delta - n - g_{k}}{\kappa} .
+\]
+
+%%%%%%%%%%%%%
+\paragraph{Bellman representation.}
+%%%%%%%%%%%%%
+
+Following Duran and Licandro (2025), the Bellman representation at time $t$ of the representative household problem is
+\begin{equation}\label{eq:BR}
+W(c_{gt}, c_{st}, x_t;  \nu_t) = U(c_{gt}, c_{st}) + \nu_t x_t ,
+\end{equation}
+where $x_t = \dot k_t$ is net investment and $\nu_t = v'(k_t)$ is the marginal value of capita per capital at time $t$.
+In the Bellman representation, preferences at $t$ are indexed by the marginal value of capital $\nu_t$.
+However, it's very important to stress that $y_t$ is not real expenditure per capital but nominal expenditure per capita, and as such $Y_t= y_t N_t$ is our measure of nominal GDP.
+The representative household maximises (\ref{eq:BR})  with respect to $\{c_g,c_s,x\}$, subject to the budget constraint
+\begin{equation}\label{eq:BC}
+P_{gt} c_{gt} + P_{st} c_{st} + x_t = m_t ,
+\end{equation}
+where $m_t = y_t - \delta k_t$ is current net income per capita. Notice that consumption expenditure per capita is $e_t = m_t - x_t$. 
+
+\begin{proposition}
+The indirect utility and expenditure functions associated to the Bellman representation of preferences in (\ref{eq:BR}) are, respectively,
+\begin{equation}\label{eq:indirect}
+u(m_t, P_{gt}, P_{st};\nu_t) = V\left(\left(\nu_t P_{st}^\chi\right)^{\frac{1}{\chi-1}},P_{gt},P_{st}\right) 
++ \nu_t \left( m_t - \left(\nu_t P_{st}^\chi\right)^{\frac{1}{\chi-1}} \right)
+\end{equation}
+and
+\begin{equation}\label{eq:expenditure}
+e(W_t, P_{gt}, P_{st};\nu_t) = \left(\nu_t P_{st}^\chi\right)^{\frac{1}{\chi-1}} + \frac{W_t}{\nu_t} - \frac{ V\left(\left(\nu_t P_{st}^\chi\right)^{\frac{1}{\chi-1}},P_{gt},P_{st}\right) }{\nu_t} .
+\end{equation}
+\end{proposition}
+
+\noindent{\sc Proof:}
+The time-$t$ household primal problem of maximising (\ref{eq:BR}) subject to (\ref{eq:BC}) may be solved in two stages. 
+At the first stage, by definition of an indirect utility function,
+\[
+V(e_t, P_{gt}, P_{st}) = \max_{\{c_{gt},c_{st}\}:P_{gt} c_{gt} + P_{st} c_{st} = e_t} U(c_{gt}, c_{st})   .
+\]
+At the second stage, solve
+\[
+ \max_x V(m_t - x, P_{gt}, P_{st}) +\nu_t x .
+\]
+%Consequently, optimal net investment is
+%\[
+%x_t = \arg\max_{x}\ V(m_t - x, P_{gt}, P_{st}) +\nu_t x = m_t - \left(\nu_t P_{st}^\chi \right)^{\frac{1}{\chi-1}}.
+%\]
+%The last equality above is derived as follows. 
+The F.O.C. is 
+\[
+ \left( \frac{e_t}{P_{st}} \right)^\chi \frac{1}{e_t} = \nu_t ,
+\]
+or equivalently,
+\[
+ e_t = \left(\nu_t P_{st}^\chi\right)^{\frac{1}{\chi-1}} .
+\]
+Since 
+\[
+x_t=m_t-e_t ,
+\]
+then
+\[
+x_t = m_t - \left(\nu_t P_{st}^\chi \right)^{\frac{1}{\chi-1}} .
+\]
+Consequently, the indirect utility function associated to the Bellman representation of preferences (\ref{eq:BR}) is
+\[
+u(m_t,P_{gt},P_{st};\nu_t) = V\big(\left(\nu_t P_{st}^\chi \right)^{\frac{1}{\chi-1}}, P_{gt}, P_{st} \big)  +\nu_t \Big(m_t - \left(\nu_t P_{st}^\chi \right)^{\frac{1}{\chi-1}}\Big) .
+\]
+The expenditure function is the solution of the corresponding dual problem
+\[
+\max_{e,x}\ e+x
+\ \ \ \text{s.t.}\ \ \ 
+ V(e, P_{gt}, P_{st}) +\nu_t x = w_t
+\]
+The F.O.C.'s are
+\[
+1 = \lambda e^{\chi-1}P_{st}^{-\chi}
+\ \ \ \ \text{and}\ \ \ \
+1 = \lambda \nu_t .
+\]
+Then, 
+\[
+ e = \left(\nu_t P_{st}^\chi\right)^{\frac{1}{\chi-1}} ,
+\]
+and
+\[
+x = \frac{w_t - V\big(\left(\nu_t P_{st}^\chi \right)^{\frac{1}{\chi-1}}, P_{gt}, P_{st} \big)}{\nu_t}  .
+\]
+Consequently
+\[
+e(w_t,P_{gt},P_{st};\nu_t) = \left(\nu_t P_{st}^\chi \right)^{\frac{1}{\chi-1}} 
++ \frac{w_t - V\big(\left(\nu_t P_{st}^\chi \right)^{\frac{1}{\chi-1}}, P_{gt}, P_{st} \big)}{\nu_t}  . 
+\]
+The last equation completes the proof. \qed
+
+
+%%%%%%%%%%%%%
+\paragraph{Equivalent variation measure.}
+%%%%%%%%%%%%%
+
+Based on the Fisher and Shell principle that welfare comparisons must be done using the same preference set, and in line with Baqaee and Burstein (2023) equivalent variation measure --see their Definition 4, let us define the hypothetical income at $z$, for \( z < t \), 
+\begin{equation}\label{eq:Mhat}
+\widehat m_{tz} = e \Big( u\big(m_z, P_{gz}, P_{sz};\nu_t\big),P_{gt}, P_{st};\nu_t\Big) .
+\end{equation}
+$\widehat m_{tz}$ is the level of income per capita at current prices that the representative household would have needed at time \( z \) to attain the utility achievable with past income and prices but evaluated using the current Bellman representation of preferences.
+
+%%%%%%%%%%%%%
+\paragraph{Fixed-base indices.}
+%%%%%%%%%%%%%
+
+Let us adopt the following convention for an economy where an Office for National Statistics have recorded National Accounts data from some initial time $t_0$ to the current time $t$. 
+In this economy, a current-base equivalent variation index, for $s\in\{t_0,t\}$, is
+\begin{equation}\label{eq:CBEV}
+{\cal P}_{t,s} =  \log( \widehat m_{t,s} ) - \log (\widehat m_{t,t_0}) .
+\end{equation}
+Notice that the index is normalized to ${\cal P}_{t,t_0} = 0$, such that ${\cal P}_{t,t} =  \log( m_t) -  \log (\widehat m_{t,t_0})$ measures welfare gains from the initial time $t_0$ to the current time $t$, and ${\cal P}_{t,t} -{\cal P}_{t,s} =  \log (m_t) -  \log(\widehat m_{t,s})$ welfare gains from any time $s\in(t_0,t)$ to $t$.
+Implicit on this index, the equilibrium instantaneous growth rate of the economy at $s$ is measured by 
+\begin{equation}\label{eq:BBEVgrowth}
+\frac{\partial{\cal P}_{t,s}}{\partial s} = \frac{\partial \widehat m_{t,s}} {\partial s}  .%= 
+%\frac{ \left( \frac{m_s}{p_s} - \frac{\lambda}{\nu_t} \right) p_t g_k}{\widehat m_{t,s}} .
+\end{equation}
+As we show below, the instantaneous growth rate at $t$ of the current-base equivalent variation index, $\frac{\partial{\cal P}_{t,s}}{\partial s}|_{s=t} $, %= (1-\lambda s_c) g_k$ 
+ is equal to the Divisia index at $t$. %, defined as $g^{\text{D}}=s_c g_c + (1-s_c) g_x$. 
+For any $s<t$, the instantaneous growth rate is lower than the Divisia index and declines as the welfare evaluation refers to a more distant point in the past. (prove it)
+%In fact, the growth rate as measured by the current-base BBEV index in (\ref{eq:BBEVgrowth}) may become negative, since it evaluates the past using current preferences, $\nu_t$ is fixed, but income measured in units of the investment good, $\frac{m_s}{p_s}$, declines at the rate $g_k$ when moving back to the past.
+
+
+%%%%%%%%%%%%%%%%%%
+\paragraph{Fisher-Shell index.}
+%%%%%%%%%%%%%%%%%%
+Following Duran and Licandro (2025), in order to show the Fisher-Shell index is equal to the Divisia index, we must compute the total derivative of $\widehat M_{tz}$ with respect to $z$ and evaluate it at $z=t$. From the main text,
+\[\tag{\ref{eq:Mhat}}
+\widehat m_{tz} = e \Big( u\big(m_z, P_{gz}, P_{sz};\nu_t\big),P_{gt}, P_{st};\nu_t\Big)  ,
+\]
+with
+\[\tag{\ref{eq:indirect}}
+u(m_t, P_{gt}, P_{st};\nu_t) = V\left(\left(\nu_t P_{st}^\chi\right)^{\frac{1}{\chi-1}},P_{gt},P_{st}\right) 
++ \nu_t \left( m_t - \left(\nu_t P_{st}^\chi\right)^{\frac{1}{\chi-1}} \right) ,
+\]
+\[\tag{\ref{eq:expenditure}}
+e(w_t, P_{gt}, P_{st};\nu_t) = \left(\nu_t P_{st}^\chi\right)^{\frac{1}{\chi-1}} + \frac{w_t}{\nu_t} - \frac{ V\left(\left(\nu_t P_{st}^\chi\right)^{\frac{1}{\chi-1}},P_{gt},P_{st}\right) }{\nu_t} ,
+\]
+and
+\[\tag{\ref{eq:IUF}}
+V(e_t, P_{gt}, P_{st}) = \frac{1}{\chi}  \left( \frac{e_t}{P_{st}} \right)^\chi - \frac{\eta}{\gamma} \left( \frac{P_{gt}}{P_{st}} \right)^\gamma  - \frac{1}{\chi} + \frac{\eta}{\gamma} .
+\]
+Combining them, we get
+\[
+\widehat m_{tz} = \frac{1-\chi}{\chi} \left(\nu_t P_{st}^\chi\right)^{\frac{1}{\chi-1}} - \frac{1}{\nu_t} \frac{\eta}{\gamma} \left( \frac{P_{gt}}{P_{st}} \right)^\gamma + m_z + \text{other terms that don't depend on $z$}
+\]
+In order to define the per capita Fisher-Shell index, we take time derivatives with respect to $z$ and evaluate them at $z = t$, such that,
+\[
+g^{\text{FS}}_t \equiv \frac{\text{d} \log\widehat m_{tz}}{\text{d} z}\Bigg|_{z=t}  = \frac{\dot m_t}{m_t}  - \frac{e_t}{m_t} g_{P_{st}} -
+\frac{\eta}{\nu_t m_t}  \left( \frac{P_{gt}}{P_{st}} \right)^\gamma
+\big(g_{P_g t} - g_{P_s t}\big) .
+\]
+
+Since
+\[
+\frac{\dot m_t}{m_t}  = s_{et}\, g_{e_t}+ (1-s_{et}) g_{xt}  ,
+\]
+where $s_e = e/m$=E/M, and 
+\[
+ g_{et}  = s_{gt} \big(g_{gt} + g_{P_{g}t}\big) +  s_{st} \big(g_{st} + g_{P_{s}t}\big) ,
+\]
+the Fisher-Shell index becomes
+\[
+g^{\text{FS}}_t = g^{D}_t + \frac{P_{gt}c_{gt}}{m_t} \big( g_{P_gt} -g_{P_gt}\big)  -
+\frac{\eta}{\nu_t m_t}  \left( \frac{P_{gt}}{P_{st}} \right)^\gamma
+\big(g_{P_gt} - g_{P_st}\big) .
+\]
+From (\ref{eq:Roy}), 
+\[
+\frac{P_{gt} c_{gt}}{e_t} = \eta \left( \frac{e_t}{P_{st}} \right)^{-\chi} \left( \frac{P_{gt}}{P_{st}} \right)^\gamma.
+\]
+Since at equilibrium $e_t^{\chi-1} = \nu_t P_{st}^\chi$, we can easily show that 
+\[
+g^{\text{FS}}_t = g^{D}_t  .
+\]
+
+%%%%%%%%%%%%%%%%%%
+\paragraph{Divisia index.}
+%%%%%%%%%%%%%%%%%%
+
+At the ABGP of the HRV's economy, the Divisia index for NDP per capita is
+\[
+g^D_t = s_e \big( s_{gt} g_g + (1-s_{gt}) g_s \big) + (1-s_e) g_x -n = g^D_t - n ,
+\]
+where the shares are $s_e \equiv \frac{e_t}{m_t}= \frac{\kappa- \delta - n - g_{K}}{\kappa} $ and, from (\ref{eq:Roy}) 
+$s_{gt} = \eta \left( \frac{e_t}{P_{st}} \right)^{-\chi} \left( \frac{P_{gt}}{P_{st}} \right)^\gamma$. The growth rate of investment is $g_x = g_K$ and the growth rates of aggregate goods and service consumptions are $g_g$ and $g_s$, respectively.
+We are only missing the growth rate of consumption services. Notice that, from (\ref{eq:Roy}), real consumption services are
+\[
+c_{st} = \frac{e_t}{P_{st}} - \eta \left( \frac{e_t}{P_{st}} \right)^{1-\chi} \left( \frac{P_{gt}}{P_{st}} \right)^{\gamma} .
+\]
+
+%%%%%%%%%%%%%
+\paragraph{Parameter values.}
+%%%%%%%%%%%%%
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lc}
+        \hline
+        \textbf{Parameter} & \textbf{Value} \\
+        \hline
+         \hline
+        \textbf{Preferences} & \\
+        \hline
+        $\rho$ (discount rate) & 0.04  \\
+        $\chi$ & 0.55  \\
+        $\eta$ & 0.44 \\
+        $\gamma$ & 0.69 \\
+         \hline
+        \textbf{Technology} & \\\hline
+        $\theta$ (capital share) & 1/3  \\
+        $\delta$ (depreciation rate) & 0.08  \\
+         $\omega$ & 0.65 \\
+        $\varepsilon$ & 0.00 \\
+        \hline
+    \end{tabular}
+    \caption{Herrendorf et al. (2021) calibration}
+    \label{tab:parameters}
+\end{table}
+
+Table~\ref{tab:parameters} shows the parameters values used by Herrendorf et al. (2021) in their quantitative exercise.
+In the measurement of sectoral total factor productivity (TFP) they have followed a structured approach based on observable economic data. 
+First, sector-specific TFP (\( A_{jt} \)), $j=\{g,s\}$,  was estimated using data from WORLD KLEMS on real value added, capital and labor inputs. Given the aggregate capital share \( \theta \), they computed the sectoral TFP growth rates using 
+\[
+\widehat{A}_{jt} = \widehat{y}_{jt} - \theta \widehat{k}_{jt} , %- (1 - \theta) \widehat{L}_{jt}, 
+\quad j \in \{g,s\},
+\]
+where $\widehat x$ measures the growth rate of variable $x$.
+All variables except \( \widehat{A}_{jt} \) are directly observable. Normalizing initial TFP levels to \( A_{j0} = 1 \), they use the estimated growth rates to construct the time series for \( A_{jt} \).
+
+Next, they estimated aggregate investment-specific TFP (\( A_{xt} \)). Again, setting the initial condition \( A_{x0} = 1 \), they computed its growth rates using 
+\[
+\widehat{A}_{xt} = \widehat{X}_t - \frac{P_{gt} X_{gt}}{X_t} \widehat{X}_{gt} - \frac{P_{st} X_{st}}{X_t} \widehat{X}_{st},
+\]
+where all components at the right-hand-side of this equation are observable. 
+%Finally, we assess the theoretical conditions required to ensure the existence of an aggregate balanced growth path (ABGP).
+
+
+\appendix
+
+%%%%%%%%%%%%%
+\paragraph{Aggregate Balanced Growth Path (ABGP).}
+%%%%%%%%%%%%%
+
+Since from the primal problem of the household
+\[
+\max V(e, P_{gt},P_{st}) + \nu_t x
+\ \ \ \ \text{subject to}\ \ \ \ \ 
+e + x = m_t .
+\]
+From the FOC for $e$,
+\[
+\nu_t = e_t^{1-\chi} P_{st}^\chi .
+\]
+Consequently, at the ABGP, $g_\nu = (1-\chi) g_e$. 
+We have then all information required to compute the current-base equivalent variation measure in (\ref{eq:CBEV}).
+ 
+From (\ref{eq:Roy}), real consumption on goods is
+\begin{equation}
+c_{gt} = \eta \left( \frac{e_t}{P_{st}} \right)^{1-\chi} \left( \frac{P_{gt}}{P_{st}} \right)^{\gamma-1} ,
+\end{equation}
+which grows at the constant rate $g_g = (1-\chi) g_k +(\gamma-1) g_{P_{g}} + (\chi-\gamma) g_{P_{s}}$.
+
+%%%%%%%%%%%%%
+\paragraph{How compute the solution.}
+%%%%%%%%%%%%%
+
+In the following, to measure quantity indices, information on prices and quantities for consumption, investment and income will be required. 
+The use of the investment good as numeraire, in this framework, is inconsequential. These are the steps to follow in order to measure the needed variables.
+
+\begin{enumerate}
+
+\item Assume that $A_{gt}$, $A_{st}$ and ${\cal A}_t$ all three grow at different constant rates, with $\widehat A_{g} > \widehat A_{s}$. %In the data, $\widehat A_{g}$ is very close to $\widehat {\cal A}$.
+\item Use equations (\ref{eq:Pj}) and (\ref{eq:calA}) to solve for  $P_{gt}$ and $P_{st}$.
+\item Solve the dynamic system (\ref{eq:K2}) and (\ref{eq:Euler}) to compute $e_t$ and $k_t$, and the value function $v(k_t)$.
+\item Use (\ref{eq:E}) and (\ref{eq:Roy}) to solve for $c_{gt}$ and $c_{st}$
+\item Use (\ref{eq:identity}) and (\ref{eq:output}) to solve for $i_t=I_t/L_t$ and $y_t=Y_t/L_t$.
+
+\end{enumerate}
+
+
+
+%%%%%%%%%%%%%
+\end{document}
+%%%%%%%%%%%%%

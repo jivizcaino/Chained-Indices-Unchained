@@ -1,0 +1,2623 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{xcolor}
+\usepackage{booktabs} % For a better table layout
+\usepackage{rotating} % For rotating the table
+\usepackage{comment}
+\usepackage{subcaption} % For subfigures#
+
+\usepackage{float}
+\usepackage[toc,page]{appendix}
+\usepackage{natbib} 
+\bibliographystyle{apalike}
+\setcitestyle{authoryear,open={(},close={)}}
+%\addbibresource{bibliography.bib} %Import the bibliography file
+
+
+\usepackage{amsthm}
+
+
+\setlength{\parskip}{10pt}
+
+\textheight 23 true cm
+\textwidth 15.8 true cm
+\oddsidemargin 0 true cm
+\evensidemargin 0 true cm
+\topmargin -0.8 true cm
+
+\thispagestyle{empty}
+
+\renewcommand{\arraystretch}{1.2}
+
+\renewcommand\baselinestretch{1.35}
+\baselineskip=1.35\normalbaselineskip
+\footnotesep=1.10\normalbaselineskip
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{acknowledgement}{Acknowledgement}
+\newtheorem{algorithm}{Algorithm}
+\newtheorem{assumption}{Assumption}
+\newtheorem{case}{Case}
+\newtheorem{claim}{Claim}
+\newtheorem{conclusion}{Conclusion}
+\newtheorem{condition}{Condition}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{corollary}{Corollary}
+\newtheorem{criterion}{Criterion}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{exercise}{Exercise}
+\newtheorem{lemma}{Lemma}
+\newtheorem{notation}{Notation}
+\newtheorem{problem}{Problem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\newtheorem{solution}{Solution}
+\newtheorem{summary}{Summary}
+
+\def\x{x}  % Change here the symbol for investment if you must
+
+\def\equiv{\doteq}  % Change here the symbol for 'equal by definition'
+
+
+\begin{document}
+
+\title{Chained Indices Unchained: \\ {\Large On the Welfare Foundations of Income Growth Measurement}}
+
+\author{
+Omar Licandro%
+\footnote{The author expresses gratitude to Ariel Burstein for a highly beneficial discussion held during a visit to UCLA in April 2024.} \\ {\small U. of Leicester and BSE} 
+\and
+Juan Ignacio Vizcaino \\ {\small University of Nottingham}}
+
+\date{April 2025}
+
+
+
+\maketitle
+{\small
+\begin{abstract}
+\vspace*{-.5em}
+{\footnotesize
+\noindent 
+This paper studies the welfare foundations of chained quantity indices used in national accounts to measure GDP growth. We examine how alternative methods of intertemporal welfare evaluation perform within a structural transformation framework, where preferences are non-homothetic, evolve over time, and aggregate dynamics converge to an Aggregate Balanced Growth Path (ABGP). We show that evaluating welfare gains through a sequence of local, preference-consistent comparisons across contiguous periods yields a chained index that aligns with the ABGP and provides a welfare-based measure of income growth. In contrast, fixed-base approaches, which assess historical gains from the standpoint of current preferences, are prone to substitution bias and generate significant revisions as preferences evolve. After calibrating the structural transformation model for the U.S. economy, we show that chained indices better capture the welfare-relevant dimensions of economic growth and provide a more robust basis for measuring real income dynamics in the presence of structural transformation.
+
+\medskip\noindent {\sc Keywords}: Structural transformation, Investment specific technical change, Chained quantity indexes, GDP measurement, Equivalent variation, Divisia index, Fisher-ideal index and Fisher-Shell index.
+
+\medskip\noindent {\sc JEL classification numbers}: C43, E01, E13, O11, O14,  O41, O47.
+}
+\end{abstract}
+}
+\thispagestyle{empty}
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%
+\section{Introduction}
+%%%%%%%%%%%%%
+
+In the 1990s, the Bureau of Economic Analysis (BEA) implemented a fundamental change in its approach to measuring GDP growth, replacing fixed-base Laspeyres indices with chained Fisher-ideal indices. This shift was driven by the tendency of standard fixed base methods to produce systematic reductions in historical growth rates after base-year revisions.\footnote{See  \cite{parker_triplett_1996} for a discussion of how fixed base indices misrepresent economic growth, understating it before the base year and overstating it thereafter.} The urgency of this issue increased in the 1980s as durable goods' prices, especially in the computer sector, declined sharply due to substantial quality improvements.
+
+The BEA began to adjust its GDP measurement framework in the mid-1980s by introducing quality adjustments to price indices, particularly for high-tech durable goods. While this improved the accuracy of real GDP estimates, it highlighted the limitations of fixed-base indices, necessitating more frequent base-year revisions to maintain the reliability of the measures. In 1996, the need for a more flexible, continuously updated index led the BEA to adopt the chained Fisher-ideal index for measuring GDP growth. By updating weights continuously, this index not only accounts for shifts in relative prices but also reduces substitution bias, reflecting structural changes in the economy and aligning growth measurement with current economic conditions without requiring periodic base-year revisions.\footnote{See \cite{whelan2002computers}.}
+
+While the chained Fisher-ideal index offers practical advantages in accuracy and stability, its welfare foundations have yet to be fully understood. Central to this discussion is the question of whether GDP growth measured through chained indices can accurately reflect changes in welfare over time, a critical aspect for assessing the true impact of economic growth on society's well-being. This paper aims to answer this question from the perspective of the economic theory of index numbers.%
+\footnote{For some foundational papers on the literature, see \cite{fisher1922making}, \cite{fisher_shell_1968}, \cite{diewert1976exact}, \cite{diewert1978superlative}, and \cite{caves1982economic}.}
+
+This paper investigates the welfare implications of chained indices for the measurement of income growth in models of structural transformation. Explain here the main issues of the structural transformation literature, the importance of a welfare-based measure of aggregate income growth, and the role of investment as pointed out by HRV.
+
+This paper focuses on the Divisia index, which is well approximated in practice by a Fisher-ideal quantity index, and contrast two recent theoretical frameworks that provide differing welfare interpretations for chained indices used in national accounts. Both approaches, those of \cite{BB2023welfare} and \cite{duran_licandro_2024}, utilize the Fisher-Shell principle as a theoretical foundation, but with key differences in their application.%
+\footnote{See also the seminal paper by \cite{Licandro_RuizCastillo_Duran}}.
+
+Index number theory, the theoretical foundation for GDP measurement, relies on stable preferences. However, when preferences evolve over time, as it is the case of the type of non-homothetic preferences used in the structural transformation literature, according to the
+{\it Fisher-Shell Principle} suggested by \cite{fisher_shell_1968},  welfare comparisons should adopt a consistent preference order. Following this principle, welfare comparisons between two different moments in time require a common preference order, or {\it reference order}, to accurately capture the welfare gains or losses associated with changes in income and expenditure. Determining how this principle should be applied in practice —particularly in the context of evolving preferences and rapid changes in price structures— still presents a theoretical and methodological challenge.
+
+\cite{BB2023welfare} propose an equivalent variation measure of welfare gains, using the preferences of the current period as a reference order to evaluate the entire history of income growth. Their approach requires stability and homotheticity of preferences to ensure that the chained index accurately reflects welfare gains.
+Any deviation from these conditions makes the chained Divisia index inconsistent with their welfare measure. 
+%For instance, under non-homothetic preferences or taste shocks, a chained Divisia index might not reliably measure welfare gains, since it would not be fully capturing the welfare effects of shifts in expenditure patterns.
+
+\cite{duran_licandro_2024}, by contrast, present an alternative approach that applies the Fisher-Shell principle in a dynamic context by chaining welfare gains between contiguous periods. They refer to it as the chained Fisher-Shell quantity index. A salient advantage of this method is that it does not need the stability and homotheticity assumptions required by \cite{BB2023welfare}. 
+Instead, in the framework of continuous-time dynamic general equilibrium models, \cite{duran_licandro_2024}~show that a Fisher-Shell true quantity index aligns with the Divisia index. Then, chained Divisia indices continuously adapt to changes in preferences, income, and prices, offering a flexible welfare-based measure of income growth. Under this approach, at any moment in time, welfare gains are measured using the preferences relevant to that specific time and then chained. 
+%This dynamic approach has the potential to provide a more accurate representation of welfare gains, especially in economies characterized by rapid technological change, shifts in consumption patterns, and significant fluctuations in relative prices.
+
+The result in \cite{duran_licandro_2024} does not invalidate the measure proposed by \cite{BB2023welfare}; rather, it highlights that chained Divisia indices are also welfare-based. Thus, it illustrates the broader principle that multiple true quantity indices can capture welfare gains in the same context. In light of this result, Proposition 1 in \cite{BB2023welfare} can be understood to demonstrate that the chained Divisia index and the Baqaee-Burstein equivalent variation measure, being alternative measures of welfare gains aiming to answer different questions, converge to each other only under homothetic and stable preferences.
+
+To illustrate the implications of these contrasting approaches, we quantitatively evaluate an endogenous growth model with learning-by-doing and embodied technical change. 
+The model captures the sustained decline in the price of investment goods relative to consumption goods, a trend that has been a notable feature of the U.S. economy for several decades. 
+In this model, we compare the Baqaee~and~Burstein~equivalent variation measure (BBEV) and the chained Fisher-Shell index. 
+Our analysis reveals that the BBEV amplifies the shortcomings of traditional fixed-base indices, exhibiting an even greater substitution bias as the relative prices of investment goods decrease over time.
+This finding suggests that the fixed-base approach, like a standard Paasche index, systematically understates past welfare gains.
+The chained Fisher-Shell index, in contrast, maintains stability and provides a time-invariant measure of welfare gains that aligns with the balanced growth path of the model.
+By continuously updating the reference order, the chained index avoids the need for frequent revisions while capturing welfare-relevant growth, reflecting the stationary nature of the dynamic economy.
+
+The findings in this paper highlight the limitations of fixed-base indices, particularly in the context of modern economies where relative prices and consumption patterns are in constant flux. The substitution bias inherent in fixed-base indices may distort long-term growth measurements, making chained indices, such as the Fisher-ideal quantity index, a more reliable tool for capturing welfare-relevant growth. Our results suggest that the chained Fisher-Shell index provides a consistent welfare-based measure that can accommodate evolving economic conditions without imposing rigid assumptions on the stability or homotheticity of preferences. This has important implications for national accounts, as it supports the use of chained indices as a more accurate reflection of welfare gains over time, aligning growth measurement with the economic realities of today’s rapidly changing economies.
+
+In sum, this paper contributes to the literature on welfare-based growth measurement by clarifying the theoretical foundations of chained indices and evaluating their practical implications within a general equilibrium framework. By comparing two distinct interpretations of the Fisher-Shell principle, we provide a deeper understanding of the welfare properties of chained indices and offer a rationale for their adoption in national accounts. Our findings support the view that chained indices %not only reduce substitution bias but also 
+offer a flexible, welfare-consistent measure that can adapt to evolving preferences and economic conditions, thereby providing an accurate measure of welfare-relevant growth.
+
+
+
+%%%%%%%%%%%%%
+\section{Structural Change Model} \label{sec:LBD}
+%%%%%%%%%%%%%
+
+To compare the behavior of fixed-base Fisher-Shell indices with that of the chained Fisher-Shell index, this section adopts the structural transformation model developed by \cite{herrendorf_rogerson_valentinyi_2021}.  
+Hereafter, we refer to it as the HRV structural transformation model.  
+The model features three sectors: goods, services, and investment, with non-homothetic preferences defined over consumption of goods and services.  
+Both goods and services are also used in the production of investment, which is governed by a CES technology.  
+This framework provides a rich environment for evaluating how fixed-base and chained true quantity indices capture welfare-relevant income growth along a balanced growth path with non-homothetic preferences and time-varying income elasticities and elasticities of substitution.
+
+%%%%%%%%%%%%%
+\paragraph{Description of technology.}
+%%%%%%%%%%%%%
+
+We assume that goods and services are produced by distinct sectors. Value added in each sector is generated using Cobb–Douglas production technologies
+\begin{equation}\label{eq:Yj}
+Y_{j,t} = A_{j,t} K_{j,t}^{\theta} L_{j,t}^{1-\theta} ,
+\end{equation}
+where \( j \), \( j \in \{g,s\} \), indexes the goods and services sectors, respectively. These production functions share a common capital intensity parameter $\theta$, $\theta\!\in\!(0,1)$, but differ in total factor productivity, denoted \( A_{j,t} \). Each sector employs the same homogeneous production factors, capital \( K_{j,t} \) and labor \( L_{j,t} \), which are freely mobile across sectors. It follows that
+\[
+K_{g,t} + K_{s,t} = K_t
+\quad \text{and} \quad
+L_{g,t} + L_{s,t} = L_t,
+\]
+where \( K_t \) and \( L_t \) denote the economy's total capital and labor endowments, respectively.
+
+Investment is produced using a CES technology
+\[
+I_t = A_{x,t} \left( \omega^{\frac{1}{\varepsilon}} X_{g,t}^{\frac{\varepsilon - 1}{\varepsilon}} + (1 - \omega)^{\frac{1}{\varepsilon}} X_{s,t}^{\frac{\varepsilon - 1}{\varepsilon}} \right)^{\frac{\varepsilon}{\varepsilon - 1}},
+\]
+where \( X_{g,t} \) and \( X_{s,t} \) denote inputs from the goods and services sectors, respectively. The parameter  \( \varepsilon \), \( \varepsilon > 0 \), governs the elasticity of substitution between these inputs, and  \( \omega \), \( \omega \in (0,1) \), captures their relative weight in the production of investment. The term \( A_{x,t} \) represents investment-specific productivity, which is neutral with respect to input composition.
+
+Capital depreciates at a constant rate \( \delta > 0 \) and evolves according to the standard law of motion
+\begin{equation}\label{eq:K}
+\dot{K}_t = I_t - \delta K_t.
+\end{equation}
+In equilibrium, efficiency requires that output in each sector be allocated between consumption and investment inputs, s.t.,
+\[
+C_{g,t} + X_{g,t} = Y_{g,t}
+\quad \text{and} \quad
+C_{s,t} + X_{s,t} = Y_{s,t},
+\]
+where \( C_{g,t} \) and \( C_{s,t} \) denote consumption of goods and services, respectively.
+
+
+%%%%%%%%%%%%%
+\paragraph{Equilibrium prices.}
+%%%%%%%%%%%%%
+
+It is straightforward to show that the relative price of goods, \( P_{g,t} \), to services, \( P_{s,t} \), satisfies
+\[
+\frac{P_{g,t}}{P_{s,t}} = \frac{A_{s,t}}{A_{g,t}},
+\]
+that is, it equals the inverse of the relative sectoral TFPs. Note that a bundle of production factors \( (K, L) \) such that \( K^\theta L^{1 - \theta} = 1 \) has the same value in both sectors, since \( P_{g,t} A_{g,t} = P_{s,t} A_{s,t} \).
+
+We adopt the investment good as the numeraire. 
+It is easy to see that, at equilibrium, the prices of goods and services, relative to the prices of investment, are given by
+\begin{equation}\label{eq:Pj}
+P_{j,t} = \frac{{\cal A}_{t}}{ A_{j,t}}, \quad j \in \{g,s\},
+\end{equation}
+where
+\begin{equation}\label{eq:calA}
+{\cal A}_{t} = A_{x,t} \left( \omega A_{g,t}^{\varepsilon - 1} + (1 - \omega) A_{s,t}^{\varepsilon - 1} \right)^{\frac{1}{\varepsilon - 1}}.
+\end{equation}
+As shown below, \( {\cal A}_{t} \) corresponds to total factor productivity in the investment sector.
+
+At equilibrium in the investment sector, the ratios of expenditure shares and input quantities on goods and services are given by
+\[
+\frac{P_{g,t} X_{g,t}}{P_{s,t} X_{s,t}} = \frac{\omega}{1 - \omega} \left( \frac{A_{s,t}}{A_{g,t}} \right)^{1 - \varepsilon}
+\quad \text{and} \quad
+\frac{X_{g,t}}{X_{s,t}} = \frac{\omega}{1 - \omega} \left( \frac{A_{g,t}}{A_{s,t}} \right)^{\varepsilon}.
+\]
+%If goods and services are complements in the investment technology, that is, \( \varepsilon \in (0,1) \), and productivity grows faster in the goods sector than in services, then the value added of the goods sector declines relative to services, even as its real input increases.
+
+In what follows, and consistently with the data, we impose the following assumption on sectoral TFP:
+
+\begin{assumption}\label{ass:TFPs}
+Total factor productivity evolves according to \( A_{g,t} = A_{g,0}\, \text{e}^{\gamma_g t} \), \( A_{s,t} = A_{s,0}\, \text{e}^{\gamma_s t} \), and \( {\cal A}_{t} = {\cal A}_{0}\, \text{e}^{\gamma_{\cal A} t} \), where the growth rates satisfy \( \gamma_{\cal A} > \gamma_g > \gamma_s \).%
+\footnote{In equation~(\ref{eq:calA}), \( A_{x,t} \) adjusts to be consistent with this assumption.}
+\end{assumption}
+As a consequence, the growth rates of \( P_{g,t} \) and \( P_{s,t} \), denoted respectively \( g_{P_g} \) and \( g_{P_s} \), are given by
+\[
+0 < g_{P_g} = \gamma_{\cal A} - \gamma_g < \gamma_{\cal A} - \gamma_s = g_{P_s}.
+\]
+Under Assumption~\ref{ass:TFPs}, the model delivers the prediction, consistent with the data, that consumption service prices grow faster than consumption goods prices, and that the overall consumption price index increases more rapidly than the price of investment goods.
+
+
+%%%%%%%%%%%%%
+\paragraph{Aggregate production technology.}
+%%%%%%%%%%%%%
+
+Like in National Accounts, we define aggregate final output, measured in units of the investment good, as
+\begin{equation}\label{eq:identity}
+Y_t = P_{g,t} C_{g,t} + P_{s,t} C_{s,t} + I_t.
+\end{equation}
+\cite{herrendorf_rogerson_valentinyi_2021} show that at equilibrium the aggregate production function is
+\begin{equation}\label{eq:output}
+Y_t = {\cal A}_t K_t^{\theta} L_t^{1 - \theta},
+\end{equation}
+where \( {\cal A}_t \) is the investment-sector productivity index defined in equation~(\ref{eq:calA}). Notice, however, that $Y_t$ is arbitrarily measured in units of the investment good.
+
+%%%%%%%%%%%%%
+%\paragraph{Aggregate investment technology.}
+%%%%%%%%%%%%%
+
+%At equilibrium, the aggregate investment technology takes the form
+%\begin{equation}\label{eq:investment}
+%I_t = \lambda_t {\cal A}_{t} K_{t}^{\theta} L_{t}^{1 - \theta},
+%\end{equation}
+%where 
+%\[
+%\lambda_t = \frac{X_{g,t}}{A_{g,t} K_t^{\theta} L_{t}^{1 - \theta}} + \frac{X_{s,t}}{A_{s,t} K_t^{\theta} L_{t}^{1 - \theta}}.
+%\]
+%As it will become clear below, the term \( \lambda_t \in (0,1) \) is the fraction of gross income devoted to produce investment goods.%
+%\footnote{For a proof, see Lemma 1 in \cite{herrendorf_rogerson_valentinyi_2021}.}
+
+%%%%%%%%%%%%%
+\paragraph{Aggregate dynamics.}
+%%%%%%%%%%%%%
+
+Combining equations~(\ref{eq:K}), (\ref{eq:identity}), and (\ref{eq:output}), the law of motion for capital, for \( t \geq 0 \), given the exogenous path of \( {\cal A}_t \) and an initial capital stock \( K_0 > 0 \), can be written as
+\[
+\dot{K}_t = \underbrace{{\cal A}_t K_t^{\theta} L_t^{1 - \theta} - E_t}_{I_t} - \delta K_t,
+\]
+where
+\begin{equation}\label{eq:E}
+E_t = P_{g,t} C_{g,t} + P_{s,t} C_{s,t}
+\end{equation}
+denotes total consumption expenditure, measured in units of the investment good.
+
+
+%%%%%%%%%%%%%
+\paragraph{Non-homothetic preferences.}
+%%%%%%%%%%%%%
+
+Let population be denoted by \( N_t \), growing at a constant rate \( n  \), \( n > 0 \). At each point in time \( t \), every individual supplies \( h_t \) units of human capital, which grows exogenously at rate  \( \gamma_h \), \( \gamma_h > 0 \). Total labor supplied is thus \( L_t = h_t N_t \), and is offered inelastically.
+
+The economy features an infinitely lived representative household whose preferences are represented by the intertemporal utility function
+\begin{equation}\label{eq:pref}
+ \int_{0}^{\infty} U(c_{g,t}, c_{s,t}) \, \text{e}^{(n - \rho) t} \, \text{d}t,
+\end{equation}
+where \( \rho > n \) is the subjective discount rate and  \( U(\cdot, \cdot) \) is per capita utility. The instantaneous utility function \( U(\cdot, \cdot) \) is assumed to belong to the price-independent generalised linear (PIGL) class. It depends on per capita consumption of goods and services, defined as \( c_{g,t} = C_{g,t}/N_t \) and \( c_{s,t} = C_{s,t}/N_t \), respectively.
+
+Since the PIGL class generally lacks a closed-form direct utility representation, we work with its indirect utility form \( V(e_t, P_{g,t}, P_{s,t}) \), where \( e_t = E_t / N_t \) denotes per capita consumption expenditure. Following Boppart (2014), we make the following assumption
+
+\begin{assumption}\label{ass:IUF}
+The instantaneous utility function \( U(c_{g,t}, c_{s,t}) \) belongs to the PIGL class and has the indirect utility representation
+\begin{equation}\label{eq:IUF}
+V(e_t, P_{g,t}, P_{s,t}) = \frac{1}{\chi} \left( \frac{e_t}{P_{s,t}} \right)^\chi 
+- \frac{\eta}{\gamma} \left( \frac{P_{g,t}}{P_{s,t}} \right)^\gamma 
+- \frac{1}{\chi} + \frac{\eta}{\gamma},
+\end{equation}
+where \( \eta > 0 \) and \( 1 > \gamma > \chi > 0 \).
+\end{assumption}
+
+\noindent EXPLAIN THE MEANING OF THE PARAMETERS HERE AND THE ROLE OF EXPENDITURE ON STRUCTURAL TRANSFORMATION.
+
+%%%%%%%%%%%%%
+\paragraph{Intertemporal problem and intratemporal allocation.}
+%%%%%%%%%%%%%
+
+Under Assumption~\ref{ass:IUF}, the representative household chooses a path \( \{e_t, k_t\} \) for per capita consumption expenditure and capital that solves the dynamic program
+\[
+v(k_t) = \max_{\{e_t,k_t\}} \int_{0}^{\infty} \frac{e_t^\chi}{\chi} \, \Gamma_t \, dt,
+\]
+subject to the law of motion for capital per capita
+\begin{equation}\label{eq:K2}
+\dot{k}_t = \widehat{\cal A}_t k_t^\theta - e_t - (\delta + n) k_t,
+\end{equation}
+where \( k_t = K_t / N_t \) and \( \widehat{\cal A}_t = {\cal A}_t h_t^{1 - \theta} \). The discount factor is \( \Gamma_t = P_{s,t}^{-\chi} \text{e}^{(n - \rho)t} \), which from Assumption~\ref{ass:TFPs} declines over time since \( P_{s,t} \) is increasing like in the data.
+Preferences are constant intertemporal elasticity of substitution (CIES) with respect to consumption expenditure.%
+\footnote{In this framework, the intertemporal elasticity of substitution is \( 1 / (1 - \chi) \). }
+The remaining terms in equation~(\ref{eq:IUF}) are excluded from the objective function, as they are additive and their discounted integral is independent of the control and state variables; thus, they do not affect the optimal path.
+
+The Euler equation characterising the solution to the household’s problem is%
+\footnote{See Lemma 4 in Boppart (2014).}
+\begin{equation}\label{eq:Euler}
+\frac{\dot{e}_t}{e_t} = \frac{1}{1 - \chi} \left( \theta \widehat{\cal A}_t k_t^{\theta - 1} - \rho - \delta - \chi \,
+g_{P_s})
+%\frac{\dot{P}_{s,t}}{P_{s,t}} 
+\right).
+\end{equation}
+An equilibrium path for \( \{e_t, k_t\} \) is given by the system formed by equations~(\ref{eq:K2}) and~(\ref{eq:Euler}), given the initial condition \( k_0 \), \( k_0 > 0\), and a standard transversality condition.
+
+The intratemporal allocation of expenditure between goods and services is determined by Roy’s Identity, which yields the expenditure share on goods
+\begin{equation}\label{eq:Roy}
+\frac{P_{g,t} c_{g,t}}{e_t} = \eta \left( \frac{e_t}{P_{s,t}} \right)^{-\chi} \left( \frac{P_{g,t}}{P_{s,t}} \right)^\gamma.
+\end{equation}
+Given this expression, \( c_{g,t} \) can be solved for directly, and \( c_{s,t} \) follows by inverting the identity \( e_t = P_{g,t} c_{g,t} + P_{s,t} c_{s,t} \).
+
+%%%%%%%%%%%%%
+\paragraph{Aggregate Balanced Growth Path (ABGP).}
+%%%%%%%%%%%%%
+
+Along the aggregate balanced growth path (ABGP), the per capita variables \( \{k_t, e_t, y_t\} \) grow at the constant rate
+\[
+g_k = \frac{\gamma_{\cal A}}{1 - \theta} + \gamma_h.
+\]
+From the Euler equation~(\ref{eq:Euler}),  capital per capita evolves according to
+\begin{equation}\label{eq:kSS}
+k_t^{*} = \kappa^{\frac{1}{\theta - 1}} \widehat{\cal A}_t^{\frac{1}{1 - \theta}},
+\qquad \text{where} \qquad
+\kappa \equiv \frac{\rho + \delta + \chi g_{P_s} + (1 - \chi) g_k}{\theta} .
+\end{equation}
+%is the user cost of capital divided by the capital elasticity \( \theta \).
+Substituting into equation~(\ref{eq:K2}), the path of per capita consumption expenditure satisfies
+\begin{equation}
+e_t^* = (\kappa - \delta - n - g_k) k_t^*.
+\end{equation}
+From the aggregate production function~(\ref{eq:output}), gross and net nominal income per capita are given by
+\begin{equation}
+y_t^* = \widehat{\cal A}_t k_t^{*\,\theta} = \kappa k_t^*
+\ \ \ \ \text{and}\ \ \ \ 
+m_t^* = (\kappa - \delta)k_t^* ,
+\end{equation}
+where the second equality in the first equation follows directly from equation~(\ref{eq:kSS}).
+The consumption shares of gross and net income, respectively, are
+\[
+\frac{e_t^*}{y_t^*} = \frac{\kappa - \delta - n - g_k}{\kappa}
+\ \ \ \ \text{and}\ \ \ \ 
+\frac{e_t^*}{m_t^*} = \frac{\kappa - \delta - n - g_k}{\kappa-\delta} .
+\]
+
+%%%%%%%%%%%%%
+\paragraph{On the Divisia index.}
+%%%%%%%%%%%%%
+In the following section, we will discuss the role of the Divisia index in measuring income growth and welfare gains. Before that, we now compute the Divisia index at the ABGP of the structural transformation economy.
+
+At the ABGP, the Divisia index for gross and net domestic product per capita is defined as follows:
+\begin{equation}\label{eq:Divisia}
+g^D_t = s_e \underbrace{\left( s_{g,t} g_g + (1 - s_{g,t}) g_{s,t} \right)}_{\widehat g_{e,t}} + (1 - s_e) g_x ,
+\end{equation}
+where \(\widehat{g}_{e,t}\) is the growth rate of real consumption expenditure per capita, and \(g_x = g_k\) is the growth rate of per capita investment.  
+The shares of consumption expenditure in gross and net income are given by \(s_e = \left\{ \frac{e_t^*}{y_t^*}, \frac{e_t^*}{m_t^*} \right\}\), respectively.  
+Note that \(\widehat{g}_{e,t}\) differs from the growth rate of consumption expenditure measured in units of the investment good, \(g_e = g_k\).
+
+From (\ref{eq:Roy}), the growth rate of goods consumption is 
+\[
+g_g = (1-\chi)\frac{\theta}{1-\theta} \gamma_{\cal A} + (1-\chi)\gamma_h+(1-\gamma) \gamma_g + (\gamma-\chi) \gamma_s > 0 .
+\]
+Along the ABGP, goods consumption directly benefit from sectoral technical progress, $\gamma_g$, human capital accumulation, $\gamma_h$, and embodied technical progress, \(\frac{\theta}{1-\theta} \gamma_{\cal A}\), but suffers from the indirect effect of consumption shifting to services, as represented by all terms related to $\chi$ and $\gamma$.
+
+The share of goods in total consumption expenditure is, from equation~(\ref{eq:Roy}),
+\[
+s_{g,t} = \eta \left( \frac{e_t}{P_{s,t}} \right)^{-\chi} \left( \frac{P_{g,t}}{P_{s,t}} \right)^\gamma.
+\]
+It is easy to see that $s_{g,t}$ is decreasing, converging to zero as time goes to infinity.
+
+Finally, to derive the growth rate \( g_{s,t} \), observe from equation~(\ref{eq:Roy}) that real consumption services satisfy
+\[
+c_{s,t} = \frac{e_t}{P_{s,t}} - \eta \left( \frac{e_t}{P_{s,t}} \right)^{1 - \chi} \left( \frac{P_{g,t}}{P_{s,t}} \right)^{1+\gamma} 
+= \left(1-s_{g,t} \frac{P_{g,t}}{P_{s,t}}\right) \frac{e_t}{P_{s,t}}.
+\]
+The growth rate \( g_{s,t} \equiv \frac{\dot{c}_{s,t}}{c_{s,t}} \) can be computed from this expression. 
+Notice that as time goes to infinity, $g_{s,t}$ converges from above to $g_k - g_{P_s} = \frac{\theta}{1-\theta}\gamma_{\cal A} + \gamma_h + \gamma_s$.
+The consumption of services benefits not only from direct gains in sectoral TFP, as given by $\gamma_s$, but also from gains in human capital, $\gamma_h$, and investment-specific technical progress, as given by \( \frac{\theta}{1-\theta}\gamma_{\cal A} \).
+
+Notice that real consumption of services is systematically growing faster than real consumption of goods, since the difference $g_{s,t}-g_c$ converges from above to 
+$$
+\lim_{t\rightarrow\infty} \big(g_{s,t}-g_c\big)  = \chi \left( \frac{\theta}{1-\theta}\gamma_{\cal A} + \gamma_h +\gamma_s \right) +\gamma \big(\gamma_g - \gamma_s\big) > 0.$$
+
+
+
+
+%%%%%%%%%%%%%
+\section{Index Number Theory and GDP Growth}
+%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%
+\paragraph{Bellman representation.}
+%%%%%%%%%%%%%
+
+Following \cite{duran_licandro_2024}, the Bellman representation of the representative household’s preferences at time \( t \) is given by
+\begin{equation}\label{eq:BR}
+W(c_{g,t}, c_{s,t}, x_t; \nu_t) = U(c_{g,t}, c_{s,t}) + \nu_t x_t,
+\end{equation}
+where \( x_t = \dot{k}_t \) denotes net investment per capita and \( \nu_t = v'(k_t) \) is the marginal value of capital per capita at time \( t \). In this representation, preferences at time \( t \) are non-homothetic and time varying, indexed by the marginal value of capital, \( \nu_t \).
+Notice that the quasi-linearity of the Bellman representation is an artefact of the additively separability of intertemporal preferences,  
+which makes the marginal value of capital independent of consumption decisions.
+
+To assess the welfare implications of output growth in a structural transformation economy, it is necessary to represent household preferences over per capita current consumption in goods and services, and per capita current investment in a way that is compatible with intertemporal optimisation. The Bellman representation offers such a framework by mapping the recursive structure of preferences into a static formulation that depends only on current choices and the marginal value of capital. This representation captures the trade-off between present consumption and future utility derived from investment, thus enabling meaningful welfare comparisons over time. Crucially, because it summarises the value of postponed consumption through the marginal value of capital, the Bellman representation provides a consistent basis for applying index number theory---such as the Fisher--Shell true quantity index---in dynamic settings. This allows the construction of output growth indices that accurately reflect welfare changes without requiring full knowledge of future consumption paths and the entire flow of consumption utility.%
+\footnote{See  \cite{duran_licandro_2024} for a more detailed discussion.}
+
+At any time $t$, the representative household maximises the Bellman representation of preferences~(\ref{eq:BR}) with respect to \( \{c_{g,t}, c_{s,t}, x_t\} \), subject to the per capita budget constraint
+\begin{equation}\label{eq:BC}
+P_{g,t} c_{g,t} + P_{s,t} c_{s,t} + x_t = m_t,
+\end{equation}
+where \( m_t  \) denotes current net income per capita. Note that 
+%per capita consumption expenditure satisfies \( e_t = m_t - x_t \).
+%Notice that 
+at equilibrium \( m_t = y_t - \delta k_t \).
+It is important to emphasise that \( y_t \) and \( m_t \) refer to nominal income per capita, gross and net, as they are expressed in units of the numeraire. They do not represent real expenditure, even though they are measured in units of the investment good.
+Accordingly, aggregate nominal income is given by \( Y_t = y_t N_t \) and \( M_t = m_t N_t \), which we take as our measures of nominal GDP and NDP, respectively. All arguments that follow are independent of this arbitrary choice of numeraire.
+
+Prior to applying index number theory to the Bellman representation in (\ref{eq:BR}), Proposition~\ref{prop:IU_EF} below derives the corresponding indirect utility function and the associated expenditure function.
+
+\begin{proposition}\label{prop:IU_EF}
+The indirect utility and expenditure functions associated with the Bellman representation of preferences in equation~\textnormal{(\ref{eq:BR})} are, respectively, given by
+\begin{equation}\label{eq:indirect}
+u(m_t, P_{g,t}, P_{s,t}; \nu_t) = 
+V\left( \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}}, P_{g,t}, P_{s,t} \right)
++ \nu_t \left( m_t - \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}} \right),
+\end{equation}
+and
+\begin{equation}\label{eq:expenditure}
+e(w_t, P_{g,t}, P_{s,t}; \nu_t) = 
+\left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}} 
++ \frac{w_t}{\nu_t}
+- \frac{ V\left( \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}}, P_{g,t}, P_{s,t} \right) }{\nu_t}.
+\end{equation}
+\end{proposition}
+
+\noindent{\sc Proof:} See Appendix \ref{app:IU_EF}.
+
+An important property of the HRV structural transformation model is that the marginal value of consumption expenditure, \( \frac{\partial V(\cdot)}{\partial e} \), must be equal to the marginal value of capital, \( \nu \),  
+which implies that consumption expenditure at equilibrium is%
+\footnote{A formal derivation is in the proof of Proposition~\ref{prop:IU_EF} in Appendix~\ref{app:IU_EF}.}  
+\begin{equation}\label{eq:e}
+e_t = \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}} .
+\end{equation}
+Thanks to the quasi-linearity of the Bellman representation, which as explained above is a direct implication of intertemporal separable preferences,  
+the indirect utility function is linear in net income \( m_t \),  
+and the expenditure function is linear in the contribution of current consumption and current net investment to welfare, \( w_t \).
+
+%%%%%%%%%%%%%
+\paragraph{Equivalent variation measure.}
+%%%%%%%%%%%%%
+
+Based on the Fisher--Shell principle ---which states that intertemporal welfare comparisons must be made using a consistent preference ordering--- and following the logic of the equivalent variation measure introduced by \cite{duran_licandro_2024}, we adopt $t$ as the base time and define the hypothetical income at time \( z \) as%
+\footnote{This hypothetical income is consistent with the equivalent variation measure suggested by Baqaee and Burstein (2023, Definition 4). It's important to point out that \cite{duran_licandro_2024} follow closely the methodology suggested in the seminal paper by Licandro et al (2002).}
+\begin{equation}\label{eq:Mhat}
+\widehat{m}_{t,z} = e \Big( u\big(m_z, P_{g,z}, P_{s,z}; \nu_t\big), P_{g,t}, P_{s,t}; \nu_t \Big).
+\end{equation}
+The quantity \( \widehat{m}_{t,z} \) represents the level of income per capita, valued at time $t$ prices, that the representative household would have needed at time \( z \) to attain the utility achievable under the historical income and prices at \( z \), but evaluated using the Bellman representation of preferences at time \( t \). 
+
+%%%%%%%%%%%%%
+\paragraph{Fixed-base Fisher-Shell indices.}
+%%%%%%%%%%%%%
+
+Let us adopt the following convention for an economy in which a national statistical agency has recorded National Accounts data from an initial time \( t_0 \) to the current time \( t \).  
+Following the strategy suggested by \cite{BB2023welfare}, in this context, we define a current-base Fisher--Shell index as
+\begin{equation}\label{eq:CBEV}
+{\cal P}_{t,z} = \log(\widehat{m}_{t,z}) - \log(\widehat{m}_{t,t_0}), \qquad z \in (t_0, t).
+\end{equation}
+By construction, the index is normalised so that \( {\cal P}_{t,t_0} = 0 \). The value at time \( t \) then satisfies
+\[
+{\cal P}_{t,t} = \log(m_t) - \log(\widehat{m}_{t,t_0}),
+\]
+which is an equivalent variation measure of welfare gains from the initial time \( t_0 \) to the current time \( t \), as evaluated using current preferences and prices. For any intermediate time \( z \in (t_0, t) \), the difference \( {\cal P}_{t,t} - {\cal P}_{t,z} = \log(m_t) - \log(\widehat{m}_{t,z}) \) captures the welfare gains from time \( z \) to \( t \).
+
+The term \( \widehat{m}_{t,z} \) can be interpreted as the level of income per capita at time $z$, after correcting for changes in the price level, corrections being made from the perspective of the current Bellman representation of preferences. 
+Then, the correction is made using current prices and current preferences. As such, the ratio \( \widehat{m}_{t,z} / m_t \) provides a money-metric measure of the relative welfare level of the past when judged from today's standpoint. This approach mirrors the logic of a Paasche index, in that it values past allocations using current preferences and prices.
+
+The current-base Fisher-Shell index implicitly defines a notion of instantaneous, welfare-based growth. For any \( z < t \), the growth rate is given by
+\begin{equation}\label{eq:BBEVgrowth}
+\frac{\partial {\cal P}_{t,z}}{\partial z} = \frac{\partial \log\widehat{m}_{t,z}}{\partial z}  = \frac{1}{\widehat{m}_{t,z}} \ \frac{\partial \widehat{m}_{t,z}}{\partial z}.
+\end{equation}
+As we demonstrate in Proposition~\ref{prop:FS} below, the instantaneous growth rate at the base time \(  t \), i.e. \( \left. \frac{\partial {\cal P}_{t,z}}{\partial z} \right|_{z=t} \), coincides with the Divisia index. For all \( z < t \), the current base Fisher-Shell growth rate is strictly lower and declines monotonically the further one moves backward in time. 
+In economies undergoing structural transformation —characterised by relative price changes and shifting expenditure patterns— this decline can be significant. 
+In some cases, as we illustrate below, the current base Fisher-Shell index may even register negative welfare growth when evaluating sufficiently distant past periods. This arises because the evaluation freezes preferences and prices at the base time \( t \).
+
+%%%%%%%%%%%%%
+\begin{proposition}
+The current-base Fisher-Shell index \({\cal P}_{t,z}\) in (\ref{eq:CBEV}), for all time \( z < t \), grows at a rate smaller than the Divisia index. Then:
+\[
+\frac{\mathrm{d} {\cal P}_{t,z}}{\mathrm{d} z}  < g^D_z, \quad \text{for all } z < t.
+\]
+\end{proposition}
+
+\noindent{\sc Proof:} See Appendix \ref{app:}. THE PROOF NEEDS TO BE FINISHED.
+
+%%%%%%%%%%%%%
+
+We can also adopt the opposite view and measure welfare gains from the perspective of any past time $\tau < t$, by using (\ref{eq:Mhat}) to measure welfare gains of moving from $\tau$ to $z\in(\tau,t)$. This alternative index will be like a Laspeyres index.
+To fix ideas, let us adopt $t_0$ as base time.
+In the following, we will represent the past-base Fisher-Shell index, for $z \in(t_0, t)$, as 
+\begin{equation}
+{\cal L}_{t_0,z} =  \log\widehat m_{t_0,z} - \log m_{t_0}.
+\end{equation}
+The index is normalised to ${\cal L}_{t_0,t_0} = 0$ and ${\cal L}_{t_0,t} = \log \widehat m_{t_0,t} - \log m_{t_0}$.
+Implicit on this index, the equilibrium instantaneous growth rate of the economy at $z$ is measured by 
+\begin{equation}\label{eq:BBEVgrowthb}
+\frac{\partial{\cal L}_{t_0,z}}{\partial z} = \frac{\partial\log \widehat m_{t_0,z}} {\partial z} = 
+\frac{1}{\widehat{m}_{t_0,z}} \ \frac{\partial \widehat{m}_{t_0,\tau}}{\partial z} .
+\end{equation}
+Interestingly, the instantaneous growth rate at $t_0$, as measured by the past-base Fisher-Shell index, i.e. $\frac{\partial{\cal L}_{t_0,\tau}}{\partial \tau}|_{\tau=t_0}$, is also equal to the Divisia index at $t_0$. 
+For any $z>t_0$, the instantaneous growth rate of the past-base Fisher-Shell index is higher than the Divisia index and increases as the welfare evaluation refers to a more distant point in the future. PROVE IT!!
+
+Finally, Appendix \ref{app:BBEV indices} shows that for all \( z \in (t_0,t) \), \( {\cal L}_{t_0,z} > {\cal P}_{t,z} \),  
+meaning that growth rates measured by means of a current-base Fisher--Shell index, like a Paasche index, are systematically lower than growth rates measured by a past-base Fisher--Shell index, like a Laspeyres index.
+REVISE THE PROOF.
+
+
+
+%%%%%%%%%%%%%%%%%%
+\paragraph{Fisher–Shell Index and  Divisia Index.}
+%%%%%%%%%%%%%%%%%%
+
+Following \cite{duran_licandro_2024}, we show that the growth rate of the base-time Fisher–Shell index coincides with the Divisia index when evaluated at the base time. %by computing the total derivative of \( \widehat{m}_{tz} \) with respect to \( z \), evaluated at \( z = t \).
+
+\begin{proposition}\label{prop:FS}
+Let \( \widehat{m}_{tz} \) be defined by equation~\textnormal{(\ref{eq:Mhat})}, and let preferences be represented as in equations~\textnormal{(\ref{eq:indirect})}, \textnormal{(\ref{eq:expenditure})}, and~\textnormal{(\ref{eq:IUF})}. Then, the instantaneous growth rate of the current-base Fisher–Shell index at current time \( t \) is equal to the Divisia index
+\[
+g^{\text{FS}}_t \equiv \left. \frac{\mathrm{d}  {\cal P}_{t,z}}{\mathrm{d} z} \right|_{z=t} = g^{D}_t 
+\ \ \ \ \text{where}\ \ \ \
+g^{D}_t  \equiv s_{et}  \underbrace{ \big( s_{g,t} \, g_{g,t} + (1-s_{g,t}) g_{s,t} \big)}_{g_{e_t}} + (1-s_{et}) g_{x,t} ,
+\]
+\( s_{et} = e_t / m_t \),  \( s_{g,t} = P_{g,t} c_{g,t} / e_t \) and \( s_{s,t} = P_{s,t} c_{s,t} / e_t \) .
+\end{proposition}
+
+\noindent{\sc Proof:} See Appendix \ref{app:FS}.
+
+
+
+It is important to note that both the fixed-base Fisher–Shell indices and the chained Fisher–Shell index are welfare-based and grounded in the Fisher–Shell principle, though they rely on different reference orders. While they yield different quantitative measures of real income, both are derived from the same underlying preference representation. The fixed-base indices apply the Fisher–Shell principle globally by evaluating welfare gains across time using a fixed preference structure —either current or historical— while the chained index applies the principle locally, assessing instantaneous welfare gains at each point in time and chaining them to construct a consistent intertemporal measure. As a result, the fixed-base and chained indices may exhibit different properties in dynamic settings. In the following section, we quantitatively examine the behaviour of these indices in the context of the structural transformation model discussed above.
+
+
+
+
+%%%%%%%%%%%%%
+\section{Mapping U.S. Data}
+\label{sec:3}
+%%%%%%%%%%%%%
+
+
+In this section, we examine the aggregation of consumption and investment within a balanced growth path (BGP) framework, focusing on the measurement of welfare gains through different indices. Using U.S. National Accounts data, we aggregate non-durable consumption and services, and durable consumption, equipment and intellectual property into comprehensive measures of consumption and investment, respectively. By applying Fisher-ideal quantity and price indices, we generate real measures of both consumption and investment, excluding residential and non-residential structures due to their distinct price behaviors.
+
+%Our findings show a significant and sustained decline in the relative price of investment over time, with the relative price falling to approximately 20\% of its level of 1947 by 2023. This trend highlights the implications of relative price changes on chained indices and underscores the divergence between constant-growth Divisia indices and BBEV measures, particularly in the context of long-term economic growth.
+
+%%%%%%%%%%%%%
+\subsection{The Relative Price of Investment and Chained Indices}\label{sec:4.1}
+%%%%%%%%%%%%%
+
+Based on U.S. National Account data, we define consumption as non-durable consumption and services, and investment as durable consumption, equipment, and intellectual property. We use Fisher-ideal quantity and price indices to aggregate the components of consumption and investment into real measures, along with the corresponding price deflators. Nominal GDP is defined as the total private expenditure on consumption and investment. Structures, both residential and non-residential, public expenditure and net exports are excluded due to their distinct price behavior. Including a third type of expenditure in our GDP definition would not fundamentally alter the analysis but would make the argument less straightforward.
+
+Figure~\ref{fig:combined_panels} illustrates the decline in the price of investment relative to consumption since 1947, the first year for which official U.S. National Accounts data are available. Since the 1960s, the relative price of investment has shown a clear downward trend, decreasing at an average annual rate of 2.06\% since the beginning of the sample. By 2023, the relative price of investment goods has fallen to approximately 20\% of its original level. As shown in Figure~\ref{fig:combined_panels}, the share of nominal consumption in our measure of nominal GDP averages around 76\% over the sample period, dipping slightly below 76\% between 1960 and 2004 and rising slightly above this level at the beginning and end of the sample period.
+
+\begin{figure}[t!]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=1\textwidth]{Figures/relative_price.pdf}
+        \captionsetup{justification=centerlast}
+        \caption*{(a) Relative Investment Price}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=1\textwidth]{Figures/consumption_share.pdf}
+        \captionsetup{justification=centerlast}
+        \caption*{(b) Consumption Share }
+    \end{minipage}
+    \captionsetup{justification=centerlast} % Centers the caption
+    \caption{Relative Prices and Income Shares. \\ \vspace{.1cm}
+        {\footnotesize BEA data. Consumption aggregates non-durable consumption and services, and investment aggregates durable consumption, equipment, and intellectual property. GDP is consumption plus investment.}}
+    \label{fig:combined_panels}
+\end{figure}
+
+In what follows, we measure real GDP using a Fisher-ideal index based on prices and quantities of the consumption and investment measures defined above. 
+The annual growth rate between 1947 and 2023, as measured by a chained Fisher-ideal index, is 3.472\%.
+To assess the consistency of the Fisher-ideal index with the Fisher-Shell index, we also compute a Divisia index using past expenditure shares.%
+\footnote{Compare the Divisia with current and past shares, and the Tornquist index that uses the simple average. }
+The differences between these two indices are negligible, visually indistinguishable in the graphs, as the sum of squared differences is of the order of \(8 \times 10^{-10}\), with the cumulative difference between 1947 and 2023 amounting to approximately 0.5\% of the initial GDP.
+Consequently, the chained Fisher-ideal approximates well the chained Fisher-Shell index suggested by \cite{duran_licandro_2024}.
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=.6\textwidth]{Figures/real_GDP.pdf}
+\end{center}
+\captionsetup{justification=centerlast} % Centers the caption
+\caption{ Real GDP \\ \vspace{.1cm}
+{\footnotesize BEA data. Real GDP is measured as a chained Fisher-ideal index (solid), a 1947 base-year index (dashed) and a 2023 base-year index (dotted). All indices are normalized to one in 1947.}}
+\label{fig:real_GDP}
+\end{figure}
+
+We also compute fixed-base indices using 1947 and 2023 as alternative base years. As shown in Figure~\ref{fig:real_GDP}, the chained Fisher-ideal index falls between the 1947 and 2023 fixed-base indices, all normalized to one in 1947.%
+\footnote{A Fisher-ideal based on the 1947 and 2003 base-year index is very similar to the chained Fisher-ideal.}
+By 2023, the difference between these two fixed-base indices is 44.5\%.
+In this context, as pointed out by  \cite{parker_triplett_1996}, a Laspeyres index (like the 1947 base-year index)  is systematically higher than a Paasche index (like the 2023 base-year index), the Fisher-ideal lying in the middle.
+
+It is interesting to see that even if the relative price of investment is permanently declining at a high rate, the consumption and investment shares remain strongly stable. The substitution bias argument does not look to work in the data. More interesting, as we show in the Appendix, when income shares are constant over time, using the Cauchy-Schwarz inequality, it is easy to prove that a quantity Laspeyres index is larger than the corresponding quantity Paasche index, the Fisher-ideal index lying in the middle. The distance between them positively depends on the distance in the growth rate of the GDP components. In other words, the raise in the relative price of investment made the Laspeyres fixed-base more inaccurate than before, not because of the substitution bias, but of a Cauchy-Schwarz inequality bias. This property is directly related to the fact that a Laspeyres index is a weighted arithmetic mean but the Paasche index is a weighted harmonic mean. What really matters is the difference in growth rates between consumption and investment.
+
+
+
+%%%%%%%%%%%%%
+\subsection{Measuring GDP Growth in Practice}
+%%%%%%%%%%%%%
+
+
+
+\paragraph{Calibration.}
+
+The calibration in Table~\ref{tab:cal} below uses the annual U.S. data published by ... for the period 1980-2017.
+
+\begin{table}[t!]
+    \centering
+    \caption{Calibrated Values of Parameters and Stationary Moments}
+    \begin{tabular}{cccccc|ccccccc}
+        \toprule
+      \( \theta \) & \( \rho \) & \( \delta \) & \( \eta \) & \( \chi \) & \( \gamma \) & \( n \) & \( \gamma_g \) & \( \gamma_s \) & \( \gamma_{\cal A} \) & \( \gamma_h \) \\
+        \midrule
+0.333   & 0.04 & 0.08 & 0.2137 & 0.22 &  0.83 & 0.0098 & 0.0109 & 0.0004& 0.0122 & 0.0041 \\
+        \bottomrule
+    \end{tabular}
+    \label{tab:cal}
+\end{table}
+
+In the calibrated structural transformation economy at the ABGP,  a statistical agency uses the model’s predicted quantities and prices for goods, services, and investment to measure standard fixed-base and chained indices.
+Panel (a) in Figure~\ref{fig:combined_GDP_BBEV} compares the chained Fisher-ideal index (solid line) with the 1980- and 2017-base indices for real GDP --dashed and dotted lines, respectively.
+All three measures track the long-run trend of the U.S. economy well.
+The x-axis covers the period from 1980 to 2017, and the y-axis plots the logarithm of real income --normalized to zero at 1980 and comparable to GDP in the data.
+As expected, the Laspeyres-type index slightly overstates growth, the Paasche-type index understates it, and the Fisher-ideal index lies in between.
+Differences across measures remain modest.%
+\footnote{It is important to notice that for the three indices in Figure~\ref{fig:combined_GDP_BBEV}, we use the same Fisher-ideal indices for goods consumption, service consumption and investment taken from the data. Very likely, computing a Laspayers index using the disaggregated will generate a larger overvaluation of GDP growth.}
+
+\begin{figure}[!t]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=1\textwidth]{Figures/GDP_sc.pdf}
+        \captionsetup{justification=centerlast}
+        \caption*{(a) Real GDP }
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=1\textwidth]{Figures/GDP_FS.pdf}
+        \captionsetup{justification=centerlast}
+        \caption*{(b) Fisher-Shell (GDP) }
+        \label{fig:FS_BBEV}
+    \end{minipage}
+    \captionsetup{justification=centerlast} % Centers the caption
+    \caption{Real GDP and Welfare Based Metrics.\\ \vspace{.1cm}
+        {\footnotesize Panel (a): Model generated data. Real GDP measured as chained Fisher-ideal (solid), 1947-base Laspeyres index (dashed), and 2023-base Paasche index (dotted)}. 
+        {\footnotesize Panel (b): Chained Fisher-Shell (solid), 1980-base Fisher-Shell (dashed), and 217-base Fisher-Shell (dotted).}}
+    \label{fig:combined_GDP_BBEV}
+\end{figure}
+
+
+
+
+\paragraph{Fixed-base vs chained Fisher-Shell indices.}
+
+As part of our main discussion on the welfare-based measurement of output growth, panel (b) in Figure~\ref{fig:combined_GDP_BBEV} displays the evolution of real GDP at the ABGP of the calibrated structural transformation economy.  
+GDP is shown using three alternative measures: the chained Fisher-Shell index, given by the Divisia index ${\cal FS}_{t}$; the 1980-base Fisher-Shell index, ${\cal L}_{1980,t}$; and the 2017-base index, ${\cal P}_{2017,t}$.  
+As in panel (a), the x-axis covers the period from 1980 to 2017, and the y-axis plots the logarithm of real income.  
+The solid line corresponds to the chained Divisia index, which closely tracks the Fisher-ideal index shown in panel (a).  
+This measure is normalized to zero in 1980 and exhibits a declining growth rate, from 1.535\% in 1980 to 1.481\% in 2017.  
+The slowdown reflects a central implication of structural transformation models: as the share of goods in total consumption falls and services rise, overall growth becomes increasingly driven by productivity in the service sector—the slowest-growing sector—resulting in a gradual decline in welfare gains over time.
+
+The fixed-base measures behave differently. 
+Let us understand first the behavior of past-base Fisher-Shell indices.
+When the representative agent adopts 1980 as the base-time, as shown by the dashed line in panel (b) of Figure~\ref{fig:combined_GDP_BBEV}, the 1980-base Fisher-Shell index ends up 15.56\% higher than the chained index in 2017, when measured relative to 1980, substantially overestimating income growth.  
+The fundamental reason is the following.
+Under past preferences and prices, optimal consumption expenditure per capita remains constant at the 1980 level, i.e., \( \widehat e_{1980,t} = e_{1980} = \left( \nu_{1980} P_{s,1980}^\chi \right)^{\frac{1}{\chi - 1}} \) for all \( t \in (1980, 2017) \).  
+As realised income \( m_t \), as well as hypothetical income \( \widehat m_{1980,t} \), grow along the balanced growth path, the hypothetical consumption share \( \widehat e_{1980,t} / \widehat y_{1980,t} \), where \( \widehat y_{1980,t} = \widehat m_{1980,t} + \delta k_t \), declines steadily, as shown in panel (a) of Figure~\ref{fig:consumption_shares}.  
+When computing the past-base Fisher-Shell index, the agent maintains a fixed level of consumption expenditure even as income rises, implying a decreasing hypothetical consumption expenditure share and an increasing hypothetical investment share.  
+Consequently, when adopting past preferences and prices, the agent places increasing weight on investment growth --whose growth rate exceeds that of consumption-- leading to an overestimation of real GDP growth.  
+
+
+The 2017-base Fisher-Shell index evaluates past outcomes using 2017 preferences and prices.
+At each earlier date \(z\),  \( z < 2017 \), the ideal consumption expenditure per capita of the representative agent is fixed at \( e_{2017} = \left( \nu_{2017} P_{s,2017}^\chi \right)^{\frac{1}{\chi - 1}} \).
+Since income generally declines when going back in time, the hypothetical consumption share becomes increasingly large relative to income.
+For example, in 1980, the representative agent would aspire to a consumption level exceeding 1.6 times their income, as shown in panel (b) of Figure~\ref{fig:consumption_shares}.
+This implies a negative investment share, revealing a strong substitution effect.
+Consequently, the 2017-base Fisher-Shell index is 56.4\% smaller than the chained index in 2017, relative to 1980.
+
+\begin{figure}[!t]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=1\textwidth]{Figures/se_1980.pdf}
+        \captionsetup{justification=centerlast}
+        \caption*{(a) 1980-base Fisher-Shell}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=1\textwidth]{Figures/se_2017.pdf}
+        \captionsetup{justification=centerlast}
+        \caption*{(b) 2017-base Fisher-Shell}
+        \label{fig:FS_BBEV}
+    \end{minipage}
+    \captionsetup{justification=centerlast} % Centers the caption
+    \caption{Hypothetical Consumption Expenditure Shares.}
+    \label{fig:consumption_shares}
+\end{figure}
+
+
+\paragraph{Base-time upgrade and GDP history revision.}
+
+
+Figure~\ref{fig:revision} illustrates how the fixed-base Fisher-Shell index evolves with each revision of the base.  
+When measured by the chained Divisia index, represented by the solid line, gross income grew around 25\% over the ten-year period between 1980 and 1990.  
+The 1980-base Fisher-Shell index overstates the Divisia index by 1.4\% in 1990, implying a total income growth of 26.4\% over the same ten-year period.  
+As the base is revised forward over time, the current-base Fisher-Shell index increasingly diverges from the chained Divisia index for the same ten-year period.  
+By 1990, for instance, the 1990-base Fisher-Shell index significantly underestimates growth, estimating income gains about 2.7\% below the chained Divisia index for the full ten-year period.  
+This gap widens with each subsequent revision, as shown in Figure~\ref{fig:revision}, reaching a 17.6\% reduction in measured growth for the 2017-base Fisher-Shell index.  
+
+\begin{figure}[t]
+    \centering
+        \includegraphics[width=.6
+       \linewidth]{Figures/revisions.pdf} % Replace with your graph file
+        \caption{Changing the base}
+      
+       \label{fig:revision}
+\end{figure}
+
+\paragraph{Summary.}
+In line with the main contribution of the paper, the chained Fisher-Shell index provides a consistent measure of welfare-based income growth.
+As formally established in Proposition~\ref{prop:FS}, this index coincides with the Divisia index, which measures instantaneous welfare gains along the economy’s equilibrium path.
+This property aligns the chained Fisher-Shell index with the growth rates reported in National Accounts, which are also constructed using a chained Fisher-ideal index.
+
+By contrast, current-base Fisher-Shell indices systematically underestimate past growth.
+This underestimation becomes more severe the further back in time one goes, as the evaluation is conducted using today’s prices and preferences.
+Moreover, current-base indices require permanent revisions: as time passes the base is updated, past growth is re-evaluated and typically revised downward.
+This feature underscores a key limitation of fixed-base indices and highlights the advantages of chaining for capturing welfare-relevant growth dynamics.
+
+
+%%%%%%%%%%%%%
+\section{Conclusions}
+%%%%%%%%%%%%%
+
+In the framework of a continuous-time, learning-by-doing economy, this paper examines the welfare foundations of chained indices, particularly the Fisher-ideal quantity index, as a preferred tool for measuring GDP growth in national accounts. 
+\cite{BB2023welfare} and \cite{duran_licandro_2024} offer alternative measures of GDP growth.
+
+By comparing the frameworks of \cite{duran_licandro_2024} and \cite{BB2023welfare}, we have highlighted the implications of fixed-base versus chained approaches for accurately reflecting welfare gains over time. Our findings underscore the theoretical and practical limitations of fixed-base indices, which suffer from substitution bias as economic conditions evolve, and require permanent revisions leading to distorted representations of welfare gains. This is particularly evident in a model with balanced growth and embodied technical change, where the chained Fisher-Shell index coincides with a chained Divisia index, but fixed-base measures like the BBEV tend to mimic the behavior of traditional Paasche indices, underestimating welfare gains due to the structural bias inherent in fixed weights.
+
+In contrast, \cite{duran_licandro_2024} chained Divisia approach offers a dynamic alternative that does not require stability and homotheticity of preferences, thus accommodating a wider range of economic environments. By chaining welfare gains between contiguous periods, this approach reflects welfare changes as they unfold, making it particularly suitable for modern economies with rapidly evolving technology. The chained Fisher-Shell index derived from this approach maintains a consistent measure of welfare gains, aligned with the steady-state growth of the balanced growth path model. This time-invariant property of the chained index avoids the need for frequent revisions and provides a flexible welfare-based measure that better captures the economic realities of today’s dynamic economies.
+
+Our analysis also speaks to the broader policy implications of adopting chained indices in national accounts. The findings suggest that chained indices like the Fisher-ideal quantity index not only reduce substitution bias but also offer a more reliable metric for tracking welfare-relevant economic growth. This advantage is particularly pertinent for policymakers and economists who rely on GDP growth figures as indicators of national progress and societal well-being. A chained approach better reflects the changing structure of the economy, ensuring that measures of growth remain consistent with people’s actual welfare over time.
+
+Overall, this paper contributes to the ongoing dialogue on the role of chained indices in national accounts and their relevance for welfare measurement. By clarifying the welfare properties of chained indices and highlighting the potential for bias in fixed-base measures, we provide a theoretical foundation and empirical rationale for their continued adoption. The findings support the view that chained indices, by adapting to structural changes in the economy, offer a more accurate reflection of welfare gains over time, ultimately contributing to a more nuanced understanding of economic growth and its impact on well-being.
+
+The fixed-base BBEV index indeed encounters a similar issue to that highlighted by \cite{parker_triplett_1996} regarding fixed-base Laspeyres indices. Both suffer from the substitution bias, where the fixed-base method does not account for shifts in spending or investment patterns over time. This leads to distortions in growth measurement, as fixed-base indices can increasingly misstate growth the further away they move from the base period. As a result, the fixed-base BBEV index may overestimate or underestimate growth, particularly in environments with dynamic changes in relative prices, much like the issues seen with the traditional fixed-base Laspeyres index.
+\newpage
+%%%%%%%%%%%%%
+
+\appendix
+%%%%%%%%%%%%%
+\begin{appendices}
+%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%
+\section{Proof of Proposition \ref{prop:IU_EF}}\label{app:IU_EF}
+%%%%%%%%%%%%%
+
+The household’s time-\( t \) primal problem of maximizing~(\ref{eq:BR}), subject to the budget constraint~(\ref{eq:BC}), can be solved in two stages.
+In the first stage, by the definition of the indirect utility function,
+\[
+V(e_t, P_{g,t}, P_{s,t}) = \max_{\{c_{g,t}, c_{s,t}\}: P_{g,t} c_{g,t} + P_{s,t} c_{s,t} = e_t} U(c_{g,t}, c_{s,t}).
+\]
+In the second stage, the household chooses \( x_t \) to solve
+\[
+\max_{x}\  V(m_t - x, P_{g,t}, P_{s,t}) + \nu_t x .
+\]
+The first-order condition is
+\[
+\frac{\partial V}{\partial e_t}(e_t, P_{g,t}, P_{s,t}) = \nu_t.
+\]
+Using the PIGL functional form in (\ref{eq:IUF}), \( \frac{\partial V}{\partial e_t} = e_t^{\chi - 1} P_{s,t}^{-\chi} \), we obtain
+\[
+e_t^{\chi - 1} P_{s,t}^{-\chi} = \nu_t \quad \Rightarrow \quad e_t = \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}}.
+\]
+It follows that
+\[
+x_t = m_t - e_t = m_t - \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}}.
+\]
+Substituting back, the indirect utility function is
+\[
+u(m_t, P_{g,t}, P_{s,t}; \nu_t) =
+V\left( \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}}, P_{g,t}, P_{s,t} \right)
++ \nu_t \left( m_t - \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}} \right).
+\]
+The expenditure function is derived from the dual problem
+\[
+\min_{e, x} \, e + x \quad \text{s.t.} \quad V(e, P_{g,t}, P_{s,t}) + \nu_t x = w_t ,
+\]
+where $w_t$ is an arbitrary level of utility. 
+The F.O.C.s with respect to $e$ and $x$ are
+\[
+1 = \mu \frac{\partial V}{\partial e} = \lambda e^{\chi - 1} P_{s,t}^{-\chi}
+\quad\text{and}\quad
+1 = \mu \nu_t ,
+\]
+where $\mu$ is the Lagrangian multiplier associated to the constraint.
+Equating multipliers yields
+\[
+e^{\chi - 1} P_{s,t}^{-\chi} = \nu_t \quad \Rightarrow \quad e = \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}}.
+\]
+The same condition as in the primal problem.
+Solving for \( x \)
+\[
+x = \frac{w_t - V\left( \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}}, P_{g,t}, P_{s,t} \right)}{\nu_t}.
+\]
+Thus, the expenditure function is
+\[
+e(w_t, P_{g,t}, P_{s,t}; \nu_t) = \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}}
++ \frac{w_t - V\left( \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}}, P_{g,t}, P_{s,t} \right)}{\nu_t},
+\]
+which completes the proof. \qedsymbol
+
+
+
+%%%%%%%%%%%%%
+\section{Proof of Proposition }
+%%%%%%%%%%%%%
+
+
+By definition, the hypothetical income at time \( z < t \), evaluated using the Bellman representation of preferences at time \( t \), is given by:
+\[
+\widehat{m}_{t,z} = e\left( u(m_z, P_{g,z}, P_{s,z}; \nu_t), P_{g,t}, P_{s,t}; \nu_t \right),
+\]
+where \( e(\cdot) \) is the expenditure function associated with the indirect utility function \( u(\cdot) \).
+
+From the definition of the indirect utility function under the Bellman representation:
+\[
+u(m_z, P_{g,z}, P_{s,z}; \nu_t)
+= V(\bar{e}_z, P_{g,z}, P_{s,z}) + \nu_t (m_z - \bar{e}_z),
+\]
+where \( \bar{e}_z = \left( \nu_t P_{s,z}^\chi \right)^{\frac{1}{\chi - 1}} \) and
+\[
+V(e, P_{g}, P_{s}) = \frac{1}{\chi} \left( \frac{e}{P_s} \right)^\chi - \frac{\eta}{\gamma} \left( \frac{P_g}{P_s} \right)^\gamma - \frac{1}{\chi} + \frac{\eta}{\gamma}.
+\]
+
+Now substitute \( u(\cdot) \) into the expenditure function:
+\[
+\begin{aligned}
+\widehat{m}_{t,z} &= e\left( V(\bar{e}_z, P_{g,z}, P_{s,z}) + \nu_t (m_z - \bar{e}_z), P_{g,t}, P_{s,t}; \nu_t \right) \\
+&= \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}} + \frac{1}{\nu_t} \left( V(\bar{e}_z, P_{g,z}, P_{s,z}) + \nu_t (m_z - \bar{e}_z) \right) - \frac{1}{\nu_t} V(e_t, P_{g,t}, P_{s,t}),
+\end{aligned}
+\]
+where \( e_t = \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}} \), so \( V(e_t, P_{g,t}, P_{s,t}) = \frac{1}{\chi} \left( \frac{e_t}{P_{s,t}} \right)^\chi - \frac{\eta}{\gamma} \left( \frac{P_{g,t}}{P_{s,t}} \right)^\gamma - \frac{1}{\chi} + \frac{\eta}{\gamma} \).
+
+Likewise, substitute \( V(\bar{e}_z, \cdot) \), and simplify:
+\[
+\begin{aligned}
+\widehat{m}_{t,z} 
+&= e_t + m_z - \bar{e}_z + \frac{1}{\nu_t} \left[ V(\bar{e}_z, P_{g,z}, P_{s,z}) - V(e_t, P_{g,t}, P_{s,t}) \right] \\
+&= m_z + \frac{1}{\nu_t}
+\left[
+\left( \frac{\bar{e}_z}{P_{s,z}} \right)^\chi
+- \left( \frac{e_t}{P_{s,t}} \right)^\chi
+- \eta \left( \left( \frac{P_{g,z}}{P_{s,z}} \right)^\gamma - \left( \frac{P_{g,t}}{P_{s,t}} \right)^\gamma \right)
+\right]
+- \bar{e}_z + e_t .
+\end{aligned}
+\]
+
+
+We start from the expression for the hypothetical income at time \( z < t \), evaluated using the Bellman representation of preferences at time \( t \):
+\[
+\widehat{m}_{t,z}
+= m_z
++ \frac{1}{\nu_t}
+\left[
+\left( \frac{\bar{e}_z}{P_{s,z}} \right)^\chi
+- \left( \frac{e_t}{P_{s,t}} \right)^\chi
+- \eta \left(
+\left( \frac{P_{g,z}}{P_{s,z}} \right)^\gamma
+- \left( \frac{P_{g,t}}{P_{s,t}} \right)^\gamma
+\right)
+\right]
+- \bar{e}_z + e_t .
+\]
+
+We now use the model’s equilibrium condition that characterises the optimal level of consumption expenditure under the Bellman representation:
+\[
+\bar{e}_z = \frac{1}{\nu_t} \left( \frac{\bar{e}_z}{P_{s,z}} \right)^\chi ,
+\qquad
+e_t = \frac{1}{\nu_t} \left( \frac{e_t}{P_{s,t}} \right)^\chi .
+\]
+
+Substituting both expressions into the original equation yields:
+\[
+\begin{aligned}
+\widehat{m}_{t,z}
+&= m_z
++ \frac{1}{\nu_t}
+\left[
+\left( \frac{\bar{e}_z}{P_{s,z}} \right)^\chi
+- \left( \frac{e_t}{P_{s,t}} \right)^\chi
+- \eta \left(
+\left( \frac{P_{g,z}}{P_{s,z}} \right)^\gamma
+- \left( \frac{P_{g,t}}{P_{s,t}} \right)^\gamma
+\right)
+\right] \\
+& \quad
+- \frac{1}{\nu_t} \left( \frac{\bar{e}_z}{P_{s,z}} \right)^\chi
++ \frac{1}{\nu_t} \left( \frac{e_t}{P_{s,t}} \right)^\chi .
+\end{aligned}
+\]
+
+The first and fourth terms cancel, as do the second and fifth. We are left with:
+\[
+\widehat{m}_{t,z}
+= m_z
+- \frac{\eta}{\nu_t}
+\left[
+\left( \frac{P_{g,z}}{P_{s,z}} \right)^\gamma
+- \left( \frac{P_{g,t}}{P_{s,t}} \right)^\gamma
+\right] .
+\]
+
+This completes the proof.
+\qedsymbol
+
+
+%%%%%%%%%%%%%
+\section{Proof of Proposition }
+%%%%%%%%%%%%%
+
+We proceed step-by-step.
+
+%%%%%%%%%%%%%
+\noindent\textbf{Step 1. Differentiating \( \log \widehat{m}_{t,z} \).} By the chain rule:
+\[
+\begin{aligned}
+\frac{\mathrm{d} {\cal P}_{t,z} }{\mathrm{d} z}  
+& =
+\frac{\mathrm{d}}{\mathrm{d} z} \log \widehat{m}_{t,z}\\
+& = 
+\frac{1}{\widehat{m}_{t,z}} \cdot \frac{\mathrm{d}}{\mathrm{d} z} \widehat{m}_{t,z} \\
+& = 
+\frac{1}{\nu_t \widehat{m}_{t,z}} \cdot \frac{\mathrm{d}}{\mathrm{d} z} u(m_z, P_{g,z}, P_{s,z}; \nu_t),
+\end{aligned}
+\]
+using the fact that the partial derivative \( \partial e(u,P_g,P_s;\nu) / \partial u = 1 / \nu \).
+
+
+%%%%%%%%%%%%%
+\noindent\textbf{Step 2. Differentiating \( u(m_z, P_{g,z}, P_{s,z}; \nu_t) \).}
+From Proposition~\ref{prop:IU_EF}:
+\[
+\begin{aligned}
+u(m_z, P_{g,z}, P_{s,z}; \nu_t) &= V(\widehat e_z, P_{g,z}, P_{s,z}) + \nu_t (m_z - \widehat e_z), \\
+\widehat e_z &= \left( \nu_t P_{s,z}^\chi \right)^{\frac{1}{\chi - 1}} .
+\end{aligned}
+\]
+It represents hypothetical consumption expenditure at $z$ prices but evaluated at $t$ preferences.
+We then get:
+\[ 
+\frac{\mathrm{d}}{\mathrm{d} z} u = \nu_t \dot{m}_z + \frac{\partial V}{\partial P_{g,z}} \dot{P}_{g,z} + \frac{\partial V}{\partial P_{s,z}} \dot{P}_{s,z},
+\]
+as the terms in \( \dot{\widehat e}_z \) cancel, and 
+\[
+\begin{aligned}
+\frac{\partial V}{\partial P_g} & = -\eta \left( \frac{P_g}{P_s} \right)^{\gamma} \cdot \frac{1}{P_g}, \\
+\frac{\partial V}{\partial P_s} & = 
+-\left( \frac{\widehat e}{P_s} \right)^{\chi} \cdot \frac{1}{P_s}
++ \eta \left( \frac{P_g}{P_s} \right)^{\gamma} \cdot \frac{1}{P_s}.
+\end{aligned}
+\]
+
+%%%%%%%%%%%%%
+\noindent\textbf{Step 3. Using Roy’s identity.}
+\[
+\widehat s_{g}= \frac{P_{g} \widehat c_{g}}{\widehat e} = \eta \left( \frac{\widehat e}{P_{s}} \right)^{-\chi} \left( \frac{P_{g}}{P_{s}} \right)^\gamma
+\quad \Rightarrow \quad 
+\eta \left( \frac{P_{g}}{P_{s}} \right)^\gamma = \widehat s_{g} \left( \frac{\widehat e}{P_{s}} \right)^{\chi} ,
+\]
+where $\widehat c_{g}$ and $\widehat s_{g}$ represent hypothetical per capital goods consumption and hypothetical goods consumption share of total hypothetical consumption expenditure.
+Then,
+\[
+\begin{aligned}
+\frac{\mathrm{d} {\cal P}_{t,z} }{\mathrm{d} z}  
+& = \frac{\dot m_z}{\widehat{m}_{t,z}}   + \frac{1}{\nu_t \widehat{m}_{t,z}} \cdot 
+\left(
+\widehat s_{g,z} \left( \frac{\widehat e_z}{P_{s,z}}\right)^\chi \left( g_{P_s,z} - g_{P_g,z} \right)
+- \left( \frac{\widehat e_z}{P_{s,z}}\right)^\chi g_{P_s,z}
+\right) \\
+& = \frac{\dot m_z}{\widehat{m}_{t,z}}   + \frac{\widehat e_t}{\widehat{m}_{t,z}} \cdot 
+\Big(
+\widehat s_{g,z}\ \left( g_{P_s,z} - g_{P_g,z} \right)
+- g_{P_s,z}
+\Big)
+\end{aligned}
+\]
+
+%%%%%%%%%%%%%
+\noindent\textbf{Step 4. Evaluate it at \( t=z \).}
+In this case, \(\widehat{m}_{z,z} = m_z\), $\widehat s_{g,z} = s_{g,z}$ and \(\widehat e_z=e_z\). Then, using \(e_z=\left( \nu_z P_{s,z}^\chi \right)^{\frac{1}{\chi - 1}}\),
+\[
+\begin{aligned}
+\left. \frac{\mathrm{d} {\cal P}_{t,z} }{\mathrm{d} z}\right |_{t=z}  
+& = \frac{1}{\nu_z m_z} \cdot \frac{\mathrm{d}}{\mathrm{d} z} u(m_z, P_{g,z}, P_{s,z}; \nu_z) \\
+& = \frac{\dot{m}_z}{m_z} -  s_{e,z} \Big( s_{g,z}\, g_{P_g,z} +  (1- s_{g,z})\, g_{P_s,z} \Big) .
+\end{aligned}
+\]
+
+%%%%%%%%%%%%%
+\noindent\textbf{Step 4. The Divisia index at \( z \).} 
+The Divisia index is:
+\[
+g^D_z = s_{e,z} \Big( s_{g,z} \, g_{g,z} +  (1- s_{g,z}) \, g_{s,z} \Big) + (1 - s_{e,z})\, g_{x,z} .
+\]
+From the definition of current net income $m_z$,
+\[
+\frac{\dot{m}_z}{m_z} = g^D_z +  s_{e,z}  \Big( s_{g,z}\, g_{P_g,z} +  (1- s_{g,z})\, g_{P_s,z} \Big) .
+\]
+Then,
+\[
+g^D_z  = \frac{\dot{m}_z}{m_z} - s_{e,z}  \Big( s_{g,z}\, g_{P_g,z} +  (1- s_{g,z})\, g_{P_s,z} \Big) = \left. \frac{\mathrm{d} {\cal P}_{t,z} }{\mathrm{d} z}\right |_{t=z}    .
+\]
+At any time $z$, the growth rate of the $z$-base Fisher-Shell index is equal to the corresponding Divisia index.
+
+%%%%%%%%%%%%%
+\noindent\textbf{Step 4. Comparing $\frac{\mathrm{d} {\cal P}_{t,z} }{\mathrm{d} z}$ with the Divisia index at \( z \).} 
+The Divisia index is:
+\[
+g^D_z = \frac{\dot{m}_z}{m_z} - s_{e,z} g_{P_{s,z}} - s_{e,z} s_{g,z} (g_{P_{g,z}} - g_{P_{s,z}}),
+\]
+and equals:
+\[
+\frac{1}{\nu_z m_z} \cdot \frac{\mathrm{d}}{\mathrm{d} z} u(m_z, P_{g,z}, P_{s,z}; \nu_z).
+\]
+But \( \widehat{m}_{t,z} \) is evaluated with \( \nu_t \), not \( \nu_z \), and at \( P_{g,t}, P_{s,t} \), not \( P_{g,z}, P_{s,z} \). So:
+\[
+\frac{\mathrm{d}}{\mathrm{d} z} \log \widehat{m}_{t,z} = \frac{1}{\nu_t \widehat{m}_{t,z}} \cdot \frac{\mathrm{d}}{\mathrm{d} z} u(m_z, P_{g,z}, P_{s,z}; \nu_t)
+< \frac{1}{\nu_z m_z} \cdot \frac{\mathrm{d}}{\mathrm{d} z} u(m_z, P_{g,z}, P_{s,z}; \nu_z) = g^D_z.
+\]
+The inequality follows because:
+\begin{itemize}
+    \item \( \nu_t \neq \nu_z \) (preferences differ over time),
+    \item \( \widehat{m}_{t,z} < m_z \) (evaluating past income at current preferences/prices undervalues it).
+\end{itemize}
+
+\noindent\textbf{Step 5. Strict inequality for \( z < t \).}
+The inequality is strict unless \( z = t \), where all evaluations align. Hence,
+\[
+\left. \frac{\mathrm{d}}{\mathrm{d} z} \log \widehat{m}_{t,z} \right|_{z=t} = g^D_t, \quad \text{and} \quad \frac{\mathrm{d}}{\mathrm{d} z} \log \widehat{m}_{t,z} < g^D_z \text{ for all } z < t.
+\]
+\qed
+
+START HERE
+
+%%%%%%%%%%%%%
+\noindent\textbf{Step 1. Differentiating \( \log \widehat{m}_{t,z} \).} By the chain rule:
+\[
+\begin{aligned}
+\frac{\mathrm{d} {\cal P}_{t,z} }{\mathrm{d} z}  
+& =
+\frac{\mathrm{d}}{\mathrm{d} z} \log \widehat{m}_{t,z}\\
+& = 
+\frac{1}{\widehat{m}_{t,z}} \cdot \frac{\mathrm{d}}{\mathrm{d} z} \widehat{m}_{t,z} \\
+& = 
+\frac{1}{\nu_t \widehat{m}_{t,z}} \cdot \frac{\mathrm{d}}{\mathrm{d} z} u(m_z, P_{g,z}, P_{s,z}; \nu_t),
+\end{aligned}
+\]
+using that \( \partial e / \partial u = 1 / \nu_t \).
+
+%%%%%%%%%%%%%
+\noindent\textbf{Step 2. Differentiating \( u(m_z, P_{g,z}, P_{s,z}; \nu_t) \).}
+From
+\[
+\begin{aligned}
+u(m_z, P_{g,z}, P_{s,z}; \nu_t) &= V(\widehat e_z, P_{g,z}, P_{s,z}) + \nu_t (m_z - \widehat e_z), \\
+\widehat e_z &= \left( \nu_t P_{s,z}^\chi \right)^{\frac{1}{\chi - 1}},
+\end{aligned}
+\]
+we get:
+\[ 
+\frac{\mathrm{d}}{\mathrm{d} z} u = \nu_t \dot{m}_z + \frac{\partial V}{\partial P_{g,z}} \dot{P}_{g,z} + \frac{\partial V}{\partial P_{s,z}} \dot{P}_{s,z},
+\]
+where \( \dot{\widehat e}_z \) terms cancel due to the envelope condition.
+
+The derivatives of \( V \) are:
+\[
+\begin{aligned}
+\frac{\partial V}{\partial P_{g,z}} & = -\eta \left( \frac{P_{g,z}}{P_{s,z}} \right)^{\gamma} \cdot \frac{1}{P_{g,z}}, \\
+\frac{\partial V}{\partial P_{s,z}} & = 
+-\left( \frac{\widehat e_z}{P_{s,z}} \right)^{\chi} \cdot \frac{1}{P_{s,z}}
++ \eta \left( \frac{P_{g,z}}{P_{s,z}} \right)^{\gamma} \cdot \frac{1}{P_{s,z}}.
+\end{aligned}
+\]
+
+%%%%%%%%%%%%%
+\noindent\textbf{Step 3. Using Roy’s identity.}
+\[
+s_{g,z}= \frac{P_{g,z} c_{g,z}}{e_z} = \eta \left( \frac{e_z}{P_{s,z}} \right)^{-\chi} \left( \frac{P_{g,z}}{P_{s,z}} \right)^\gamma
+\quad \Rightarrow \quad 
+\eta \left( \frac{P_{g,z}}{P_{s,z}} \right)^\gamma = s_{g,z} \left( \frac{e_z}{P_{s,z}} \right)^{\chi} .
+\]
+Then:
+\[
+\frac{\mathrm{d} {\cal P}_{t,z} }{\mathrm{d} z}  
+= \frac{\dot m_z}{\widehat{m}_{t,z}}   + \frac{1}{\nu_t \widehat{m}_{t,z}} \cdot 
+\left(
+s_{g,z}\left( \frac{e_z}{P_{s,z}}\right)^\chi ( g_{P_{s,z}} - g_{P_{g,z}} )
+- \left( \frac{\widehat e_z}{P_{s,z}}\right)^\chi g_{P_{s,z}}
+\right)
+\]
+
+%%%%%%%%%%%%%
+\noindent\textbf{Step 4. Evaluation at \( t = z \).}
+In this case, \(\widehat{m}_{z,z} = m_z\) and \(\widehat e_z = e_z\). Using that \(e_z = \left( \nu_z P_{s,z}^\chi \right)^{\frac{1}{\chi - 1}}\), we obtain:
+\[
+\begin{aligned}
+\left. \frac{\mathrm{d} {\cal P}_{t,z} }{\mathrm{d} z} \right|_{t = z}  
+& = \frac{1}{\nu_z m_z} \cdot \left. \frac{\mathrm{d}}{\mathrm{d} z} u(m_z, P_{g,z}, P_{s,z}; \nu_z) \right|_{t = z} \\
+& = \frac{\dot{m}_z}{m_z} -  s_{e,z} \Big( s_{g,z}\, g_{P_{g,z}} +  (1 - s_{g,z})\, g_{P_{s,z}} \Big),
+\end{aligned}
+\]
+where \(s_{e,z} = \frac{e_z}{m_z}\).
+
+
+%%%%%%%%%%%%%
+\noindent\textbf{Step 5. Divisia index at \( z \).} 
+By definition,
+\[
+g^D_z = s_{e,z} \Big( s_{g,z} \, g_{g,z} +  (1 - s_{g,z}) \, g_{s,z} \Big) + (1 - s_{e,z})\, g_{x,z}.
+\]
+From the definition of net income,
+\[
+\frac{\dot{m}_z}{m_z} = g^D_z + s_{e,z} \Big( s_{g,z}\, g_{P_{g,z}} +  (1 - s_{g,z})\, g_{P_{s,z}} \Big),
+\]
+so:
+\[
+g^D_z = \frac{\dot{m}_z}{m_z} -  s_{e,z} \Big( s_{g,z}\, g_{P_{g,z}} +  (1 - s_{g,z})\, g_{P_{s,z}} \Big).
+\]
+
+Thus:
+\[
+\left. \frac{\mathrm{d} {\cal P}_{t,z} }{\mathrm{d} z} \right|_{t = z} = g^D_z.
+\]
+
+%%%%%%%%%%%%%
+\noindent\textbf{Step 6. Comparing growth at \( z < t \).}
+
+From Step 1, we have:
+\[
+\frac{\mathrm{d} {\cal P}_{t,z}}{\mathrm{d} z} = \frac{1}{\widehat{m}_{t,z}} \cdot \frac{1}{\nu_t} \cdot \frac{\mathrm{d}}{\mathrm{d} z} u(m_z, P_{g,z}, P_{s,z}; \nu_t) .
+\]
+
+From Step 2, recall:
+\[
+\frac{\mathrm{d}}{\mathrm{d} z} u = \nu_t \dot{m}_z + \frac{\partial V}{\partial P_{g,z}} \dot{P}_{g,z} + \frac{\partial V}{\partial P_{s,z}} \dot{P}_{s,z}.
+\]
+
+Therefore:
+\[
+\frac{\mathrm{d} {\cal P}_{t,z}}{\mathrm{d} z} = \frac{\dot{m}_z}{\widehat{m}_{t,z}} + \frac{1}{\nu_t \widehat{m}_{t,z}} \left( \frac{\partial V}{\partial P_{g,z}} \dot{P}_{g,z} + \frac{\partial V}{\partial P_{s,z}} \dot{P}_{s,z} \right) .
+\]
+
+Now consider the Divisia index at time \( z \), from Step 5:
+\[
+g^D_z = \frac{\dot{m}_z}{m_z} - s_{e,z} \left( s_{g,z} g_{P_{g,z}} + (1 - s_{g,z}) g_{P_{s,z}} \right) .
+\]
+
+Let us rewrite the derivative of \( {\cal P}_{t,z} \) similarly:
+\[
+\frac{\mathrm{d} {\cal P}_{t,z}}{\mathrm{d} z} = \frac{\dot{m}_z}{\widehat{m}_{t,z}} - \underbrace{\left( \left( \frac{\widehat e_z}{P_{s,z}} \right)^{\chi} - s_{g,z} \left( \frac{e_z}{P_{s,z}} \right)^{\chi} \right) \cdot \frac{g_{P_{s,z}}}{\nu_t \widehat{m}_{t,z}}}_{(*)}
+- \underbrace{s_{g,z} \left( \frac{e_z}{P_{s,z}} \right)^{\chi} \cdot \frac{g_{P_{g,z}}}{\nu_t \widehat{m}_{t,z}}}_{(**)}.
+\]
+
+Meanwhile, \( g^D_z \) contains:
+\[
+- s_{e,z} \left( s_{g,z} g_{P_{g,z}} + (1 - s_{g,z}) g_{P_{s,z}} \right) = - \left( \frac{e_z}{m_z} \right) \left[ s_{g,z} g_{P_{g,z}} + (1 - s_{g,z}) g_{P_{s,z}} \right] .
+\]
+
+To compare both expressions:
+
+- Note that \( \widehat{m}_{t,z} < m_z \), because it reflects past income evaluated at current preferences, which undervalues it.
+- Also \( \nu_t \neq \nu_z \), so the marginal utility weights differ.
+- And \( \widehat e_z = \left( \nu_t P_{s,z}^\chi \right)^{\frac{1}{\chi - 1}} \neq e_z = \left( \nu_z P_{s,z}^\chi \right)^{\frac{1}{\chi - 1}} \).
+
+Hence, the differences in numerators and denominators in the adjustment terms (*) and (**) lead to a smaller sum for \( \frac{\mathrm{d} {\cal P}_{t,z}}{\mathrm{d} z} \) than for \( g^D_z \), since the adjustment is over-scaled relative to the true marginal valuation of the past economy.
+
+Therefore:
+\[
+\frac{\mathrm{d} {\cal P}_{t,z}}{\mathrm{d} z} < g^D_z \quad \text{for all } z < t.
+\]
+
+\qed
+
+
+
+%%%%%%%%%%%%%
+\section{Proof of Proposition \ref{prop:FS}}\label{app:FS}
+%%%%%%%%%%%%%
+
+From the definition of the current-base Fisher-Shell index in (\ref{eq:CBEV}) and the corresponding hypothetical income in (\ref{eq:Mhat}), we have
+\[
+{\cal P}_{t,z} = \log \widehat{m}_{t,z} -  \log \widehat{m}_{t,t_0} \quad \text{with} \quad 
+\widehat{m}_{t,z} = e\Big( u \big(m_z, P_{g,z}, P_{s,z}; \nu_t \big), P_{g,t}, P_{s,t}; \nu_t \Big) .
+\]
+Then, the growth rate of the current-base Fisher-Shell index at current time $t$ is given by
+\[
+g^{\text{FS}}_t = \left. \frac{\mathrm{d}}{\mathrm{d} z} \log \widehat{m}_{t,z} \right|_{z=t} 
+= \left. \frac{1}{\widehat{m}_{t,z}} \cdot \frac{\mathrm{d} \widehat{m}_{t,z}}{\mathrm{d} z} \right|_{z=t}.
+\]
+By the chain rule:
+\[
+\frac{\mathrm{d} \widehat{m}_{t,z}}{\mathrm{d} z} = \frac{\partial e}{\partial u} \cdot \frac{\mathrm{d} u}{\mathrm{d} z}.
+\]
+From the expenditure function in (\ref{eq:expenditure}),
+\[
+e(u, P_{g,t}, P_{s,t}; \nu_t) = 
+\left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}} 
++ \frac{u}{\nu_t}
+- \frac{ V\left( \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}}, P_{g,t}, P_{s,t} \right) }{\nu_t},
+\]
+we have \( \partial e / \partial u = 1/\nu_t \). Hence,
+\[
+g^{\text{FS}}_t = \frac{1}{\nu_t \, {m}_{t}} \cdot \left. \frac{\mathrm{d} u}{\mathrm{d} z} \right|_{z=t} ,
+\]
+since \( \widehat{m}_{t,t} = m_t\).
+Next, from the indirect utility function in (\ref{eq:indirect}),
+\[
+u(m_z, P_{g,z}, P_{s,z}; \nu_t) = 
+V\left( \widehat e_z, P_{g,z}, P_{s,z} \right) + \nu_t (m_z - \widehat e_z),
+\quad \text{with} \quad \widehat e_z = \left( \nu_t P_{s,z}^\chi \right)^{\frac{1}{\chi - 1}},
+\]
+we differentiate:
+\[
+\frac{\mathrm{d} u}{\mathrm{d} z} = 
+\frac{\partial V}{\partial e} \cdot \frac{\mathrm{d} \widehat e_z}{\mathrm{d} z}
++ \frac{\partial V}{\partial P_{g,z}} \cdot  \frac{\mathrm{d} P_{g,z}}{\mathrm{d} z} 
++ \frac{\partial V}{\partial P_{s,z}} \cdot  \frac{\mathrm{d} P_{s,z}}{\mathrm{d} z}
+- \nu_t \cdot \frac{\mathrm{d} \widehat e_z}{\mathrm{d} z} + \nu_t\,\cdot  \frac{\mathrm{d} m_{z}}{\mathrm{d} z}.
+\]
+From
+\[
+V(e, P_g, P_s) =
+\frac{1}{\chi} \left( \frac{e}{P_s} \right)^\chi 
+- \frac{\eta}{\gamma} \left( \frac{P_g}{P_s} \right)^\gamma 
+- \frac{1}{\chi} + \frac{\eta}{\gamma},
+\]
+we compute the partial derivatives:
+\[
+\frac{\partial V}{\partial e} = \left( \frac{e}{P_s} \right)^{\chi - 1} \cdot \frac{1}{P_s}, \quad
+\frac{\partial V}{\partial P_g} = -\eta \left( \frac{P_g}{P_s} \right)^{\gamma} \cdot \frac{1}{P_g},
+\]
+\[
+\frac{\partial V}{\partial P_s} = 
+-\left( \frac{e}{P_s} \right)^{\chi} \cdot \frac{1}{P_s}
++ \eta \left( \frac{P_g}{P_s} \right)^{\gamma} \cdot \frac{1}{P_s}.
+\]
+
+\noindent From the definition of $\widehat e_t$, we find that the terms in \( \mathrm{d} \widehat e_z / \mathrm{d} z \) cancel. 
+Substituting into the total derivative:
+\begin{align*}
+\left. \frac{\mathrm{d} u}{\mathrm{d} z} \right|_{z=t}
+&= -\eta \left( \frac{P_{g,t}}{P_{s,t}} \right)^{\gamma } \cdot g_{P_g,t} \\
+&\quad + \left(
+ \eta \left( \frac{P_{g,t}}{P_{s,t}} \right)^{\gamma }  
+  -\left( \frac{e_t}{P_{s,t}} \right)^{\chi } \right) \cdot  g_{P_s,t} \\
+&\quad + \nu_t \cdot \dot{m}_t.
+\end{align*}
+Note that $\widehat e_t = e_t$.
+Now we express the price effects in terms of observable shares using Roy’s identity:
+\[
+s_{g,t}= \frac{P_{g,t} c_{g,t}}{e_t} = \eta \left( \frac{e_t}{P_{s,t}} \right)^{-\chi} \left( \frac{P_{g,t}}{P_{s,t}} \right)^\gamma
+\quad \Rightarrow \quad 
+\eta \left( \frac{P_{g,t}}{P_{s,t}} \right)^\gamma = s_{g,t} \left( \frac{e_t}{P_{s,t}} \right)^{\chi} .
+\]
+
+\noindent Rewriting the price derivative terms in the total derivative:
+\begin{align*}
+& -\eta \left( \frac{P_{g,t}}{P_{s,t}} \right)^{\gamma} \cdot g_{P_g,t}
++ \left(
+ \eta \left( \frac{P_{g,t}}{P_{s,t}} \right)^{\gamma }  
+  -\left( \frac{e_t}{P_{s,t}} \right)^{\chi } \right) \cdot  g_{P_s,t} \\
+&=
+- \left( \frac{e_t}{P_{s,t}} \right)^{\chi} \cdot 
+\left( s_{g,t} g_{P_g,t} + (1 - s_{g,t}) g_{P_s,t} \right) \\
+& = 
+e_t\nu_t \left( s_{g,t} g_{P_g,t} + (1 - s_{g,t}) g_{P_s,t} \right) .
+\end{align*}
+The last equality derives from \(e_t = \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}}\).
+
+\noindent Now return to the full expression:
+\[
+g^{\text{FS}}_t = 
+\frac{\dot m_t}{m_t} -
+\frac{e_t}{m_{t}} \Big(
+s_{g,t} g_{P_g,t} - (1 - s_{g,t}) g_{P_s,t}
+\Big) .
+\]
+
+\noindent From $m_t = e_t + x_t$, and $e_t = P_{g,t} c_{g,t} + P_{s,t} c_{s,t}$, we get
+\[
+\frac{\dot{m}_t}{m_t} = s_{e,t} g_{e,t} + (1 - s_{e,t}) g_{x,t},
+\]
+\[
+g_{e,t} = s_{g,t} (g_{g,t} + g_{P_{g,t}}) + (1 - s_{g,t})(g_{s,t} + g_{P_{s,t}}),
+\]
+so that all price terms cancel:
+\begin{align*}
+g^{\text{FS}}_t 
+&= s_{e,t} \left[ s_{g,t} g_{g,t} + (1 - s_{g,t}) g_{s,t} + s_{g,t} g_{P_{g,t}} + (1 - s_{g,t}) g_{P_{s,t}} \right] \\
+&\quad + (1 - s_{e,t}) g_{x,t} - s_{e,t} g_{P_{s,t}} - s_{e,t} s_{g,t} (g_{P_{g,t}} - g_{P_{s,t}}) \\
+&= s_{e,t} \left( s_{g,t} g_{g,t} + (1 - s_{g,t}) g_{s,t} \right) + (1 - s_{e,t}) g_{x,t} = g^D_t. \qed
+\end{align*}
+
+
+%%%%%%%%%%%%%
+\section{Robustness}
+%%%%%%%%%%%%%
+
+An alternative to the previous chained Fisher-Shell index, that evaluates welfare gains at any time $z<t$, using time $z$ preferences and prices, would evaluate welfare gains using $z$ prices but $t$ preferences. 
+Let us define the following hypothetical income at $h < z < t$,
+\begin{equation}
+\widehat{m}_{t,z,h} = e \Big( u\big(m_h, P_{g,h}, P_{s,h}; \nu_t\big), P_{g,z}, P_{s,z}; \nu_t \Big).
+\end{equation}
+The quantity \( \widehat{m}_{t,z,h} \) represents the level of income per capita valued at time $z$ prices, that the representative household would have needed at time \( h \) to attain the utility achievable under the historical income and prices at \( h \), but evaluated using the Bellman representation of preferences at time \( t \). 
+
+
+From the definition of the current-base Fisher-Shell index in (\ref{eq:CBEV}) and the corresponding hypothetical income in (\ref{eq:Mhat}), we have
+\[
+{\cal P}_{t,z,h} = \log \widehat{m}_{t,z,h} -  \log \widehat{m}_{t,t_0,h} \quad \text{with} \quad 
+\widehat{m}_{t,z,h} = e \Big( u\big(m_h, P_{g,h}, P_{s,h}; \nu_t\big), P_{g,z}, P_{s,z}; \nu_t \Big) .
+\]
+Then, the growth rate of ${\cal P}_{t,z,h} $ at current time $z$ is given by
+\[
+\widehat g^{\text{FS}}_z = \left. \frac{\mathrm{d}}{\mathrm{d} h} \log \widehat{m}_{t,z,h} \right|_{h=z} 
+= \left. \frac{1}{\widehat{m}_{t,z,h}} \cdot \frac{\mathrm{d} \widehat{m}_{t,z,h}}{\mathrm{d} h} \right|_{h=z}.
+\]
+By the chain rule:
+\[
+\frac{\mathrm{d} \widehat{m}_{t,z,h}}{\mathrm{d} h} = \frac{\partial e}{\partial u} \cdot \frac{\mathrm{d} u}{\mathrm{d} h}.
+\]
+From the expenditure function in (\ref{eq:expenditure}),
+\[
+e(u, P_{g,t}, P_{s,t}; \nu_t) = 
+\left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}} 
++ \frac{u}{\nu_t}
+- \frac{ V\left( \left( \nu_t P_{s,t}^\chi \right)^{\frac{1}{\chi - 1}}, P_{g,t}, P_{s,t} \right) }{\nu_t},
+\]
+we have \( \partial e / \partial u = 1/\nu_t \). Hence,
+\[
+\widehat g^{\text{FS}}_z = \frac{1}{\nu_t \, \widehat{m}_{t,z,h}} \cdot \left. \frac{\mathrm{d} u}{\mathrm{d} h} \right|_{h=z} .
+\]
+Next, from the indirect utility function in (\ref{eq:indirect}),
+\[
+u(m_h, P_{g,h}, P_{s,h}; \nu_t) = 
+V\left( \widehat e_{t,h}, P_{g,h}, P_{s,h} \right) + \nu_t (m_h - \widehat e_{t,h}),
+\quad \text{with} \quad \widehat e_{t,h} = \left( \nu_t P_{s,h}^\chi \right)^{\frac{1}{\chi - 1}},
+\]
+we differentiate:
+\[
+\frac{\mathrm{d} u}{\mathrm{d} h} = 
+\frac{\partial V}{\partial e} \cdot \frac{\mathrm{d} \widehat e_h}{\mathrm{d} h}
++ \frac{\partial V}{\partial P_{g,h}} \cdot  \frac{\mathrm{d} P_{g,h}}{\mathrm{d} h} 
++ \frac{\partial V}{\partial P_{s,h}} \cdot  \frac{\mathrm{d} P_{s,h}}{\mathrm{d} h}
+- \nu_t \cdot \frac{\mathrm{d} \widehat e_h}{\mathrm{d} h} + \nu_t\,\cdot  \frac{\mathrm{d} m_{h}}{\mathrm{d} h}.
+\]
+From
+\[
+V(e, P_g, P_s) =
+\frac{1}{\chi} \left( \frac{e}{P_s} \right)^\chi 
+- \frac{\eta}{\gamma} \left( \frac{P_g}{P_s} \right)^\gamma 
+- \frac{1}{\chi} + \frac{\eta}{\gamma},
+\]
+we compute the partial derivatives:
+\[
+\frac{\partial V}{\partial e} = \left( \frac{e}{P_s} \right)^{\chi - 1} \cdot \frac{1}{P_s}, \quad
+\frac{\partial V}{\partial P_g} = -\eta \left( \frac{P_g}{P_s} \right)^{\gamma} \cdot \frac{1}{P_g},
+\]
+\[
+\frac{\partial V}{\partial P_s} = 
+-\left( \frac{e}{P_s} \right)^{\chi} \cdot \frac{1}{P_s}
++ \eta \left( \frac{P_g}{P_s} \right)^{\gamma} \cdot \frac{1}{P_s}.
+\]
+
+\noindent From the definition of $\widehat e_h$, we find that the terms in \( \mathrm{d} \widehat e_h / \mathrm{d} h \) cancel. 
+Substituting into the total derivative:
+\begin{align*}
+\left. \frac{\mathrm{d} u}{\mathrm{d} h} \right|_{h=z}
+&= -\eta \left( \frac{P_{g,z}}{P_{s,z}} \right)^{\gamma } \cdot g_{P_g,z} \\
+&\quad + \left(
+ \eta \left( \frac{P_{g,z}}{P_{s,z}} \right)^{\gamma }  
+  -\left( \frac{\widehat e_{t,z}}{P_{s,z}} \right)^{\chi } \right) \cdot  g_{P_s,z} \\
+&\quad + \nu_t \cdot \dot{m}_z.
+\end{align*}
+Now we express the price effects in terms of observable shares using Roy’s identity:
+\[
+s_{g,t}= \frac{P_{g,t} c_{g,t}}{e_t} = \eta \left( \frac{e_t}{P_{s,t}} \right)^{-\chi} \left( \frac{P_{g,t}}{P_{s,t}} \right)^\gamma
+\quad \Rightarrow \quad 
+\eta \left( \frac{P_{g,t}}{P_{s,t}} \right)^\gamma = s_{g,t} \left( \frac{e_t}{P_{s,t}} \right)^{\chi} .
+\]
+
+\noindent Rewriting the price derivative terms in the total derivative:
+\begin{align*}
+& -\eta \left( \frac{P_{g,z}}{P_{s,z}} \right)^{\gamma} \cdot g_{P_g,z}
++ \left(
+ \eta \left( \frac{P_{g,z}}{P_{s,z}} \right)^{\gamma }  
+  -\left( \frac{\widehat e_{t,z}}{P_{s,z}} \right)^{\chi } \right) \cdot  g_{P_s,z} \\
+&=
+- \left( \frac{\widehat e_{t,z}}{P_{s,z}} \right)^{\chi} \cdot 
+\left( s_{g,z}\, g_{P_g,z} + (1 - s_{g,z}) g_{P_s,z} \right) \\
+& = 
+\widehat e_{t,z}\nu_t \left( s_{g,z}\, g_{P_g,z} + (1 - s_{g,z}) g_{P_s,z} \right) .
+\end{align*}
+The last equality derives from \(\widehat e_{t,z} = \left( \nu_t P_{s,z}^\chi \right)^{\frac{1}{\chi - 1}}\).
+
+\noindent Now return to the full expression:
+\[
+\widehat g^{\text{FS}}_z = 
+\frac{\dot m_z}{ \widehat{m}_{t,z,h}} -
+\frac{\widehat e_{t,z}}{ \widehat{m}_{t,z,h}} \Big(
+s_{g,z}\, g_{P_g,z} - (1 - s_{g,z}) g_{P_s,z}
+\Big) .
+\]
+
+\noindent From $m_t = e_t + x_t$, and $e_t = P_{g,t} c_{g,t} + P_{s,t} c_{s,t}$, we get
+\[
+\frac{\dot{m}_t}{m_t} = s_{e,t} g_{e,t} + (1 - s_{e,t}) g_{x,t},
+\]
+\[
+g_{e,t} = s_{g,t} (g_{g,t} + g_{P_{g,t}}) + (1 - s_{g,t})(g_{s,t} + g_{P_{s,t}}),
+\]
+so that all price terms cancel: (CHECK FROM HERE)
+\begin{align*}
+\widehat g^{\text{FS}}_z 
+&= s_{e,z} \Big( s_{g,z} g_{g,z} + (1 - s_{g,z}) g_{s,z} + s_{g,z} g_{P_{g,z}} + (1 - s_{g,z}) g_{P_{s,z}} \Big)  + (1 - s_{e,z}) g_{x,z}  - \\
+&\quad - \bar s_{e,t,z} \Big( s_{g,z}\, g_{P_{g,z}} + (1 - s_{g,z})  g_{P_{s,z}} \Big)  ,
+\end{align*}
+where $\bar s_{e,t,z} = \frac{\widehat e_{t,z}}{m_z}$.
+Then
+\begin{align*}
+\widehat g^{\text{FS}}_z 
+&= s_{e,t} \left( s_{g,t} g_{g,t} + (1 - s_{g,t}) g_{s,t} \right) + (1 - s_{e,t}) g_{x,t} = g^D_t. \qed
+\end{align*}
+
+
+
+%%%%%%%%%%%%%
+\section{Laspeyres and Paasche indices}\label{app:L&P}
+%%%%%%%%%%%%%
+
+This appendix shows that, in an economy with constant income shares, the substitution bias does not explain why the Laspeyres index exceeds the Paasche index. Instead, this discrepancy results from a more fundamental property: the Laspeyres index is a weighted aritmethic mean while the Paasche index is a weighted harmonic mean. This fundamental property was already known in the XIX century and is clearly mentioned by Irving Fisher (1911), who wrote “the Paasche price index can be written as a current-period revenue share–weighted harmonic average.” Let us develop the argument in our framework.
+
+In the context of the LBD economy of Section~\ref{sec:LBD} with two goods, consumption and investment, the Laspeyres and Paasche indices between $s$ and $t$, $s<t$, are defined as
+\[
+{\cal L}_{t,s} = \frac{c_t + p_s x_t}{c_s + p_s x_s}
+\ \ \ \ \text{and}\ \ \ \ \
+{\cal P}_{t,s} = \frac{c_t + p_t x_t}{c_s + p_t x_s} .
+\]
+In an economy with constant income shares, at it is the case in the LBD economy, the indices read
+\[
+{\cal L}_{t,s} = s_c g_c + (1-s_c)g_x
+\ \ \ \ \text{and}\ \ \ \ \
+{\cal P}_{t,s} = \left(s_c g_c^{-1} + (1-s_c) g_x^{-1} \right)^{-1},
+\]
+where the time-invariant consumption share $s_c = \frac{c_t}{c_t + p_t c_t }$; $g_c$ and $g_x$ are the time-invariant growth rates between $s$ and $t$ of consumption and investment, respectively. The Laspeyres index measures the weighted average gains from moving forward, being equal to a Divisia index, while the Paasche index measures the inverse of the weighted average loses from moving backward. They are arithmetic and harmonic means, respectively
+
+After some simple algebra, we can easily show that the ratio
+\[
+\frac{{\cal L}}{\cal P} = 1  + s_c(1-s_c) \left( \frac{g_c}{g_x}+ \frac{g_x}{g_c} - 2\right)  \geq 1.
+\]
+Since \( g_c^2 + g_x^2 \geq 2 g_c g_x \), by the Cauchy-Schwarz inequality, we have the well-know result in index number theory that  \( \mathcal{L} \geq \mathcal{P}\), with equality only if \( g_c = g_x \).
+
+Let us call $z$ to the ratio of both growth rates, then
+\[
+\frac{{\cal L}}{\cal P} = 1  + s_c(1-s_c) \left( z+ \frac{1}{z} - 2\right)
+\ \ \ \ \text{and}\ \ \ \
+\frac{\partial \frac{{\cal L}}{\cal P}}{\partial z}= s_c(1-s_c) \left( 1 - \frac{1}{z^2}\right)\geq 0 ,
+\]
+irrespective of $z$ being $g_c/g_x$ or the inverse.
+ The distance between \( \mathcal{L}\) and \(\mathcal{P} \) increases with the distance between \( g_c \) and \( g_x \).
+% Therefore, the ratio \( \frac{\mathcal{L}}{\mathcal{P}} \) reflects an increasing divergence as \( g_c \) and \( g_x \) deviate further from each other.
+The result does not depend on whether investment is growing faster than consumption, but on the distance between both growth rates as measured by $z$.
+
+% For given growth rates, %provided \( g_c < g_x \), \( \frac{\mathcal{L}}{\mathcal{P}} \) becomes larger as the difference between \( g_c \) and \( g_x \) widens. This is because the Laspeyres index \( \mathcal{L} \), which is a weighted average of the growth rates, will tend to be pulled upward by the faster-growing component \( g_x \), while the Paasche index \( \mathcal{P} \), which inversely weights the components, is more affected by the slower-growing component \( g_c \). 
+
+Finally, for given growth rates, provided \( g_c \neq g_x \), the ratio \( \frac{\mathcal{L}}{\mathcal{P}} \) is hump-shaped with respect to \( s_c \), reaching its maximum when \( s_c = \frac{1}{2} \).
+This can be explained as follows: when \( s_c = \frac{1}{2} \), the Laspeyres index \( \mathcal{L} \) and the Paasche index \( \mathcal{P} \) are balanced in terms of the weight given to \( g_c \) and \( g_x \). This equal weighting maximizes the effect of the divergence between \( g_c \) and \( g_x \) on \( \frac{\mathcal{L}}{\mathcal{P}} \), making the ratio the largest at \( s_c = \frac{1}{2} \). For values of \( s_c \) closer to 0 or 1, the ratio decreases as one of the growth rates dominates the calculation, reducing the impact of the difference between \( g_c \) and \( g_x \).
+
+In this context, a larger decline rate of the relative investment price does not generate any substitution effect, since at equilibrium consumption and investment shares remain constant, but raises the distance between the growth rate of consumption and the growth rate of investment. As a consequence, it also increases the distance between the corresponding Paasche and Laspeyres indices. Figure~\ref{fig:GDP_LBD (b)} shows the 1947 and 2023 fixed-base indices for an economy with a 3.3\% annual decline of the relative investment price, instead of the observed 2.06\% as reported in Table~\ref{tab:cal}.  When compared to Figure~\ref{fig:real_GDP}, the distance in 2023 between the two indices jumped up to 106\%.
+The fundamental reason is that the difference between the annual investment growth rate and the annual consumption growth rate raised from 2.59\% in the benchmark economy to 3.25\% in the economy with larger decline in the relative price of investment.
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=.6\textwidth]{Figures/GDP_LBD (b).pdf}
+\end{center}
+\captionsetup{justification=centerlast} % Centers the caption
+ \caption{ Real GDP \\ \vspace{.1cm}
+{\footnotesize BEA data. Real GDP is measured as a chained Fisher-ideal index (solid), a 1947 base-year index (dashed) and a 2023 base-year index (dotted)}}
+\label{fig:GDP_LBD (b)}
+\end{figure}
+
+
+Notice that, in our framework, a Paasche index can be written as
+\[
+{\cal P}_{t,s} = \widehat s_c g_c + (1-\widehat s_c)g_x = \left(s_c g_c^{-1} + (1-s_c) g_x^{-1} \right)^{-1},
+\]
+where
+\[
+\widehat s_c = \frac{s_c g_x}{(1-s_c) g_c + s_c g_x} > s_c .
+\]
+The inequality holds because $g_x > g_c$.
+Since the Paasche index gives to consumption a weight larger than its income share, and consumption growth at a lower rate than investment, the Paasche index is smaller than the Laspeyres index, irespective of any substitution bias.
+The larger $g_x$ is, the higher the consumption weight $\widehat s_c$ and the lower the Paasche index.
+
+More generally, let us assume there is a set of $n$ items with quantities and prices $\mathbf{x}_t = \{x_{1,t} x_{2,t},...,x_{n,t}\}$ and $\mathbf{p}_t = \{p_{1,t}, p_{2,t},...,p_{n,t}\}$, respectively. For this set of items, let us compare times $t$ and $s$, $t>s$, by the mean of the ratio of the corresponding Laspeyres and Paasche quantity indices, s.t.,
+$$
+\frac{{\cal L}_{t,s}}{{\cal P}_{t,s}} = \frac{\mathbf{p}_{s} \mathbf{x}_t}{\mathbf{p}_s \mathbf{x}_s} \times  \frac{\mathbf{p}_{t} \mathbf{x}_s}{\mathbf{p}_t \mathbf{x}_t}
+$$
+Let us assume that the shares $s_i = \frac{p_{i,t}x_{i,t}}{\mathbf{p}_t \mathbf{x}_t}$ are time invariant, then
+$$
+\frac{{\cal L}_{t,s}}{{\cal P}_{t,s}} =
+\left(\sum s_{i} g_{i,t}\right) \left(\sum s_{i} g^{-1}_{i,t}\right) \geq 1
+$$
+where $g_{i,t} = \frac{x_{i,t}}{x_{i,s}}$ is the growth factor of item $i$ between $s$ and $t$.
+The object at the right hand side is the product of the mean and the harmonic mean, represented by the Laspeyres and the inverse of the Paasche, respectively. The property that $\frac{{\cal L}_{t,s}}{{\cal P}_{t,s}}$ is larger than one is known as the {\it arithmetic-harmonic mean inequality}. The left-hand side of the inequality is increasing on the variance of vector $\mathbf{g}=\{g_1,g_2, ..., g_n\}$.
+
+In an economy with log preferences defined on a vector $\mathbf{x}_t$, income shares are equal over time irrespective of prices, since income effect and substitution effect compensate each other. In this framework, the disperion of quantities will depend on relative price trends, making the Laspeyres index to overestimate growth relative to the Paasche index. It makes clear that this bad property of fixed-base indices may be unrelated to the substitution bias. 
+
+Interestingly, the introduction of quality corrections in prices, by definition, changes the growth rate of quantities without affecting the income shares. They cannot then produce any substitution bias. However, by changing the growth rate of quantities differently, affect the variance of their growth rates. There is no economic reason, but it is a property of the indices themselves.
+
+
+%%%%%%%%%%%%%
+\section{Past- and Current-base BBEV indices}\label{app:BBEV indices}
+%%%%%%%%%%%%%
+
+It is easy to show that the past-based BBEV is always larger than the current-base BBEV. 
+Let us define the current-base BBEV index as
+\[
+{\cal P}^{\text{BB}}_{t,s} = \frac{m_t}{m_{t,s}} = m_t \left(\frac{p_t}{\nu_t}\left(\log p_s - \log p_t\right) + \frac{p_t m_s}{p_s} \right)^{-1}
+\]
+and the past-base BBEV index as
+\[
+{\cal L}^{\text{BB}}_{t,s} = \frac{m_{s,t}}{m_{s}} = \frac{1}{m_s} \left(\frac{p_s}{\nu_s}\left(\log p_t - \log p_s\right) + \frac{p_s m_t}{p_t} \right) ,
+\]
+where from equation (\ref{eq:HI})
+\[
+m_{t,s}
+= \frac{p_t}{\nu_t} 
+\left(\log p_s - \log p_t \right)
++  \frac{p_t m_s}{p_s} 
+ .
+\]
+Consequently, at the equilibrium of the LBD economy,
+\begin{eqnarray*}
+\frac{{\cal L}^{\text{BB}}_{t,s}}{{\cal P}^{\text{BB}}_{t,s}} &=&
+\left(\frac{p_s}{\nu_s} \frac{1}{m_t}\left(\log p_t - \log p_s\right) + \frac{p_s}{p_t} \right)
+\left(\frac{p_t}{\nu_t} \frac{1}{m_s}\left(\log p_s - \log p_t\right) + \frac{p_t}{p_s} \right) \nonumber \\
+ &=&
+\left(\frac{p_t}{\nu_s} \frac{1}{m_t}\left(\log p_t - \log p_s\right) + 1 \right)
+\left(\frac{p_s}{\nu_t} \frac{1}{m_s}\left(\log p_s - \log p_t\right) +1 \right) \nonumber \\
+ &=&
+\Big( 1 - s_c \lambda g_k \,
+ \text{e}^{- g_k(t-s)} (t-s)  \Big)
+\Big(1 +  s_c \lambda g_k \, \text{e}^{ g_k(t-s)} (t-s)  \Big)
+\end{eqnarray*}
+
+The right hand side of the last line can be written as
+\[
+h(x) \equiv
+\left(1 - a g_k \, \text{e}^{-g_k x} x\right) \left(1 + a g_k\, \text{e}^{g_k x} x\right) ,
+\]
+with $h(0) = 1$, where $x=t-s \geq 0$ and $a = s_c\lambda \in(0,1)$.
+The first and second derivatives are
+\[
+h'(x) 
+= a \text{e}^{-g_k x} g \left( \text{e}^{2 g_k x} -1 + g_kx\left( 1 + \text{e}^{g_k x} (\text{e}^{g_k x}-2a)\right)\right)
+\]
+and
+\[
+h''(x) 
+= a \text{e}^{-g_k x} g_k^2 \left( 2 + 2 \text{e}^{g_k x} (\text{e}^{g_k x}-a) + g_kx(\text{e}^{2 g_k x}-1)\right) >0 ,
+\]
+with $h'(0)=0$ and $h''(0) = 4-2a >0$, since $a\in(0,1)$ and $g_k>0$. Consequently, ${\cal L}^{\text{BB}}_{t,s} > {\cal P}^{\text{BB}}_{t,s}$ for all $s<t$.
+The ratio of the past-base BBEV to the current-base BBEV behaves like the ratio of the Laspeyres to the Paasche indices. 
+
+%Let us give a deeper look to ${\cal P}^{\text{BB}}_{t,s}$
+%\[
+%{\cal P}^{\text{BB}}_{t,s} =   \left(\frac{p_t}{\nu_t m_t}\left(\log p_s - \log p_t\right) + \frac{p_t m_s}{p_s m_t} \right)^{-1}
+%\]
+
+%\paragraph{Does the reference order really matters?}
+%To answer this question, let us evaluate the past-base and current-base BBEV indices using in both cases an arbitrary reference order $\widetilde \nu$. In this case, the current-base BBEV index is
+%\[
+%\widetilde{\cal P}^{\text{BB}}_{t,s} =  m_t \left(\frac{p_t}{\widetilde\nu}\left(\log p_s - \log p_t\right) + \frac{p_t m_s}{p_s} \right)^{-1}
+%\]
+%and the past-base BBEV index is
+%\[\widetilde{
+%\cal L}^{\text{BB}}_{t,s} = \frac{1}{m_s} \left(\frac{p_s}{\widetilde\nu}\left(\log p_t - \log p_s\right) + \frac{p_s m_t}{p_t} \right) .
+%\]
+
+%Consequently, at the equilibrium of the LBD economy,
+%\begin{eqnarray*}
+%\frac{\widetilde{\cal L}^{\text{BB}}_{t,s}}{\widetilde{\cal P}^{\text{BB}}_{t,s}} &=&
+%\left(\frac{p_s}{\widetilde\nu} \frac{1}{m_t}\left(\log p_t - \log p_s\right) + \frac{p_s}{p_t} \right)
+%\left(\frac{p_t}{\widetilde\nu} \frac{1}{m_s}\left(\log p_s - \log p_t\right) + \frac{p_t}{p_s} \right) \nonumber \\
+% &=&
+%\left(\frac{p_t}{\widetilde\nu} \frac{1}{m_t}\left(\log p_t - \log p_s\right) + 1 \right)
+%\left(\frac{p_s}{\widetilde\nu} \frac{1}{m_s}\left(\log p_s - \log p_t\right) +1 \right) \nonumber \\
+% &=&
+%\Big( 1 - s_c \lambda g_k \, (t-s)  \nu_t/\widetilde\nu\Big)
+%\Big(1 +  s_c \lambda g_k \,  (t-s) \nu_s/\widetilde\nu \Big) .
+%\end{eqnarray*}
+%Since $\nu_t$ is declining over time, for any $\widetilde\nu=\nu_z$, $z\in(s,t)$, $\widetilde{\cal L}^{\text{BB}}_{t,s} > \widetilde{\cal P}^{\text{BB}}_{t,s}$ irrespective of the choice of the reference order. What really matters is that the fixed-base index always set prices at the base time.
+
+%Let us assume $\widetilde\nu = \nu_t$. Then, the right hand side of the last line can be written as
+%\[
+%h(x) \equiv
+%\left(1 - a g_k \,  x\right) \left(1 + a g_k\, \text{e}^{g_k x} x\right) ,
+%\]
+%with $h(0) = 1$ as before.
+%The first and second derivatives are
+%\[
+%h'(x) 
+%= a g \left( \text{e}^{g_k x} -1 + g_kx\left( 1 + \text{e}^{g_k x} (\text{e}^{g_k x}-2a)\right)\right)
+%\]
+%and
+%\[
+%h''(x) 
+%= a \text{e}^{g_k x} g_k^2 \left( 2 + 2 \text{e}^{g_k x} (\text{e}^{g_k x}-a) + g_kx(\text{e}^{2 g_k x}-1)\right) >0 ,
+%\]
+%with $h'(0)=0$ and $h''(0) = 4-2a >0$, since $a\in(0,1)$ and $g_k>0$. Consequently, ${\cal L}^{\text{BB}}_{t,s} > {\cal P}^{\text{BB}}_{t,s}$ for all $s<t$.
+
+
+%%%%%%%%%%%%%
+\section{Learning-by-Doing and the Intertemporal Elasticity of Substitution}
+%%%%%%%%%%%%%
+
+In the general case, when the constant intertemporal elasticity of substitution (CIES) $\sigma$ is different from one, the indirect utility function (\ref{eq:indirect}) and the expenditure functions (\ref{eq:EF}) read
+\[
+u(u_t,p_t;\nu_t) = \frac{\nu_t}{p_t}m_t + \frac{1}{\sigma-1}\left(\frac{p_t}{\nu_t}\right)^{\sigma-1}
+\ \ \ \text{and}\ \ \ 
+e(u_t,p_t;\nu_t) = \frac{p_t}{\nu_t} u_t - \frac{1}{\sigma-1}\left(\frac{p_t}{\nu_t}\right)^{\sigma} .
+\]
+Consequently, for $s<t$, $t$ being the base-time, the hypothetical income at time $s$ is
+\[
+\widehat m_{t,s} = \frac{\nu_t^{-\sigma}}{\sigma-1} p_t \left(p_s^{\sigma-1}-p_t^{\sigma-1}\right) 
++ \frac{p_t m_s}{p_s} ,
+\]
+which converges to (\ref{eq:HI}) when $\sigma\rightarrow 1$.
+We have simulated the economy for a large range of values of $\sigma >0$. The result is qualitatively similar to Figure~\ref{fig:BBEV_vs_FS_sigma}. The larger the intertemporal elasticity of substitution, the larger the substitution bias, making the fixed-base BBEV measure to diverge more relative to the chained Divisia. Moreover, discrepancies are still substantial even for low levels of the IES.
+
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=1\textwidth]{Figures/BBEV_vs_FS_sigma_0_075.pdf} % Replace with your image file
+        \captionsetup{justification=centerlast}
+        \caption*{(a) $\sigma = 0.075$ }
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=1\textwidth]{Figures/BBEV_vs_FS_sigma_2_5.pdf} % Replace with your image file
+        \captionsetup{justification=centerlast}
+        \caption*{(b) $\sigma = 2.5$ }
+    \end{minipage}
+    \captionsetup{justification=centerlast} % Centers the caption
+    \caption{Comparison of Fisher-Shell and Fixed-Base BBEV metrics.\\ \vspace{.1cm}
+        {\footnotesize Chained Fisher-Shell (solid), BBEV 1947-fixed-base (dashed), and BBEV 2023-fixed-based (dotted)}}
+    \label{fig:BBEV_vs_FS_sigma}
+\end{figure}
+
+\noindent {\bf Elasticity of substitution between $c$ and $x$ in the Bellman representation.}
+In the general case of CIES, from the household problem, the ratio of consumption to net investment is
+\[
+\frac{c}{x} = \frac{p \left( \frac{p}{\nu}\right)^\sigma}{m - \left( \frac{p}{\nu} \right)^\sigma} = p \left(m  \left( \frac{\nu}{p} \right)^\sigma-1\right)^{-1} .
+\]
+The first derivative with respect to the relative price $p$ is
+\[
+\frac{\partial\left(\frac{c}{x}\right)}{\partial p} = \frac{c}{px} \left(
+1 + \sigma  \frac{m}{{px}}
+\right).
+\]
+The elasticity of substitution between $c$ and $x$ in the Bellman representation is then $\xi = 1 + \frac{\sigma}{1-\widehat s_c}$, with $1-\widehat s_c = \frac{\delta+g_k}{zq}$ and $g_k = \frac{\sigma( \alpha z q - \delta - \rho )}{1- \lambda + \sigma\lambda} $. 
+It is clear that the elasticity of substitution between \( c \) and \( x \) in the Bellman representation, \( \xi \), is positively related to the intertemporal elasticity of substitution, \( \sigma \). A higher \( \sigma \) implies a greater responsiveness of consumption to an increase in the relative price of investment, as households become more willing to substitute present for future consumption.
+
+Consequently, as the relative price of investment declines permanently, a higher intertemporal elasticity of substitution leads to a greater fictitious substitution bias in the fixed-base BBEV index, amplifying the distortion in the BBEV measure when comparing the present with the distant past.
+
+
+%\section{The value function}
+%The value function of the representative individual can be explicitly written in the two-sector learning-by-doing model. At equilibrium, the budget constrain in  (\ref{eq:Intertemp_BC}) reads
+%\[
+%c_t = w_t + (r - \delta - g_k) p_t k_t .
+%\]
+%Then, under $u(c) = \log c$, after substituting the equilibrium consumpton into (\ref{eq:household}),
+%\[
+%v(k_t;\Theta_t) = \frac{ \log \big(w_t + (r - \delta - g_k) p_t k_t\big)  }{\rho} + \frac{(1-\lambda)g_k} {\rho^{2}}  .
+%\]
+%This implies that, at equilibrium, 
+%$$
+%\nu_t = v'_k(k_t;\Theta_t)= \frac{  (r - \delta - g_k) p_t  }{ \rho \big(w_t + (r - \delta - g_k) p_t k_t \big) } .
+%$$
+
+
+\end{appendices}
+
+%\printbibliography %Prints bibliography
+
+\newpage
+\bibliography{bibliography.bib}
+
+%%%%%%%%%%%%%
+\end{document}
+%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%
+\section{Does the reference order really matter?}
+%%%%%%%%%%%%%
+
+Let us define the equivalent variation measure for an arbitrary reference order $\widetilde\nu$
+\begin{equation}
+\widetilde m_{t,s} = e\Big(u(m_s,p_s;\widetilde\nu) ,p_t;\widetilde\nu\Big)
+= \frac{p_t}{\widetilde\nu} 
+\left(\log p_s - \log p_t \right)
++  \frac{p_t m_s}{p_s} 
+ ,
+\end{equation}
+For $s\in(t_0,t)$, let us define the following index
+\[
+\widetilde{\cal P}_{t,s} = \log \widetilde m_{t,t_0} - \log \widetilde m_{t,s} 
+= \frac{p_t}{\widetilde\nu} 
+\left(\log p_{t_0} - \log p_s \right)
++  p_t \left(\frac{m_{t_0}}{p_{t_0}} 
+-  \frac{ m_s}{p_s}\right)
+\]
+which takes the value 0 at $t_0$ and $\widetilde{\cal P}_{t,t} =\widetilde m_{t,t_0} - m_t$
+
+
+Its first derivative with respect to $s$ is 
+\begin{equation}\label{eq:derivativeHI}
+\dot{\widetilde m}_{t,s} = 
+\frac{p_t}{p_s} \dot m_s + 
+ \left( \frac{p_t}{\widetilde\nu }  - \frac{p_t m_s}{p_s}
+\right) 
+\frac{\dot p_s}{p_s} .
+\end{equation}
+Let us define the Fisher-Shell index as
+\[
+\widetilde g_t^{\text{FS}} \equiv
+\frac{\dot{\widetilde{m}}_{t,s}|_{s=t}}{m_t} =
+g_{m,t} + \left( \frac{p_t}{\widetilde\nu\, m_t}  - 1
+\right)  g_{p,t}  ,
+\]
+where  $g_{m,t}$ and $g_{p,t}$ are the instantaneous growth rates of $m_t$ and $p_t$, respectively. 
+Differentiating the household budget constraint,
+\[
+g_{m,t} - s_{x,t} g_{p,t} = s_{c,t} g_{c,t} + s_{x,t} g_{x,t}  .
+\]
+Consequently.
+\[
+g_t^{\text{FS}} 
+=
+s_{c,t} g_{c,t}  + s_{x,t}g_{x,t} + \left( \frac{\nu_t}{\widetilde\nu} - 1 
+\right)  s_{c,t}g_{p,t}.
+\]
+
+
+%%%%%%%%%%%%%
+\subsubsection{Three-Sector Learning-by-Doing Model}
+%%%%%%%%%%%%%
+
+
+Let us assume population is constant, defined on a continuum of measure one. 
+A representative households has constant intertemporal elasticity of substitution preferences defined on a flow of consumption, with intertemporal elasticity of substitution $\sigma >0$.
+Let us adopt the consumption good as numeraire.  
+
+There are three sectors, one producing non-durable goods in quantity $y_t$, another producing structures in quantity $h_t$, and the third one producing investment goods in quantity $i_t$. 
+A measure one of perfectly competitive firms operates in each sector.
+In the non-durable sector, a representative firm produces $y_t$ by means of a Cobb-Douglas technology defined on capital and labor. 
+The per capita technology is
+ 
+\begin{equation}\label{eq:y}
+y_t = z_t k_t^\alpha s_t^\beta
+= c_t + m_{i,t} +  m_{h,t} ,
+\end{equation}
+ 
+where $z_t$ is the state of technology in this sector. There are decreasing returns, meaning that $\alpha >0 $, $\beta > 0$ and $\alpha + \beta < 1$.
+Non-durable production is allocated to consumption, $c_t$, and as an input (materials) in the investment and construction sectors, $m_{i,t}$ and $m_{h,t}$, respectively. All variables are in per capita terms.
+In the investment and construction sectors, materials are transformed into the investment good and structures at the constant rates $q_{i,t}$ and $q_{h,t}$, s.t.,
+which at the time transform into the stock of capital and sturctures
+\begin{equation}\label{eq:ks}
+\dot k_t = q_{i,t} m_{i,t} - \delta_k k_t \ \ \ \ \text{and}\ \ \ \ \dot s_t =  q_{h,t} m_{h,t} - \delta_s s_t ,
+\end{equation}
+where $\delta_i > 0$ and $\delta_s>0$ represent the depreciation rates in the investment and structure technologies.
+
+The state of technology in the investment and construction sectors is described by the vector $\{ q_{i,t}, q_{h,t} \}$.
+In the following, we will refer to improvement in $\{ q_{i,t}, q_{h,t} \}$ as embodied technical progress and to improvements in $z_t$ as disembodied. (give here some references)
+
+A planner solves the following problem
+ 
+\begin{equation}\label{eq:household}
+v(k_{s,t},k_{o,t},;\Theta_t) = \max \int_t^\infty u( c_s) \ \text{e}^{-\rho (s-t)} \text{d} s 
+\end{equation}
+s.t. equations (\ref{eq:y}) and (\ref{eq:ks}); $\rho > 0$ is subjective discount rate.
+Vector $\Theta_t = \{z_t, q_{i,t}, q_{s,t}\}$ represents the state of technology at $t$.
+Preferences are constant intertemporal elasticity of substitution (CIES), with $\sigma >0$ representing the IES.
+The vector $\Theta_t = \{p_t,w_t,r_t\}$ is the set of equilibrium prices, where $p_t$ is the price of the investment good, $w_t$ the wage rate and $r_t$ the net return to capital assets.
+The first order conditions of the household problem collapse to the standard Euler equation
+ 
+\[
+\frac{\dot c_t}{c_t} = \sigma\left(r_t - \rho \right) .
+\]
+
+
+
+For the following, it is important to notice that, in this economy, $y_t$ measures nominal gross income.
+All the exercise that follows consists in transforming it in a measure of real income emerging from people's preferences, ideally measuring gains in welfare.
+
+All sectors benefit from learning-by-doing (LBD) operating as knowledge spillovers from capital goods production.
+Disembodied technical progress in the non-durable sector takes the form $z_t = z k_t^\gamma$.
+In the investment and construction sectors embodied technical progress take the form $q_{i,t} = q_i k_t^{\lambda_i}$ and $q_{h,t} = q_h k_t^{\lambda_h}$.
+Parameters verify the following constraints: $z>0$, $q_i>0$, $q_h>0$, $\gamma>0$, $\lambda_i>\lambda_h>0$ and $\gamma_i+\lambda = 1-\alpha$.
+
+%Let us adopt the non-durable good as numeraire, and denote by $p_t$ to the relative price of the durable good. 
+Because of linearity in the durable goods technology, at equilibrium,
+ 
+\begin{equation}\label{eq:p}
+p_t = q_t^{-1} =  q^{-1} k_t^{-\lambda}.
+\end{equation}
+ 
+At equilibrium, the relative price of investment goods permanently declines at the rate of embodied technical progress $\lambda g_k$, where $g_k$ is the growth rate of capital.
+From the FOC for $k_t$ in the non-durable sector $r_t = \alpha z q$, which is constant thanks to the assumption that $\gamma+\lambda = 1-\alpha$.
+
+
+In this framework, an equilibrium is a path $\{c_t,k_t\}$ verifying the Euler equation
+ 
+\[
+\frac{\dot c_t}{c_t} = \sigma \left( 
+\alpha z q - \delta - \rho  - \lambda \frac{\dot k_t }{k_t}
+\right)
+,
+\]
+ 
+and the feasibility condition
+% 
+\[
+\frac{\dot k_t}{k_t} = \big(zq  - \delta \big)  - q k_t^{\lambda-1} c_t .
+\]
+%The user cost of capital is $r +\delta - \frac{\dot p}{p}$ with, as shown above, $\frac{\dot p}{p} = -\lambda \frac{\dot k}{k}$.
+
+It is easy to show that the economy is at its balanced growth path from the initial time with 
+ 
+\begin{equation}\label{eq:BGP}
+k_t = k_0 \,\text{e}^{g_k  t}
+\ \ \ \ \ \text{and}\ \ \ \ 
+c_t =   \widehat s_c\, \underbrace{z k_t^{1-\lambda}}_{y_t} = 
+\underbrace{\widehat s_c\, z k_0^{1-\lambda}}_{c_0}  \,\text{e}^{g_c  t} ,
+\end{equation}
+ 
+where $\widehat s_c = \frac{zq-\delta - g_k}{zq}$ %\frac{(1-\alpha)zq  + \rho }{zq} $ 
+is the share of consumption on total non-durable production $y_t$.
+The equilibrium growth rates of capital and consumption, respectively, are
+ 
+\begin{equation}\label{eq:growth}
+g_k = \frac{\sigma\Big( \alpha z q - \delta - \rho \Big)}{1-(1-\sigma)\lambda} ,
+\ \ \ \ \ \text{and}\ \ \ \ 
+g_c = (1-\lambda) g_k .
+\end{equation}
+ 
+The shares of consumption and investment on  non-durable production are
+ 
+\begin{equation}\label{eq:shares}
+s_x =  \frac{\alpha z q  - \rho - \delta}{z q - \delta}
+\ \ \ \ \text{and}\ \ \ \
+s_c = 1 - s_x.
+\end{equation}
+ 
+In the following, let us assume the condition $\alpha z q  - \rho - \delta > 0$ holds, implying that $s_x\in(0,1)$.
+In order for an economy to growth, technology must be productive enough to cover for depreciation and the value of time.
+
+%%%%
+\paragraph{Bellman representation of preferences.}
+%%%%
+
+Following Duran~and~Licandro~(2025), from the Bellman equation associated to the representative household problem in (\ref{eq:household}), we derive the so-called Bellman representation of preferences
+ 
+\[
+w(c,x;\nu_t) = \log c + \nu_t  x ,
+\ \ \ \ \ \text{where}\ \ \ \
+\nu_t = v'(k_t;\Theta_t)  %= \frac{1-\lambda}{\rho k_0} \, \text{e}^{-g_k t} >0 
+\]
+ 
+is the marginal value of capital and $x = \dot k$ is net investment. 
+In continuous time, the Hamilton-Jacobi-Bellman (HJB) equation transforms a dynamic problem into an infinitesimal sequence of static problems.
+In this sense,  $w(c,x;\nu_t)$ represents at time $t$ the same preference order represented in (\ref{eq:household}).
+It embodies the utility of current consumption and the utility of all future consumption generated by current net investment.
+Even if the instantaneous preferences, $\log c_t$, are time invariant, since the marginal value of capital $\nu_t$ changes over time the Bellman representation is time dependent.
+In the following, we will use $\nu_t$ as a shortcut to refer to the time-$t$ Bellman representation of preferences.
+
+The primal problem faced by the representative household at time $t$ is
+ 
+\[
+\max_{c,x}\  \log c + \nu_t x ,
+\]
+s.t.
+ 
+\begin{equation}\label{eq:d}
+c + p_t x = y_t ,
+\end{equation}
+ 
+where  $y_t$ is time-$t$ net income of the representative household at  equilibrium.
+The optimal solution is
+ 
+\begin{equation}\label{eq:c}
+c = \frac{p_t}{\nu_t} 
+\ \ \ \ \text{and}\ \ \ \ 
+x = \frac{y_t}{p_t} - \frac{1}{\nu_t}.
+\end{equation}
+ 
+Since the Bellman representation is quasilinear in net investment, optimal consumption depends not on current income but on the ratio of the relative price of investment to the marginal value of capital. Non-consumed income is residually allocated to investment.
+
+
+\noindent REVISE FROM HERE
+
+It is important to notice that at equilibrium, as shown above, the share of consumption in net income is $ s_c = \frac{(1-\alpha)zq  + \rho }{zq - \delta}$. From (\ref{eq:c}),
+\[
+ s_c = \frac{c_t}{y_t} =  \frac{p_t}{\nu_t y_t} = \frac{1}{\nu_t z q} \ \frac{1}{k_t}  ,
+\]
+which requires 
+\[
+\nu_t = \frac{1}{(1-\alpha)zq  + \rho}  \ \frac{1}{k_t}.
+\]
+
+ 
+\noindent In other words, the value function of the representative household at equilibrium reads
+\begin{equation}\label{eq:v}
+v(k_t;\Theta_t) = A_t +  \frac{\log(k_t)}{(1-\alpha)zq  + \rho}  ,
+\end{equation}
+ 
+where the effect of $\Theta_t$ is in $A_t$.
+
+Substituting the optimal solution (\ref{eq:c}) in the objective, we obtain the indirect utility function
+ 
+\begin{equation}\label{eq:indirect}
+u(y_t,p_t;\nu_t) =
+\log p_t - \log \nu_t  + \frac{\nu_t y_t  }{p_t} - 1 ,
+\end{equation}
+ 
+which depends on the utility index $\nu_t$.
+
+What are the effects of an increase in the relative price of investment on the indirect utility function?
+First, an increase in investment prices has a negative income effect on utility through the term $\frac{\nu_t y_t  }{p_t} -1$, which measures the utility of current income allocated to investment, valued at the marginal value of capital $\nu_t$.
+Second, a higher investment price makes the representative household optimally substitute current consumption by current investment.
+%This is the substitution effect of an investment price increase on utility.
+The utility of current consumption is represented by the term $\log p_t- \log \nu_t$. 
+
+In this framework, the income effect dominates the substitution effect. To show this, take the derivate of the indirect utility function w.r.t. $p_t$, i.e.,
+ 
+\[
+\frac{\partial u(y_t,p_t;\nu_t)}{\partial p_t} = \frac{1}{p_t} - \frac{\nu_t y_t  }{p_t^2} = \frac{1}{p_t} \left( 1-\frac{1}{\widehat s_c} \right) < 0 .
+\]
+ 
+The last equality results from using equation (\ref{eq:c}) and the equilibrium value of the consumption share in (\ref{eq:shares}).
+An increase in the relative price of investment has the unequivocal effect of reducing welfare. 
+Notice that in this model, a reduction in the price of investment results from an increase in the state of embodied technological knowledge, improving the production possibility frontier. An optimal allocation based on a more efficient technology will then bring more welfare.
+
+Let us now solve the dual problem
+ 
+\[
+\min_{c,x} c + p_t x ,
+\]
+s.t.
+\[
+\log c + \nu_t x = u_t .
+\]
+ 
+The associated expenditure function is
+ 
+\[
+e(u_t,p_t;\nu_t) = \frac{p_t}{\nu_t} u_t + \frac{p_t}{\nu_t} \big( 1 - \log p_t + \log \nu_t\big).
+\]
+ 
+An increase in investment prices requires a larger income to provide the same utility $u_t$, as measured by the first term at the right-hand-side.
+However, substituting out of investment may reduce this cost, as measured by the second term of the right-hand-side.
+Let us compute the first derivate of the expenditure function w.r.t. $p_t$, i.e.,
+ 
+\[
+\frac{\partial e(u_t,p_t;\nu_t)}{\partial p_t} = \frac{u}{\nu_t} + \frac{1 - \log p_t + \log \nu_t}{\nu_t} - \frac{1}{\nu_t} 
+ = \frac{1}{\nu_t} \left( \frac{1}{\widehat s_c} -1 \right) > 0 .
+\]
+ 
+It is easy to see that the income effect of an investment price increase on total expenditure, as expected from the primal problem, dominates. 
+
+What is the effect of changes in the marginal value of capital $\nu_t$ on both the indirect utility function and the expenditure function? It is easy to see that both are equal to the effect of prices multiplied by minus one.
+
+In summary, in this framework, an improvement in the environment that makes the investment sector productivity permanently increase has the direct effect of making the price of investment goods to decline; this permanent decline in the price of investment goods raises utility and reduces the income needed to generate it. Any correction of past income that takes into account the declining path of investment prices should be larger than observed past income $m_s$.
+
+\noindent TO HERE
+ 
+
+
+\paragraph{Base-year equivalent variation measures.}
+
+Let us now use index number theory to compare income at the current time $t$, with income at any past time $s < t$, controlling for changes in prices.
+Since the Bellman representation of preferences $w(c,x;\nu_t)$ is changing over time, as pointed out by Fisher~and~Shell~(1968), a common preference set should be used to make such a comparison.
+Following the application of the Fisher-Shell principle by Baqaee~and~Burstein~(2023), we first adopt the current representation $w(c,x;\nu_t)$ as a benchmark for intertemporal comparisons of income. 
+We will refer to it as current-base equivalent variation measure. 
+We will then study the alternative of adopting past preferences $w(c,x;\nu_s)$ as the benchmark, which we will refer as past-base equivalent variation measure. We will finally, in line with the well-known Fisher-ideal index used to combine Laspeyres and Paasche indices, create a sort Fisher-ideal index by combining the current-base and past-base equivalent variation measures.
+
+In line with Baqaee~and~Burstein~(2023), let us try to answer the question ``how much better off is the representative household in $t$ compared to $s$?” In answering this question, for any $s < t$, we take the perspective of the current representative agent and define the hypothetical income
+ 
+\begin{equation}\label{eq:HI}
+y_{t,s} = e\Big(u(y_s,p_s;\nu_t) ,p_t;\nu_t\Big)
+= \frac{p_t}{\nu_t} 
+\left(\log p_s - \log p_t \right)
++  \frac{p_t y_s}{p_s} 
+ ,
+\end{equation}
+ 
+where $y_{t,s} $ is the expenditure at time $s$ that the representative household would needed at current prices $p_t$ to support the utility attainable with income $y_s$ at prices $p_s$ when the indirect utility function and the expenditure function are both evaluated using current preferences $\nu_t$.
+In other words, $y_{t,s}$ is the level of income required at time $s$ to, at current prices $p_t$ and using current preferences $\nu_t$, provide the utility that the representative household would have got with past income $y_s$ at past prices $p_s$. 
+For the representative household at current time $t$, $y_{t,s}/y_t$ is a money metric measure of the welfare loses of moving back to the past, from current time $t$ to past time $s$.
+Its inverse measures in this particular metrics how much better off is the representative household in $t$ compared to $s$.
+Notice that if past prices were equal to current prices, the hypothetical income would be $y_s$, irrespective of the preference set adopted to evaluate past choices. 
+In an economy with time invariant prices, the ratio of past income to current income, $y_s/y_t$, measure them these welfare loses. 
+
+%Notice also that the logic behind the construction of the hypothetical income $y_{t,s}$ is similar to the logic behind a Paasche index. We build a hypothetical past income valuing past quantities at current prices. The fundamental difference emerging from the use of the Fisher-Shell principle is that we don't use past observed quantities but, given income $y_s$ and prices $p_s$, the optimal quantities emerging from current instead of past preferences.
+
+%When evaluating the time $s$ problem using current prices $p_t$, consumers would like to consume less. The term $\log p_s -\log p_t$ measures then the difference between represents the change in consumption due to 
+
+In a world of declining investment prices, at current prices, less income would be required at time $s$ to buy investment goods that the income required at past prices. It makes the second term at the right-hand-side of (\ref{eq:HI}) smaller than past income $y_s$. As we move back into the past, the relative price of investment goods is higher and higher, and the amount of investment goods that can be afforded with income $y_s$ is smaller and smaller. 
+
+The first term at the right-hans-side, indeed, measures the substitution effect. As we move to the past, investment prices are larger and larger. Optimal consumption, as given by equation (\ref{eq:c}), is then larger and larger too, requiring more and more income to afford it. 
+Valuing past investment at the current marginal value of capital $\nu_t$ makes past optimal consumption higher. Consequently, the current representative household has the perception that she was richer in the past that she previously though she was.
+
+How do income and substitution effects interact in the two-sector LBD economy when comparing current income $d_t$ with the past hypothetical income evaluated at current prices $p_t$ and current preferences $\nu_t$? For that, let us substitute the equilibrium conditions into (\ref{eq:HI}) to get
+\begin{equation}\label{eq:HI2}
+\frac{y_{t,s}}{y_t} = 
+  s_c 
+\left(\log p_s - \log p_t \right)
++  \frac{p_t}{p_s} \frac{y_s}{y_t}=
+\underbrace{  s_c \lambda g_k (t-s) }_{\text{substitution effect}}+ 
+\underbrace{\ \text{e}^{g_k (s-t)} \ }_{\text{income effect}}.
+\end{equation}
+The permanent decline on investment prices, $g_p = - \lambda g_k$, plus the permanent increase in nominal income, $g_c = (1-\lambda) g_k$, make the income effect to reduce the hypothetical income relative to current income.
+Since investment declines with the raise of investment prices, in the limit it goes to zero, making the income effect of a decline in the investment price negligible.
+The substitution effect makes the hypothetical past income to raise, since the decline in prices makes consumption grow. The substitution effect will dominate since in computing our hypothetical income consumption can grow unboundedly. This is nothing else than the well known {\it substitution bias} problem of fixed based quantity indices.
+
+Since past investment prices were higher than current ones, as the evidence clearly show, when making the intertemporal comparison, the representative household would like to substitute out of past investment by increasing past consumption. Consequently, the term $\log p_s - \log p_t$ measures the substitution bias. From the optimal condition for consumption (\ref{eq:c}), more and more income is needed to raise consumption.
+The last term, $\frac{\nu_t d_s}{p_s}$ the max possible investment at $s$, resulting of allocating all income to buy investment goods, but valued at the current marginal value of capital $\nu_t$.
+
+If alternatively, past preferences were used to evaluate the hypothetical past income, the past-base equivalent variation measure would be
+ 
+\begin{equation}\label{eq:HIL}
+\widetilde y_{t,s} = e\Big(u(d_s,p_s;\nu_s) ,p_t;\nu_s\Big)
+= \frac{p_t}{\nu_s} 
+\left(\log p_s - \log p_t \right)
++  \frac{p_t d_s}{p_s} 
+ ,
+\end{equation}
+ 
+which, after substituting for the equilibrium solution, becomes
+ 
+\begin{equation}\label{eq:HI2L}
+\frac{\widetilde y_{t,s}}{d_t} = 
+ s_c \frac{\nu_t}{\nu_s}
+\left(\log p_s - \log p_t \right)
++  \frac{p_t}{p_s} \frac{d_s}{d_t}
+=
+\underbrace{s_c \lambda g_k (t-s)  \text{e}^{g_k (s-t)} }_{\text{substitution effect}} + 
+\underbrace{\ \text{e}^{g_k (s-t)} \ }_{\text{income effect}}.
+\end{equation}
+ 
+The substitution effect operates now in the opposite direction than in the BBEV measure.
+
+Since the BBEV measure, based on current preferences, tends to overestimate past income, and the alternative $\widetilde y_{t,s}$  measure, based on past preferences, tends to underestimate it, we will also create, in line with the Fisher-ideal index, a geometric mean of both indices for comparability. We expect that an appropriate weighting of both indices will eliminate the bias, as it does in standard static quantity indices.
+
+\paragraph{Fisher-Shell index.}
+
+Let us follow Duran~and~Licandro~(2025) and first compute the derivative of $y_{t,s} $ in (\ref{eq:HI}) w.r.t. $s$, which after some simplifications becomes
+\begin{equation}\label{eq:derivativeHI}
+\dot{y}_{t,s} = 
+\frac{p_t}{p_s} \dot y_s + 
+c_t \left( 1  - \frac{p_t}{p_s}\frac{y_s}{c_t}
+\right) 
+\frac{\dot p_s}{p_s} .
+\end{equation}
+The instantaneous growth rate at $s$ of the hypothetical income $y_{t,s}$ is
+\[
+\frac{\dot{y}_{t,s}}{y_{t,s}} = 
+\left(
+\log p_s - \log p_t  + \frac{p_t}{p_s}  \frac{y_s}{c_t}
+\right)^{-1}
+\left(
+\frac{p_t}{p_s} \frac{y_s}{c_t} g_{d,s} + 
+\left( 1  - \frac{p_t}{p_s}\frac{y_s}{c_t}
+\right) 
+g_{p,s}
+\right) ,
+\]
+where $\dot{y}_{t,s}$ is the derivative with respect to s, and the instantaneous growth rates of $y_s$ and $p_s$ are $g_{d,s} = \frac{\dot y_s}{y_s}$ and $g_{p,s} = \frac{\dot p_s}{p_s}$, respectively.
+Moreover, from the definition of current income
+\[
+g_{d,s} - s_{x,s} g_{p,s} = s_{c,s} g_{c,s} + s_{x,s} g_{x,s}  ,
+\]
+where the income shares are $s_{c,s} = \frac{c_s}{y_s}$ and $s_{x,s} = \frac{p_s x_s}{y_s}$, respectively. Substituting it in the previous equation
+\[
+\frac{\dot{\widehat d}_{t,s}}{y_{t,s}} = 
+\left( \frac{p_s}{p_t}  \frac{c_t}{y_s}
+\big(\log p_s - \log p_t \big) + 1
+\right)^{-1}
+\left(
+\frac{ g_{d,s}  -
+\left( 1- \frac{p_s}{p_t}\frac{c_t}{y_s} \right) g_{p,s}} {g_{d,s} - s_{x,s} g_{p,s}}\right)
+\Big(s_{c,s} g_{c,s} + s_{x,s} g_{x,s}\Big)
+\]
+
+
+When we evaluate it at $s=t$, s.t.,
+\[
+\dot{\widehat{d}}_{t,s}|_{s=t} =
+\dot y_t - \underbrace{\left( y_t - \frac{p_t}{\nu_t}  \right)}_{p_t x_t} \frac{\dot p_t}{p_t} 
+.
+\]
+Differentiating  the definition of income w.r.t. time, we get $\frac{\dot y_t}{y_t} - s_{it} \frac{\dot p_t}{p_t} = s_{ct} \frac{\dot c_t}{c_t}  + s_{it} \frac{\dot x_t}{x_t} $, with income shares $s_c + s_i =1$.
+To finally define the Fisher-Shell index as
+\[
+g_t^{\text{FS}} \equiv
+\frac{\dot{\widehat{d}}_{t,s}|_{s=t}}{y_t} =
+s_{ct} \frac{\dot c_t}{c_t}  + s_{it} \frac{\dot x_t}{x_t} .
+\]
+As in Durand and Licandro (2025), the Fisher-Shell index is equal to the Divisia index. Morevoer, since the LBD economy is at its balanced growth path from the initial time, all shares and growth rates are time independent, determined in equations (\ref{eq:growth}) and  (\ref{eq:shares}).
+
+It is important to notice that the base-preferences indices and the Fisher-Shell index are all welfare based. Even if they provide different quantitative measures of real income, they all emerge from a representation of the same preference map. However, they have different properties. In the following section, we study the behavior of these different measures in the framework of the two-sector AK model under analysis.
+
+\paragraph{Calibration.}
+
+The calibration below uses the annual US GDP data published by John Fernald for the period 1947-2023.%
+\footnote{See https://www.johnfernald.net/TFP.}
+We set $q=1$, without any lose of generality, and $\rho = 0.05$.
+From the Fernald data set, we set $\alpha = 0.3356$ to the average capital's share of income, the average decline rate of the relative price of investment is used to set $g_{p} =  -0.01985$, the average growth rate of gross GDP per capital is $\widehat g = 0.02267$, and the average gross investment share is set at $\widehat s_x = 0.223$.
+
+From (\ref{eq:y}) and the LBD assumption, the growth rate of gross output is
+$$
+\widehat g = \big(1- \lambda (1-\widehat s_x)\big) g_k .
+$$
+From (\ref{eq:p}),  $g_p = - \lambda g_k$.
+We can then use the observed growth rate of gross output  per capital $\widehat g$, the gross investment share $\widehat s_x $ and the decline rate of investment goods prices $g_{p}$ to obtain $g_k=0.0381$ and $\lambda = 0.5208$.
+From the definition of the net income share of consumption in (\ref{eq:shares}), the productivity scale factor is calibrated at $z = 0.666$ and the depreciation rate emerging from the equilibrium growth rate of capital in (\ref{eq:growth}) is $\delta = 0.11$.
+
+
+\paragraph{Fisher-Shell vs base-year equivalent variaton measures.}
+
+For the above mentioned calibration, Figure \ref{fig:1} represents the evolution of real income in the calibrated LBD economy using three alternative base-year indices and the Fisher-Shell index. The x-axis measures time, going from 1950 to 2020, and the y-axis measures the logarithm of the different real income measures. 
+
+The diagonal in the three figures represents the chained Divisia index, which as showed above is equal to the chained Fisher-Shell index suggested by Duran~and~Licandro~(2025). It is normalised to one (zero in logs) at year 2020. In this representation per capita net income is growing at the constant yearly rate $g = 2.02\%$. It has the property of delivering a time invariant measure, which not depend on any particular base year, which is constant consistently with the economy being at its balanced growth path.
+
+How do the base-year equivalent variation measures behave? In each of the three graphs in Figure 1, the four dashed lines represent the corresponding equivalent variation measures evaluated at  $t=\{1960, 1980, 2000, 2020\}$. At the evaluation time, all three measures are normalised to be in the diagonal. 
+The top panel of Figure 1 represents the measure suggested by Baqaee~and~Burstein~(2023). This equivalent variation measure, when evaluated at a particular time, does not report constant growth rates, but growth rates decline farther the economy is from the current time. Moreover, when time passes and the current time moves to the right, the evaluation of the past performances also change. In other words, a Statistical Office using this measure will be revising past growth continuously. When equivalent variation is measured at current-base preferences, since the relative price of investment permanent declines, the equivalent variation tends to overestimate past income, the overestimation growing with the distance to the current time.%
+\footnote{It is important to notice that, when evaluating past income at past prices using current preferences, there is a past time before which optimal consumption is larger then income. In our calibrated economy, this arrives around forty years before the current time. For this reason, we don't report the measures more than 40 years before the evaluation time.}
+
+Explain the substitution bias.
+
+The middle graph in Figure 1 reports the past-based equivalent variation measure. 
+ 
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=.6\textwidth]{BBEV}
+\includegraphics[width=.6\textwidth]{BBEVLaspeyres}
+\includegraphics[width=.6\textwidth]{BBEVFisher}
+\end{center}
+\caption{Fixed-Base Preferences Equivalent Variation Measures}
+\label{fig:1}
+\end{figure}
+
+
+
+%For any time $s<t$, the BBEV measure, when applied to the Bellman representation of preferences, is the $\phi^s_t$ that verifies
+%\[
+%u(d_t,p_t;\nu_t) =
+%u(\text{e}^{\phi^s_t} \, d_s,p_s;\nu_t) .
+%\]
+%The BBEV condition reads
+%\[
+%\widetilde d_{t,s} = \text{e}^{\phi^s_t} \, d_s
+%= \frac{p_s}{\nu_t} \left(
+%\log p_t + \frac{\nu_t d_t}{p_t} - \log p_s
+%\right)
+% .
+%\]
+%Taking the first derivative wrt $s$ and evaluating it at $s=t$, the instantaneous growth rate at $t$ of the BBEV is
+%$$
+%\frac{\dot{\widetilde{d}}_{t,s}|_{s=t}}{d_t} = \left(1-\frac{p_t}{\nu_t d_t} \right) \frac{\dot p_t}{p_t}
+%$$
+
+
+%For any $s < t$ the right-hand-side is negative, requiring that the growth rate implicit in the BBEV measure is smaller than $g_k$. It converges to $g_k$ when $s$ converges to $t$, but farther $s$ is from $t$ larger the distance. This property reminds the famous substitution bias effect on fixed-based quantity indices when, as it is the case in the example, the relative price of investment is permanently declining. When the economy moves ahead over time and the BBEV is computed again and again all growth rates will be revised up, concluding that we were underestimating the growth rates.
+
+
+%ALTERNATIVE. For any time $s<t$, the BBEV measure, when applied to the Bellman representation of preferences, is the $\phi^s_t$ that verifies
+%\[
+%u(\text{e}^{\phi^s_t} \,d_t,p_t;\nu_t) =
+%u( d_s,p_s;\nu_t) .
+%\]
+%The BBEV condition reads
+%\[
+%\widetilde d_{t,s} = \text{e}^{\phi^s_t} \, d_t
+%= \frac{p_t}{\nu_t} \left(
+%\log p_s + \frac{\nu_t d_s}{p_s} - \log p_t
+%\right)
+% .
+%\]
+%Taking the first derivative wrt $s$ and evaluating it at $s=t$, the instantaneous growth rate at $t$ of the BBEV is
+%$$
+%\frac{\dot{\widetilde{d}}_{t,s}|_{s=t}}{d_t} = \left(1-\frac{p_t}{\nu_t d_t} \right) \frac{\dot p_t}{p_t}
+%$$
+
+
+\noindent IT WILL BE INTERESTING HERE TO RUN THE GREENWOOD ET AL (1997) ECONOMY AND COMPARE THE INDICES.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
+\newpage
+
+\noindent {\bf LOOK FOR THE SUBSTITUTION BIAS}
+
+\noindent {\bf (HERE give an intuitive explanation on how the substitution bias operates in the BBEV measure.)}
+
+\paragraph{On the substitution bias.}
+Let's divide the derivative of the hypothetical income in equation (\ref{eq:derivativeHI}) by $s$, and make some substitutions, to get
+\begin{equation}\label{eq:gds}
+\widehat g_{t,s} =
+\frac{\dot{\widehat d}_{t,s}}{d_s} = 
+\frac{p_t}{p_s} \frac{\dot d_s}{d_s} + 
+\left( \frac{d_t}{d_s} s_c   - \frac{p_t}{p_s}
+\right) 
+g_p ,
+\end{equation}
+where, as defined above, $s_c = c/d$ and $g_p = \frac{\dot p_s}{p_s}$, which are both time-invariant at equilibrium.
+Differentiate net income $d_s = c_s + p_s x_s$ w.r.t. $s$
+\begin{equation}\label{eq:subst}
+\frac{\dot{d}_{s}}{d_s} = s_c g_c + s_x (g_x + g_p) .
+\end{equation}
+To simplify notation, we profit from the property that the income shares and the growth rates are time independent at equilibrium.
+Most of the derivations that follow don't depend on this.
+Substitute (\ref{eq:subst}) into (\ref{eq:gds}) to get 
+\[
+\widehat g_{t,s} =
+\frac{p_t}{p_s}\big(s_c g_c + s_x g_x\big) + 
+\left( \frac{d_t}{d_s} s_c   - \frac{p_t}{p_s} +  \frac{p_t}{p_s} s_x 
+\right) 
+g_p ,
+\]
+
+From the equilibrium condition for consumption (\ref{eq:c}),
+\[
+g_p = g_c + g_v .
+\]
+reflecting changes in $c$ due to changes in $p$ and preferences, as represented by the change in the marginal value of capital $g_v = \frac{\dot {\nu}_s}{{\nu}_s}$, 
+which is also constant at equilibrium. Then,
+\[
+\widehat g_{t,s} =
+\frac{d_t}{d_s} s_c g_c +  \frac{p_t}{p_s}  s_x g_x + 
+\left( \frac{d_t}{d_s} s_c   - \frac{p_t}{p_s} +  \frac{p_t}{p_s} s_x 
+\right)  g_v .
+\]
+Notice that if preferences were not changing over time, the second term at the right-hand-side would be zero and the change on the BBEV index relative to current income at $s$ will only depend on the growth rates of consumption and investment. Notice that
+\[
+\frac{d_t}{d_s} s_c g_c +  \frac{p_t}{p_s}  s_x g_x = \left(\frac{d_t}{d_s} s_c  +  \frac{p_t}{p_s}  s_x \right) \Big(\widehat s_c g_c + \widehat s_x g_x\Big) ,
+\]
+where the perceived shares are
+\[
+\widehat s_c = \frac{\frac{d_t}{d_s} s_c}{\frac{d_t}{d_s} s_c  +  \frac{p_t}{p_s}  s_x}
+\ \ \ \ \text{and}\ \ \ \ \
+\widehat s_x = \frac{\frac{p_t}{p_s}  s_x}{\frac{d_t}{d_s} s_c  +  \frac{p_t}{p_s}  s_x}
+\]
+It clearly shows that when using current prices to evaluate the allocation of income in the past, ....
+
+%%%%%%%%%%%%%
+\subsubsection{Greenwood, Hercowitz and Krusell (1997)}
+%%%%%%%%%%%%%
+
+This section studies a non-stochastic continuous time version of Greenwood, Hercowitz and Krusell (1997). Preferences are represented by the utility function
+\[
+\int_{t}^\infty U(c_s,\ell_s) \text{e}^{-\rho(s-t)} \text{d}s
+\ \ \ \ \ \text{with}\ \ \ \ \
+U(c,\ell) = \theta \ln c + (1-\theta)  \ln (1-\ell) ,
+\]
+where $c$ is consumption per capita and $\ell$ is the fraction of time allocated to production activities. Parameters $\rho>0$ and $\theta\in(0,1)$.
+
+A final non-durable good is produced by means of technology
+\[
+y_t = z_t k_t^\alpha \ell_t^{1-\alpha} ,
+\]
+where $k$ is the stock of capital per capita and $z$ is total factor productivity in the non-durable sector. Parameter $\alpha\in(0,1)$.
+The production of the non-durable good is allocated to consumption $c_t$ and as an input  in the production of investment goods, such that
+\[
+y_t = c_t + \frac{i_t}{q_t} ,
+\]
+where the accumulation law of capital is 
+\[
+\dot k_t =  i_t - \delta k_t.
+\]
+Net investment $\dot k_t$ is gross investments $i_t$ minus depreciation, where $\delta>0$ is the depreciation rate. The investment technology transforming the non-durable good into capital benefits from the investment specific total factor productivity $q_t$. %, which is assumed to raise exogenously at the rate of embodied technical progress $\gamma$.
+
+Let us adopt the final non-durable good as numeraire. A competitive equilibrium is a path for the exogenous states $\{z_t,q_t\}$, the endogenous state $k_t$, the aggregates quantities $\{y_t,c_t,x_t\}$, where $x_t = \dot k_t$, the relative price of investment goods $p_t=1/q_t$, the wage rate $w_t$ and the interest rate $r_t$, s.t.,
+\begin{itemize}
+\item The representative household solves
+\[
+ \rho V(k_t,z_t,q_t) = \max_{\{c_t,x_t,\ell_t\}}  U(c_t,\ell_t) + V_1(k_t,z_t,q_t) x_t + V_2(k_t,z_t,q_t) \dot z_t + V_3(k_t,z_t,q_t) \dot q_t
+\]
+s.t.
+\[
+c_t + p_t x_t = r_t p_t k_t + w_t \ell_t -\delta p_t k_t .
+\]
+\item The representative non-durable good firm solves
+\[
+\max_{\{k_t,\ell_t\}} z_t k_t^\alpha \ell_t^{1-\alpha} - r_t p_t k_t - w_t \ell_t .
+\]
+
+\item The aggregate resource constraints hold
+\[
+c_t +\frac{i_t}{q_t} = z_t k_t^\alpha \ell_t^{1-\alpha} 
+\ \ \ \ \text{and}\ \ \ \ 
+\dot k_t = i_t - \delta k_t . 
+\]
+\end{itemize}
+
+\paragraph{Balanced Growth Path.}
+
+Let us assume that $z_t = z_0\, \text{e}^{(1-\alpha)\gamma_z t}$ and $q_t = q_0\, \text{e}^{(1-\alpha)\gamma_q t}$, with $\gamma_z >0$ and $\gamma_q >0$. It is easy to see that at the balanced growth path the growth rates of consumption and investment are, respectively,
+\[
+g_c = \gamma_z + \alpha \gamma_q 
+\ \ \ \ \text{and}\ \ \ \ 
+g_k = \gamma_z + \gamma_q .
+\]
+Since $p_t = \frac{1}{q_t}$, the relative price of investment goods permanently decline at the rate $\frac{\dot p_t}{p_t} = (\alpha-1) \gamma_q < 0$.
+
+The equilibrium interest rate at the balanced growth path solves the Euler equation, s.t.,
+\[
+r^* = \rho + \delta +\gamma_z + \gamma_q.
+\]
+From the non-durable firm's FOC for capital, the stationary value of capital is
+\[
+k_t = k^* \text{e}^{g_k t}
+\ \ \ \ \text{with}\ \ \ \
+k^* = \left(\frac{\alpha z_0 q_0}{r^*}  \right)^{\frac{1}{1-\alpha}} ,
+\]
+and the equilibrium wage rate
+\[
+w_t = \underbrace{(1-\alpha) z_0 k^{*\alpha}}_{w^*} \text{e}^{g_c t} .
+\]
+From the resource constraints
+\[
+i_t = \underbrace{(g_k +\delta) k^*}_{i^*} \text{e}^{g_k t} 
+\ \ \ \ \text{and}\ \ \ \
+c_t = \underbrace{\left( z_0 k^{*\alpha} -\frac{i^*}{q_0} \right)}_{c^*} \text{e}^{g_c t} .
+\]
+Finally, from the household's FOC for labor
+\[
+\ell^* = 1-\frac{1-\theta}{\theta} \frac{c^*}{w^*} .
+\]
+Let us define gross income $m_t \equiv  r_t p_t k_t + w_t  -\delta p_t k_t $ as the equilibrium return to physical capital and the value of the labor endowment owned by the individual, which is given to the individual at time $t$. Notice that at the BGP, $m_t$ is growing at the constant rate $g_c$.
+
+When we apply the Duran~and~Licandro~Fisher-Shell index, the growth rate of GDP is 
+\[
+g = s_c g_c + (1-s_c) g_k  
+\ \ \ \ \text{where}\ \ \ \
+s_c = \frac{z_0 k^{*\alpha} - \frac{i^*}{q_0}}{z_0 k^{*\alpha}} .
+\]
+
+Following Baqaee~and~Burstein~(2023), let us first solve the primal problem at time $t$
+\[
+\max_{c,\ell,x}  \theta \ln c + (1-\theta)  \ln (1-\ell)+ %\nu\, \text{e}^{(\rho - \alpha A)t} 
+v_t x ,
+\]
+s.t.
+\[
+c + p_t x + w_t(1-\ell)= m_t .
+\]
+The FOC for $c$ and $\ell$ are
+\[
+c= \frac{\theta p_t}{v_t} 
+\ \ \ \ \
+1-\ell =  \frac{(1-\theta)p_t}{v_t w_t} .
+\ \ \ \ \text{and}\ \ \ \ 
+x= \frac{m_t}{p_t} - \frac{p_t}{v_t}  .  
+\]
+Substituting the optimal solution in the objective, we obtain the indirect utility function
+\[
+u_t(m_t,p_t,w_t) = \ln p_t - (1-\theta) \ln w_t + v_t \frac{m_t}{p_t} -p_t + {\cal C}_t ,
+\]
+where {\small${\cal C}_t = \theta\ln\theta + (1-\theta)\ln(1-\theta)- \ln v_t$}.
+Since preferences are quasilinear in $x$, the utility of income is given by the value of allocating all income $m$ to investment. 
+Since the opportunity cost of increasing consumption or leisure is the value $v_t/p_t$ of reducing investment, optimal consumption and leisure depend negatively on it.
+
+For any time $s<t$, the BBEV applied to the Bellman representation of preferences is the $\phi^s_t$ that verifies --see Baqaee~and~Burstein~(2023) Definition 3--
+\[
+\ln p_t - (1-\theta) \ln w_t + v_t \frac{m_t}{p_t}-p_t  =
+\ln p_s - (1-\theta) \ln w_s + v_t \frac{\text{e}^{\phi^s_t} \,m_s}{p_s} - p_s.
+\]
+Since at equilibrium $m_t = m^*\, \text{e}^{g_c t}$, $w_t = w^*\, \text{e}^{g_c t}$ and $p_t = p^*  \text{e}^{(\alpha-1)\gamma_q t}$, the BBEV measure becomes
+\[
+\text{e}^{\phi^s_t} = \text{e}^{g_k(t-s)} - \frac{\left((1-\alpha)\gamma_q +(1-\theta)g_c\right) + p^* \left(\text{e}^{(\alpha-1)\gamma_q t} - \text{e}^{(\alpha-1)\gamma_q s}\right)}{v_t \frac{m^*}{p^*} \text{e}^{g_k s}}
+\]
+For any $s < t$ the second term in the right-hand-side is negative, requiring that the growth rate implicit in the BBEV measure is smaller than $g_k$. It converges to $g_k$ when $s$ converges to $t$, but farther $s$ is from $t$ larger the distance. This property reminds the famous substitution bias effect on fixed-based quantity indices when, as it is the case in the example, the relative price of investment is permanently declining. When the economy moves ahead over time and the BBEV is computed again and again all growth rates will be revised up, concluding that we were underestimating the growth rates.
+
+
+%%%%%%%%%%%%%
+\subsection{Structural Transformation}
+%%%%%%%%%%%%%
+
+Let us interpret the structural transformation faced by the US economy  from the perspective of Comin et al. (2021). In this example, the problem is static and preferences are time invariant, then there is no need of applying a Fisher-Shell index.
+
+Following Comin et al. (2021), let us assume there are three sectors in the economy that we denote by $j$, with $j\in\{a,m,s\}$ corresponding to agriculture, manufacturing and services, respectively. They produce the consumption goods $\mathbf{c} = \{c_a, c_m,c_s\}$ by means of linear technologies using homogeneous labor $\mathbf{l} = \{\ell_a, \ell_m,\ell_s\}$ as the sole production factor. Labor productivities are $A_j$, for $j\in\{a,m,s\}$. For simplicity, let us normalise the labor endowment to one and adopt labor as the numeraire, implying that the nominal wage is one. The problem of the representative firms in all three sectors is trivial, requiring that prices $p_j = A_j^{-1}$. 
+It is easy to see that, under these assumptions, total expenditure is equal to total income, equal to one.
+
+Household utility from consuming $\mathbf{c}$ is a function $U(\mathbf{c})$ implicitly defined by 
+\begin{equation}\label{eq:NHutility}
+1 = \sum_{j} \eta_j^{\frac{1}{\sigma}} \left( \frac{c_j} {U^{\epsilon_j}}\right)^{\frac{\sigma-1}{\sigma}} ,
+\end{equation}
+where the weights $\eta_j>0$, the elasticity of substitution between goods $\sigma >0$, and parameters $\epsilon_j > 0$ control the income elasticities.
+Let us denote by $\mathbf{p} = \{p_a, p_m,p_s\}$ to the equilibrium price vector. From the expenditure minimisation problem of the household, the Hicksian demand functions, for $j=\{a,m,s\}$, are
+\begin{equation}\label{eq:NHdemand}
+c_j = \eta_j \left( \frac{p_j}{E}\right)^{-\sigma} U^{(1-\sigma)\epsilon_j} ,
+\end{equation}
+where expenditure $E = \sum_j p_jc_j$. The elasticity of the relative demand $c_j/c_i$ with respect to the utility level $U$ is $(1-\sigma)(\epsilon_j-\epsilon_i)$, implying that  non-homotheticity does not vanish in the long term. Substituting the Hicksian demands (\ref{eq:NHdemand}) into (\ref{eq:NHutility}) defines the indirect utility function $u(E,\mathbf{p}) = U$ as the implicit solution for 
+\begin{equation}\label{eq:NHindutility}
+1 = \sum_{j} \eta_j \left( \frac{p_j} {E}\right)^{1-\sigma} u(E,\mathbf{p})^{(1-\sigma)\epsilon_j} .
+\end{equation}
+The indirect utility function is homogeneous of degree zero in prices and expenditure.
+
+After substituting optimal consumption into the definition of total expenditure, the expenditure function, representing the cost of achieving utility $U$ at prices $\mathbf{p}$, reads
+\begin{equation}\label{eq:NHexpfunction}
+e(U,\mathbf{p}) = \left(\sum_j \eta_j \, U^{(1-\sigma)\epsilon_j} p_j^{1-\sigma} \right)^{\frac{1}{1-\sigma}} .
+\end{equation}
+It is increasing in both $U$ and $\mathbf{p}$, and homogenous of first degree in $\mathbf{p}$.
+
+At equilibrium, the level of utility is implicitly given by 
+\begin{equation}\label{eq:NHU}
+1 = \sum_{j} \eta_j A_j^{\sigma-1} U^{(1-\sigma)\epsilon_j} ,
+\end{equation}
+and the allocation of labor across sectors by
+\begin{equation}\label{eq:NHl}
+\ell_j = \eta_j A_j^{\sigma-1}  U^{(1-\sigma)\epsilon_j}.
+\end{equation}
+
+Let us assume that all $A_j$'s, for $j=\{a,m,s\}$, grow at the positive rates $\gamma_j$.
+From (\ref{eq:NHU}), the progress in technology makes utility $U$ to increase at the rate
+\[
+\frac{\dot U}{U} = \sum_j \omega_j \gamma_j ,
+\ \ \ \text{where}\ \ \ 
+\omega_j = \frac{\eta_j A_j^{\sigma-1} U^{(1-\sigma)\epsilon_j}}{\sum_j \epsilon_j\eta_j A_j^{\sigma-1} U^{(1-\sigma)\epsilon_j}} ,
+\]
+and from (\ref{eq:NHl})
+\[
+\frac{\dot \ell_j}{\ell_j} = (\sigma-1) \left(\gamma_j-\epsilon_j \frac{\dot U}{U} \right) .
+\]
+
+In the following, we use the parameter estimations in Comin et al (2021) to study the differential properties of the BBEV and DLFS. The benchmark analysis is performed using their estimation in the first column of Table 1, implying $\sigma = 0.26$, $\epsilon_a = 0.2$ and $\epsilon_s = 1.65$, with $\epsilon_m$ normalised to one. 
+
+\noindent{\bf TO BE COMPLETED}
+
+%%%%%%%%%%%%%
+\paragraph{References}
+%%%%%%%%%%%%%
+
+\begin{itemize}
+
+\leftskip -20pt
+\rightskip 0pt
+
+\item[] Baqaee, David, and Ariel Burstein (2023) ``Welfare and output with income effects and taste shocks."  Quarterly Journal of Economics 138(2), 769-834.
+
+\item[] Boucekkine, Raouf, Fernando Del Rio, and Omar Licandro (2003) ``Embodied technological change, learning‐by‐doing and the productivity slowdown." Scandinavian Journal of Economics 105(1), 87-98.
+
+\item[] Dur\'an, Jorge and Omar Licandro (2025) ``Is the output growth rate in NIPA a welfare measure?" Economic Journal, forthcoming.
+
+\item[] Felbermayr, Gabriel, and Omar Licandro (2005) ``The underestimated virtues of the two-sector AK model."  B.E. Journal in Macroeconomics, Topics in Macroeconomics 5(1).
+
+\item[] Fisher, Franklin, and Karl Shell (1968) ``Taste and quality change in the pure theory of the true-cost-of-living index," in Wolfe, J. (ed.) Value, Capital, and Growth. Edinburgh University Press.
+
+\item[] Greenwood, Jeremy, Zvi Hercowitz and Per Krusell (1997) ``Long-run implications of investment-specific technological change."  American Economic Review 879(3), 342-362.
+
+\item[] Kongsamut, Piyabha, Sergio Rebelo, and Danyang Xie (2001) ``Beyond balanced growth."  Review of Economic Studies 68(4), 869-882.
+
+\end{itemize}
+
+\appendix
+
+\section{Appendix: Primal and dual problems.}
+The primal problem faced by the individual is
+$$
+ \max U(c;x)
+\ \ \ \text{s.t.}\ \ \ 
+\sum_{i=1}^N p_{i} c_{i} \leq m.
+$$
+The FOCs read
+$$
+U'_i(c;x) = \mu p_{i} .
+$$
+The dual problem faced by the individual is
+$$
+\min \sum_{i=1}^N p_{i} c_{i}
+\ \ \ \text{s.t.}\ \ \ 
+U(c;x) \geq  u.
+$$
+The FOCs read
+$$
+p_i = \lambda U'_i(c;x)  .
+$$
+
+
+\paragraph{Embodied technical progress with non-homothetic preferences.}
+The planner's problem is to maximize the utility function:
+
+\[
+\max_{c(t), k(t)} \quad \int_0^\infty e^{-\rho t} \left( \left( c(t)^\beta \cdot k(t)^{1-\beta} \right)^{1-\frac{1}{\sigma}} \right) \, dt
+\]
+
+subject to the feasibility condition:
+
+\[
+\dot{k}(t) = q(0) A(0) e^{(\eta_q + \eta_A) t} \cdot k(t)^\alpha - q(0) e^{\eta_q t} \cdot c(t) - \delta \cdot k(t)
+\]
+
+and the non-negativity constraints:
+
+\[
+c(t) \geq 0, \quad k(t) \geq 0
+\]
+
+with initial capital:
+
+\[
+k(0) = k_0
+\]
+
+Preferences are non-homothetic in the sense that instantaneous utility of consumption $c_t$ depends on the level of wealth as measure by the stock of capital $k_t$. The intertemporal elasticity of substitution $\sigma >0$ is constant. 
+
+The Bellman equation associated with this problem is:
+
+\[
+\rho V(k, t) = \max_{c} \left\{ \left( c^\beta \cdot k^{1 - \beta} \right)^{1 - \frac{1}{\sigma}} + \frac{\partial V(k, t)}{\partial t} + \frac{\partial V(k, t)}{\partial k} \left[ q(0) A(0) e^{(\eta_q + \eta_A) t} \cdot k^\alpha - q(0) e^{\eta_q t} \cdot c - \delta \cdot k \right] \right\}
+\]
+
+\section{Calibration LBD Model}
+
+
+From (\ref{eq:growth}), at equilibrium, the growth rates of capital and consumption, respectively, are
+\[
+g_k = \alpha z q - \delta - \rho  ,
+\ \ \ \ \ \text{and}\ \ \ \ 
+g_c = (1-\lambda) g_k .
+\]
+From (\ref{eq:p}), the decline rate of the relative price of investment goods is
+\[
+g_p =  -\lambda g_k .
+\]
+
+
+The share of consumption on gross income is $\widehat s_c = \frac{(1-\alpha)zq  + \rho }{zq} $ .
+From (\ref{eq:shares}), shares of consumption and investment on net income are
+\[
+s_x =  \frac{\alpha z q  - \rho - \delta}{z q - \delta}
+\ \ \ \ \text{and}\ \ \ \
+s_c = 1 - s_x.
+\]
+
+The growth rate of gross and net output, respectively, are
+$$
+\widehat g = (1-\widehat s_x) g_c + \widehat s_x g_k 
+\ \ \ \ \text{and} \ \ \ 
+g = (1-s_x) g_c +  s_x g_k 
+.
+$$
+
+
+The calibration  uses the annual US GDP measures published by Fernald for the period 1947-2023.
+We set $q=1$, without any lose of generality, and $\rho = 0.075$.
+From the Fernald data set, $\alpha = 0.3356$ is the average capital's share of income, $g_{p} = 0.01985$ is the average decline rate of the relative price of investment, the growth rate of gross GDP per capital is $\widehat g = 0.02267$ and the gross investment share at $\widehat s_x = 0.223$.
+
+Consequently, the growth rate of gross output is
+$$
+\widehat g = (1-\widehat s_x) g_c + \widehat s_x g_k .
+$$
+From (\ref{eq:y}) and the LBD assumption, $g_c = (1-\lambda) g_k$.
+From (\ref{eq:p}),  $g_p = \lambda g_k$.
+We can then use the observed growth rate of gross output  per capital $g = 0.0227$, the gross investment share $\widehat s_x = 0.223\%$ and $g_{p} = 1.985 \%$ to obtain $g_k=0.0381$ and $\lambda = 0.5208$.
+
+With a discount rate $\rho = 0.075$, from the definition of the share of consumption growth income, the productivity scale factor $z = 0.666$ and the depreciation rate emerging from the equilibrium growth rate of capital in (\ref{eq:growth}) is $\delta = 0.11$.
+
+\end{document}

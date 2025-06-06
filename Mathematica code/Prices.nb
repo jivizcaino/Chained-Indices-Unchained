@@ -1,0 +1,631 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 12.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     23697,        623]
+NotebookOptionsPosition[     23021,        604]
+NotebookOutlinePosition[     23414,        620]
+CellTagsIndexPosition[     23371,        617]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "prices", " ", "*)"}], "\[IndentingNewLine]", 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"prices", "=", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{
+        "\"\<year\>\"", ",", "\"\<consumption\>\"", ",", 
+         "\"\<goods cons.\>\"", ",", "\"\<services cons.\>\"", ",", 
+         "\"\<investment\>\""}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1980", ",", "3.38486", ",", "2.49874", ",", "4.27722", ",", 
+         "3.70660"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1981", ",", "3.70706", ",", "2.81452", ",", "4.71789", ",", 
+         "4.05046"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1982", ",", "3.94020", ",", "2.77526", ",", "5.08145", ",", 
+         "4.28557"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1983", ",", "4.13014", ",", "2.89092", ",", "5.37101", ",", 
+         "4.32213"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1984", ",", "4.30928", ",", "3.18558", ",", "5.65199", ",", 
+         "4.37383"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1985", ",", "4.47032", ",", "3.10615", ",", "5.91693", ",", 
+         "4.43179"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1986", ",", "4.56129", ",", "3.04405", ",", "6.11072", ",", 
+         "4.51800"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1987", ",", "4.68333", ",", "3.14970", ",", "6.29964", ",", 
+         "4.59972"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1988", ",", "4.85947", ",", "3.20651", ",", "6.57150", ",", 
+         "4.72555"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1989", ",", "5.06906", ",", "3.33837", ",", "6.87916", ",", 
+         "4.84678"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1990", ",", "5.27972", ",", "3.41825", ",", "7.19019", ",", 
+         "4.95664"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1991", ",", "5.48049", ",", "3.49304", ",", "7.47847", ",", 
+         "5.04494"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1992", ",", "5.63350", ",", "3.56772", ",", "7.74407", ",", 
+         "5.05738"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1993", ",", "5.78062", ",", "3.62014", ",", "7.99018", ",", 
+         "5.12893"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1994", ",", "5.91037", ",", "3.75824", ",", "8.20389", ",", 
+         "5.21613"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1995", ",", "6.03666", ",", "3.70584", ",", "8.42766", ",", 
+         "5.31778"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1996", ",", "6.17206", ",", "3.75615", ",", "8.64583", ",", 
+         "5.33394"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1997", ",", "6.30188", ",", "3.86652", ",", "8.87597", ",", 
+         "5.35258"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1998", ",", "6.39851", ",", "3.85496", ",", "9.06244", ",", 
+         "5.33572"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "1999", ",", "6.50663", ",", "3.84563", ",", "9.27319", ",", 
+         "5.35980"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2000", ",", "6.66676", ",", "3.83200", ",", "9.58983", ",", 
+         "5.44609"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2001", ",", "6.84303", ",", "3.71272", ",", "9.89450", ",", 
+         "5.49755"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2002", ",", "6.97210", ",", "3.79725", ",", "10.15155", ",", 
+         "5.51994"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2003", ",", "7.12951", ",", "3.74572", ",", "10.49883", ",", 
+         "5.57243"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2004", ",", "7.31532", ",", "3.83041", ",", "10.85537", ",", 
+         "5.73742"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2005", ",", "7.52009", ",", "3.79532", ",", "11.27063", ",", 
+         "5.98417"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2006", ",", "7.73929", ",", "3.81063", ",", "11.70145", ",", 
+         "6.20323"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2007", ",", "7.96210", ",", "3.77461", ",", "12.12070", ",", 
+         "6.33387"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2008", ",", "8.12778", ",", "3.60227", ",", "12.51524", ",", 
+         "6.41826"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2009", ",", "8.20824", ",", "3.55071", ",", "12.55769", ",", 
+         "6.37067"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2010", ",", "8.34884", ",", "3.82982", ",", "12.84648", ",", 
+         "6.30640"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2011", ",", "8.53499", ",", "3.88994", ",", "13.14500", ",", 
+         "6.39552"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2012", ",", "8.70147", ",", "3.98272", ",", "13.41895", ",", 
+         "6.49351"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2013", ",", "8.86704", ",", "4.03900", ",", "13.74033", ",", 
+         "6.56695"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2014", ",", "9.02963", ",", "4.00448", ",", "14.07275", ",", 
+         "6.69924"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2015", ",", "9.12429", ",", "4.06337", ",", "14.27155", ",", 
+         "6.75385"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2016", ",", "9.23528", ",", "3.90288", ",", "14.53424", ",", 
+         "6.76541"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+        "2017", ",", "9.41576", ",", "3.89692", ",", "14.90486", ",", 
+         "6.87951"}], "}"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", "\n", 
+   RowBox[{
+    RowBox[{"yearCTotPData", "=", 
+     RowBox[{"prices", "[", 
+      RowBox[{"[", 
+       RowBox[{"All", ",", 
+        RowBox[{"{", 
+         RowBox[{"1", ",", "2"}], "}"}]}], "]"}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", "\n", 
+   RowBox[{"(*", 
+    RowBox[{
+    "Use", " ", "ListPlot", " ", "to", " ", "plot", " ", "the", " ", "data"}],
+     "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"ListPlot", "[", 
+     RowBox[{"yearCTotPData", ",", 
+      RowBox[{"Joined", "->", "True"}], ",", 
+      RowBox[{"AxesLabel", "->", 
+       RowBox[{"{", 
+        RowBox[{
+        "\"\<Year\>\"", ",", "\"\<Total Consumption Price Index\>\""}], 
+        "}"}]}], ",", 
+      RowBox[{
+      "PlotLabel", "->", 
+       "\"\<Total Consumption Price Index Over Years\>\""}]}], "]"}], ";"}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{"Calculate", " ", "the", " ", "ratios"}], "*)"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"constoinv", "=", 
+     RowBox[{
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"#", "[", 
+           RowBox[{"[", "2", "]"}], "]"}], "/", 
+          RowBox[{"#", "[", 
+           RowBox[{"[", "5", "]"}], "]"}]}], ")"}], "&"}], "/@", "prices"}], 
+      " ", 
+      RowBox[{
+       RowBox[{"prices", "[", 
+        RowBox[{"[", 
+         RowBox[{"2", ",", "5"}], "]"}], "]"}], "/", 
+       RowBox[{"prices", "[", 
+        RowBox[{"[", 
+         RowBox[{"2", ",", "2"}], "]"}], "]"}]}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"goodstoinv", "=", 
+     RowBox[{
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"#", "[", 
+           RowBox[{"[", "3", "]"}], "]"}], "/", 
+          RowBox[{"#", "[", 
+           RowBox[{"[", "5", "]"}], "]"}]}], ")"}], "&"}], "/@", "prices"}], 
+      " ", 
+      RowBox[{
+       RowBox[{"prices", "[", 
+        RowBox[{"[", 
+         RowBox[{"2", ",", "5"}], "]"}], "]"}], "/", 
+       RowBox[{"prices", "[", 
+        RowBox[{"[", 
+         RowBox[{"2", ",", "3"}], "]"}], "]"}]}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"servtoinv", "=", 
+     RowBox[{
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"#", "[", 
+           RowBox[{"[", "4", "]"}], "]"}], "/", 
+          RowBox[{"#", "[", 
+           RowBox[{"[", "5", "]"}], "]"}]}], ")"}], "&"}], "/@", "prices"}], 
+      " ", 
+      RowBox[{
+       RowBox[{"prices", "[", 
+        RowBox[{"[", 
+         RowBox[{"2", ",", "5"}], "]"}], "]"}], "/", 
+       RowBox[{"prices", "[", 
+        RowBox[{"[", 
+         RowBox[{"2", ",", "4"}], "]"}], "]"}]}]}]}], ";"}], "\n", 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"Create", " ", "year"}], "-", 
+     RowBox[{"ratio", " ", "pairs"}]}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"pairsconstoinv", "=", 
+     RowBox[{"MapThread", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"#1", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", "#2"}], "}"}], "&"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"prices", ",", "constoinv"}], "}"}]}], "]"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{"pairsgoodstoinv", "=", 
+     RowBox[{"MapThread", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"#1", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", "#2"}], "}"}], "&"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"prices", ",", "goodstoinv"}], "}"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"pairsservtoinv", "=", 
+     RowBox[{"MapThread", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"#1", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", "#2"}], "}"}], "&"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"prices", ",", "servtoinv"}], "}"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+    "Plot", " ", "the", " ", "ratios", " ", "over", " ", "the", " ", 
+     "years"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"expfig", "=", 
+    RowBox[{"ListPlot", "[", 
+     RowBox[{"pairsconstoinv", ",", 
+      RowBox[{"Joined", "->", "True"}], ",", 
+      RowBox[{"AxesLabel", "->", 
+       RowBox[{"{", 
+        RowBox[{"\"\<Year\>\"", ",", "\"\<Ratio of Pe to Px\>\""}], "}"}]}], 
+      ",", 
+      RowBox[{
+      "PlotLabel", "->", 
+       "\"\<Ratio of Total Consumption Price to Investment Price\>\""}]}], 
+     "]"}]}], "\n", 
+   RowBox[{"goodsfig", "=", 
+    RowBox[{"ListPlot", "[", 
+     RowBox[{"pairsgoodstoinv", ",", 
+      RowBox[{"Joined", "->", "True"}], ",", 
+      RowBox[{"AxesLabel", "->", 
+       RowBox[{"{", 
+        RowBox[{"\"\<Year\>\"", ",", "\"\<Ratio of Pg to Px\>\""}], "}"}]}], 
+      ",", 
+      RowBox[{
+      "PlotLabel", "->", 
+       "\"\<Ratio of Consumption Goods Price to Investment Price\>\""}]}], 
+     "]"}]}], "\n", 
+   RowBox[{
+    RowBox[{"servsfig", "=", 
+     RowBox[{"ListPlot", "[", 
+      RowBox[{"pairsservtoinv", ",", 
+       RowBox[{"Joined", "->", "True"}], ",", 
+       RowBox[{"AxesLabel", "->", 
+        RowBox[{"{", 
+         RowBox[{"\"\<Year\>\"", ",", "\"\<Ratio of Ps to Px\>\""}], "}"}]}], 
+       ",", 
+       RowBox[{
+       "PlotLabel", "->", 
+        "\"\<Ratio of Consumption Service Price to Investment Price\>\""}]}], 
+      "]"}]}], ";"}], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"sermodel", "=", 
+     RowBox[{"Plot", "[", 
+      RowBox[{
+       RowBox[{"Ps", "[", "t", "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"t", ",", "1980", ",", "2017"}], "}"}], ",", 
+       RowBox[{"PlotStyle", "\[Rule]", 
+        RowBox[{"{", "Dashed", "}"}]}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", "\n", 
+   RowBox[{"Show", "[", 
+    RowBox[{"servsfig", ",", "sermodel"}], "]"}], "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", "\n"}]}]], "Input",
+ CellChangeTimes->{{3.95301528233278*^9, 3.953015365720355*^9}, {
+   3.9530154427393084`*^9, 3.953015455338243*^9}, {3.953015665113661*^9, 
+   3.9530157098919573`*^9}, 3.953015771212716*^9, {3.9530159263490353`*^9, 
+   3.9530159684716873`*^9}, {3.953016099378418*^9, 3.953016113903492*^9}, {
+   3.9530161770450773`*^9, 3.9530164444565*^9}, 3.953016489569099*^9, {
+   3.9530165919220543`*^9, 3.953016667162757*^9}, {3.95301735978915*^9, 
+   3.953017405265257*^9}, {3.953017550491098*^9, 3.953017581449658*^9}, {
+   3.953017616186819*^9, 3.953017692871519*^9}, {3.953017920810891*^9, 
+   3.953017941478887*^9}, {3.95301799357537*^9, 3.9530180361054983`*^9}},
+ CellLabel->
+  "In[365]:=",ExpressionUUID->"67995238-c8c5-4778-a13b-d547892f4bd2"],
+
+Cell[BoxData[
+ GraphicsBox[{{}, {{}, {}, 
+    {RGBColor[0.368417, 0.506779, 0.709798], PointSize[0.012833333333333334`],
+      AbsoluteThickness[1.6], LineBox[CompressedData["
+1:eJwtzm1IkwEQB/DphqhETSt4IgcuRVyEM3KYlO0PpvgGam6S5rSiQF2xkFKp
+hRNEP/hBfPlgyHai6HxJjfpqDkVGhjCjMJ2tIFG0SWouFbFw+tzBcffj4Pgr
+75tuPQyUSCQx/j6ax7VpAy/a4+GzocdhEMJC2Hs29C8YVz3n2Qc2eEstncI4
+W0J4HzH6IyplS7SMkPQs0aV7zQ4mfPJWhee+YZ8gFMf+/OqZY8sJ6QbPWKXs
+j+gzhNMpp4TQfLZAkJao5W8H2BGE7l67vTV4W3QkIat2Tp9Zz44mGC8krWkd
+7FjCC5W1JcfNvkToaH/8bmSJHU9YbuooV6T5RCcQ1tecfZ+72Ff9+XSFF8cD
+/4q+Tuhb+T51MpUNQtX0fPZgJfsmweEsHT7rYqcTpm/olXnKHdHZhDvbyUX2
+CnauP796uG6pgK0jbJxTqJpl7Nv+vF8SrQHf+F8xwVSuySgJ4vtdwoRUrpHF
+sx8Q5hd2GoU2dhnho8rk+Xd5V/Qjwgdl5suZe+wnhNlZX0j1c/ZTwjWTelHf
+z64hNPyPM7+yss2EKwa9u32IbSHkZC3OuH6x6wmTbZ1dv/d3tYffOcqW
+      
+      "]]}}, {{}, {}}},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{True, True},
+  AxesLabel->{
+    FormBox["\"Year\"", TraditionalForm], 
+    FormBox["\"Ratio of Pe to Px\"", TraditionalForm]},
+  AxesOrigin->{1979.229166666667, 0.9722909594973503},
+  DisplayFunction->Identity,
+  Frame->{{False, False}, {False, False}},
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->{{Automatic, Automatic}, {Automatic, Automatic}},
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  Method->{
+   "OptimizePlotMarkers" -> True, "OptimizePlotMarkers" -> True, 
+    "CoordinatesToolOptions" -> {"DisplayFunction" -> ({
+        Identity[
+         Part[#, 1]], 
+        Identity[
+         Part[#, 2]]}& ), "CopiedValueFunction" -> ({
+        Identity[
+         Part[#, 1]], 
+        Identity[
+         Part[#, 2]]}& )}},
+  PlotLabel->FormBox[
+   "\"Ratio of Total Consumption Price to Investment Price\"", 
+    TraditionalForm],
+  PlotRange->{{1979.229166666667, 2017.}, {0.9722909594973503, 
+   1.4987627290476984`}},
+  PlotRangeClipping->True,
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {
+     Scaled[0.05], 
+     Scaled[0.05]}},
+  Ticks->{Automatic, Automatic}]], "Output",
+ CellChangeTimes->{
+  3.953015299368104*^9, 3.953015380860509*^9, 3.95301546706666*^9, {
+   3.9530156881772757`*^9, 3.9530157108897676`*^9}, 3.9530157723460484`*^9, {
+   3.953015940036106*^9, 3.953015969421666*^9}, 3.953016445977298*^9, 
+   3.953016494802288*^9, {3.953016637251101*^9, 3.953016653633173*^9}, 
+   3.953017374320207*^9, 3.9530174057874928`*^9, 3.953017582865884*^9, {
+   3.953017682939961*^9, 3.953017693715891*^9}, {3.953017996888748*^9, 
+   3.953018004109881*^9}, 3.953018038879566*^9},
+ CellLabel->
+  "Out[374]=",ExpressionUUID->"cf66b29c-9366-4e50-bab4-4732018a2321"],
+
+Cell[BoxData[
+ GraphicsBox[{{}, {{}, {}, 
+    {RGBColor[0.368417, 0.506779, 0.709798], PointSize[0.012833333333333334`],
+      AbsoluteThickness[1.6], LineBox[CompressedData["
+1:eJxTTMoPSmViYGBQA2IQDQYf5jn8B4P39mD+l3kOU7XXffpW+wHC/zHPwfG3
+bUrs3ncQ/p95DjPnLn7zez9UPcN8B+/oy488PD9C+CzzHYyzdZmbF0H1c8x3
+eKKQkFL1G6qeZ77DwQnVNyY4QOUF5jtI7mPmviwF5YvMd/hiG7aXIRLKl5jv
+UDPRiFsrDsqXme/g4akZ8CwPyleY7/CvcfVB131Qvsp8h5CsT6smH4DyNeY7
++J4zitwvCXWfznyHnhm57EZdUHmD+Q6GG6fxrd0G5ZvMd2gy+XeBXxWq3mK+
+g8w2Lq8jML7NfIfH3C63y9mhfAeg/5KzfQ02Q/W7zHdgXffGO5wdyveY72DC
+uunm3mAo32e+Q575ZPW4F9DwCJjvEN7BX39jA5QfMt9hVejeewLS0PCOmO+g
+fp3b+InGWwg/Zr4DE8t6mYuebyD8hPkOf+XfiPsueQXhp8x3kDvX2fisBMrP
+mO8g8cZeZv9lqPqc+Q6lHTv3q9yH8gvmO8T0noywkYWaXzLfQbE+y4HdCMqv
+mO9w7LBC5qV4qPoaIH+L1Efufii/Yb7DgZDtXzySXkP4LfMdpAsXMtU+fmUP
+ADpiyfs=
+      "]]}}, {{}, {}}},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{True, True},
+  AxesLabel->{
+    FormBox["\"Year\"", TraditionalForm], 
+    FormBox["\"Ratio of Pg to Px\"", TraditionalForm]},
+  AxesOrigin->{1979.229166666667, 0.8126799753532334},
+  DisplayFunction->Identity,
+  Frame->{{False, False}, {False, False}},
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->{{Automatic, Automatic}, {Automatic, Automatic}},
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  Method->{
+   "OptimizePlotMarkers" -> True, "OptimizePlotMarkers" -> True, 
+    "CoordinatesToolOptions" -> {"DisplayFunction" -> ({
+        Identity[
+         Part[#, 1]], 
+        Identity[
+         Part[#, 2]]}& ), "CopiedValueFunction" -> ({
+        Identity[
+         Part[#, 1]], 
+        Identity[
+         Part[#, 2]]}& )}},
+  PlotLabel->FormBox[
+   "\"Ratio of Consumption Goods Price to Investment Price\"", 
+    TraditionalForm],
+  PlotRange->{{1979.229166666667, 2017.}, {0.8126799753532334, 
+   1.0803917751670322`}},
+  PlotRangeClipping->True,
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {
+     Scaled[0.05], 
+     Scaled[0.05]}},
+  Ticks->{Automatic, Automatic}]], "Output",
+ CellChangeTimes->{
+  3.953015299368104*^9, 3.953015380860509*^9, 3.95301546706666*^9, {
+   3.9530156881772757`*^9, 3.9530157108897676`*^9}, 3.9530157723460484`*^9, {
+   3.953015940036106*^9, 3.953015969421666*^9}, 3.953016445977298*^9, 
+   3.953016494802288*^9, {3.953016637251101*^9, 3.953016653633173*^9}, 
+   3.953017374320207*^9, 3.9530174057874928`*^9, 3.953017582865884*^9, {
+   3.953017682939961*^9, 3.953017693715891*^9}, {3.953017996888748*^9, 
+   3.953018004109881*^9}, 3.9530180389016314`*^9},
+ CellLabel->
+  "Out[375]=",ExpressionUUID->"47952438-8dfa-429d-87ea-fd555d87bb4d"],
+
+Cell[BoxData[
+ GraphicsBox[{{{}, {{}, {}, 
+     {RGBColor[0.368417, 0.506779, 0.709798], PointSize[
+      0.012833333333333334`], AbsoluteThickness[1.6], LineBox[CompressedData["
+
+1:eJwtz00o5HEYB/Bp7IExB0lIOxlrGw4OkpfJsL6sg7Y5TNMcxExe8s4iraKm
+ZrUOxC6yrVzmkddSJFvL4DCKNE3GQba9MES2toQ1wwxG+1+/56mn7/O5Pd+k
+6jZjrVwmk2mk/Z/Pc2UHHwXP4bPD7FL96NCwA3bsJ2REONvZj3ZMONB4k3st
+LCOMLvkDP/+wXxDy6xWXyk9/hcMJ3R2XA14nW0lonNwOWkLsKILOaMpTl9wI
+xxD2GyoT7xfY8YSUrbJFpcon/JIw+z75YvMzW01Q6GfKc3V+4deE2qX+72vj
+7FRCoTs+fcXDTiMcxJZbLUF2OiHu7JW7p/tWOJMwlnNqjX1iawnyQk3qxuCd
+cB7B8s1h0IbYkPpO77591xQQLpb+8e4023zsEsK6x393bAsK6wkr08On44n3
+wgbCyVfv8aGObSJEGqKdRSp2KcE8ebS1nMI2S/0XjgIDfexKwsT12lhrxINw
+DeHXl0iXy8RuIBzWZzum3jwKtxBuyy5UwzZ2O2HPE5asnWN/IMzVheecy0PC
+XZLdffIKNdtKmF89+z2kZ38k9KRVeUZc7F7CbudIllHxVPAPo9zQHw==
+       
+       "]]}}, {{}, {}}}, {{{}, {}, 
+     TagBox[
+      {RGBColor[0.368417, 0.506779, 0.709798], AbsoluteThickness[1.6], 
+       Opacity[1.], Dashing[{Small, Small}], LineBox[CompressedData["
+1:eJwVyntUjHkcx/EpZVFRwhAOK2pTuq06bdT3SxbJ7E6akiRH6cyYNCTFdtOF
+LpTaasTG/JB0U5tbitourIZ03a3NLcU6xRqeufYwXfbxx+e8z+ucz7fBB7aF
+6rJYLA6zrz19zZHFoiT4mbOXIQWdNmqJAeNLycLwTMbGlXfc2IxZButezteh
+IK9ybawtY6pxd5uDLgVnqzZqAhmf2yEYCtGjoKg64EMdY1OvNpV0GgW1t5L7
+I+US7Bew7p4xoWCovqd6WCFBIV/UiuYUFD/I/WSkkWCx9Lmoy5MCccPFpgla
+gu0j3aYrRBRIy9a3D2olmP5MRZnkUhCepSfQmZSgeCHXIqSOAvfgOeIPOgQP
+v41tEwxQkGi7gTtPn2DZDd+4f6fKYerHbzY5TCP4a9ebSh07OdRKFnTNMyC4
+3XfeQDNPDs83eg27ziQYP8AxnpUgh5WDj3OsTAh2lx1M01yRQ8P+gajpcwja
+/yU0ErXJoZkyeWfJJli1CLMy1HKQh+Z9NDYjmDORnr9qsQLyelYnuywmaJ3S
+m5a+WQFHHYXe3ksJLlqzIjo+UgEZKbIbq80J6sU0uY4UKsDgSc5lPwuCLWJe
+wjKpAu7qJy/3sCLotXCK+yO5Ap45560W2RBUeVN8nyVKcNvpknjSjiBapj+J
+3KqE9oPWQRGOBI2cwoxl0UroiHd/fMaJ4CrppDikWAnaWCJNdSHoeueQtVW3
+EsLC83UFawgaUPFBEWNK4PiVPU5zJ1jiR13rslbBTnvDFYfWEeQHzpgf5q+C
+ZzrZRoUbCI6VLpc7ZKjgwsNih9ubCG6JMxOn1qkgM27GyLktBBcn7ePqDKvg
+g1W2TQOH4HjH/mUP5qvhqHTPlAouQYv6grTLm9SwOUA696QPQVm7+fXPUWrI
+ePNTTYkfweVdKYW3StWg2WX+LnsHwZ9/c6yN6ldDbye7vCaQ4JTSJv51Qw0M
+OgaMl+wmGHpK5jHipgHbDPvMk8EET6xKkeaKNCDrsyirCCXo7qRV/F2kgadz
+w/wLBASH8y8OaHs14Ly1U9wcRvBTwfqwHsNR6ItqnflSRNDYStfJymMUinKM
+zO5HEKyxFy7lRI/C0OXIm8OHCR4pHpBC1Sh4XbV81XeEYLlre7Py9SjQ5w9s
+vBNDMObYpe3GbBrYp/5Z0xdPUK5+ITXj0hAszLrfmEjw92UHUzpO0DBVmPDg
+CWN1blxAYyoN5fsO/PmUcTjvoWt1Gg1KgXerkrGusyk7N4OG4/y5bZZJBPX3
+nHf3y6Lh6t4LPdmMeZ33PAfzaXgfVDm0O5lgXXrFNm0RDaeDJK/3M2Z9P3ub
+7AoNjkHZb35hPJ7ZHPCqmIbYXRFv8xgP1WvT7pfQYBjo9K6Vcb/+iHdmBQ22
+OxoouxSClmyqaMlNGnr8q+RrGXcnGbrMvkVDtD9ReDKu5h7p1btNQ+P2JFUI
+49r0H2ze19DA9fuRLmCcsyfG8/ZdGlS+zp+vMG6RmX5Xeo+Gs76WX65//ddN
+zCqsp2GIN32sjfGsY4+0iX/QkMr7MtbPOMGufDKykYaVvP/G3zK+l/XSkN9E
+Q4fPiwkFY746xDygmYZDPu2Tk4wXtLh5cFpo+B8GtXVV
+        "]]},
+      Annotation[#, "Charting`Private`Tag$134943#1"]& ]}, {}}},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{True, True},
+  AxesLabel->{
+    FormBox["\"Year\"", TraditionalForm], 
+    FormBox["\"Ratio of Ps to Px\"", TraditionalForm]},
+  AxesOrigin->{1979.229166666667, 0.9512488996054971},
+  DisplayFunction->Identity,
+  Frame->{{False, False}, {False, False}},
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->{{Automatic, Automatic}, {Automatic, Automatic}},
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  Method->{
+   "OptimizePlotMarkers" -> True, "OptimizePlotMarkers" -> True, 
+    "CoordinatesToolOptions" -> {"DisplayFunction" -> ({
+        Identity[
+         Part[#, 1]], 
+        Identity[
+         Part[#, 2]]}& ), "CopiedValueFunction" -> ({
+        Identity[
+         Part[#, 1]], 
+        Identity[
+         Part[#, 2]]}& )}},
+  PlotLabel->FormBox[
+   "\"Ratio of Consumption Service Price to Investment Price\"", 
+    TraditionalForm],
+  PlotRange->{{1979.229166666667, 2017.}, {0.9512488996054971, 
+   1.877519807101055}},
+  PlotRangeClipping->True,
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {
+     Scaled[0.05], 
+     Scaled[0.05]}},
+  Ticks->{Automatic, Automatic}]], "Output",
+ CellChangeTimes->{
+  3.953015299368104*^9, 3.953015380860509*^9, 3.95301546706666*^9, {
+   3.9530156881772757`*^9, 3.9530157108897676`*^9}, 3.9530157723460484`*^9, {
+   3.953015940036106*^9, 3.953015969421666*^9}, 3.953016445977298*^9, 
+   3.953016494802288*^9, {3.953016637251101*^9, 3.953016653633173*^9}, 
+   3.953017374320207*^9, 3.9530174057874928`*^9, 3.953017582865884*^9, {
+   3.953017682939961*^9, 3.953017693715891*^9}, {3.953017996888748*^9, 
+   3.953018004109881*^9}, 3.953018038931972*^9},
+ CellLabel->
+  "Out[378]=",ExpressionUUID->"d0028860-fbeb-4604-95df-429097d199af"]
+}, Open  ]]
+},
+WindowSize->{833, 911},
+WindowMargins->{{Automatic, 707}, {Automatic, 50}},
+FrontEndVersion->"12.3 for Mac OS X x86 (64-bit) (July 9, 2021)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"fe0207a0-e85e-46c8-8cfb-91a86f54a3f0"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 12647, 357, 1123, "Input",ExpressionUUID->"67995238-c8c5-4778-a13b-d547892f4bd2"],
+Cell[13230, 381, 2626, 61, 244, "Output",ExpressionUUID->"cf66b29c-9366-4e50-bab4-4732018a2321"],
+Cell[15859, 444, 2634, 61, 244, "Output",ExpressionUUID->"47952438-8dfa-429d-87ea-fd555d87bb4d"],
+Cell[18496, 507, 4509, 94, 244, "Output",ExpressionUUID->"d0028860-fbeb-4604-95df-429097d199af"]
+}, Open  ]]
+}
+]
+*)
+
