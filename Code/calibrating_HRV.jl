@@ -4,13 +4,13 @@ figuresdir = abspath(joinpath(currentdir, "..", "Figures"))
 
 using Pkg
 Pkg.activate(@__DIR__)  
-#Pkg.instantiate()
+Pkg.instantiate()
 #Pkg.resolve()
 #Pkg.precompile()
 
-#using XLSX, DataFrames
-#using BlackBoxOptim
-#using Plots; plotlyjs()
+using XLSX, DataFrames
+using BlackBoxOptim
+using Plots; plotlyjs()
 
 #------------------------------------------------------------------------------
 
@@ -18,11 +18,12 @@ Pkg.activate(@__DIR__)
 #Import the HRV Data
 file_name  = "HRV2021_Data.xlsx"
 sheet_name = "Data"
-data_range = "A1:AU72"
+data_range = "A1:AU78"
 
 # Read the data from the Excel file
 HRV_data = XLSX.readtable(joinpath(datadir, file_name), sheet_name)
-HRV_df = DataFrame(HRV_data...)
+HRV_df = DataFrame(HRV_data)
+#HRV_df = DataFrame(HRV_data...)
 
 #Get the shares of Goods and Services in Investment and Consumption (X,C) respectively
 VAX_GOOD_SHARE = HRV_df[HRV_df.year .>= 1980, "VAX_GOOD_S"]
@@ -47,7 +48,7 @@ calAx_2017     = HRV_df[HRV_df.year .== 2017, "calA_X_I_TD"][1]
 
 #Get the Initial and Final Values for Population and Efficiency Units of Labor
 N_1980         = HRV_df[HRV_df.year .== 1980, "POP"][1]
-N_2017         = HRV_df[HRV_df.year .== 2017, "POP"][1]
+N_2023         = HRV_df[HRV_df.year .== 2023, "POP"][1]
 
 L_1980         = HRV_df[HRV_df.year .== 1980,"LAB_TOT_QI"][1]
 L_2017         = HRV_df[HRV_df.year .== 2017,"LAB_TOT_QI"][1]
@@ -91,7 +92,7 @@ sg(Pg,e,Ps,η,χ,γ) = η*((e/Ps)^(-χ))*((Pg/Ps)^γ)
 g_Ag        = log(Ag_2017/Ag_1980)/(2017-1980)
 g_As        = log(As_2017/As_1980)/(2017-1980)
 g_calAx     = log(calAx_2017/calAx_1980)/(2017-1980)
-g_n         = (log(N_2017/N_1980))/(2017-1980)
+g_n         = (log(N_2023/N_1980))/(2023-1980)
 g_l         = (log(L_2017/L_1980))/(2017-1980)
 
 g_h         = g_l - g_n
@@ -102,9 +103,9 @@ g_h         = g_l - g_n
 Ag_0        = 1.000
 As_0        = 1.000
 calAx_0     = 1.000
-Ag_t        = Ag_0.*exp.( g_Ag.*((1980:2017) .- 1980))
-As_t        = As_0.*exp.( g_As.*((1980:2017) .- 1980))
-calAx_t     = calAx_0.*exp.( g_calAx.*((1980:2017) .- 1980))
+Ag_t        = Ag_0.*exp.( g_Ag.*((1980:2023) .- 1980))
+As_t        = As_0.*exp.( g_As.*((1980:2023) .- 1980))
+calAx_t     = calAx_0.*exp.( g_calAx.*((1980:2023) .- 1980))
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -136,7 +137,7 @@ function sim_model_full(params::Vector{Float64};Pg_t::Vector{Float64},Ps_t::Vect
   χ = params[1]
   η = params[2]
   γ = params[3]
-  
+
   # Impose the Parameter Restriction From HRV
   if !(1 > γ > χ > 0)
       eq = Dict{String, Vector{Float64}}()
@@ -146,18 +147,19 @@ function sim_model_full(params::Vector{Float64};Pg_t::Vector{Float64},Ps_t::Vect
                   "Lt" , "Nt" , "Ht" ,
                   "Lst", "Lgt", "Yst", "Ygt", "Wt", "Rt", 
                   "Agt", "Ast", "Axt", "calAxt", "calAxhatt"]
-          eq[var] = fill(1e6, length(1980:2017))
+          eq[var] = fill(1e6, length(1980:2023))
       end
       return eq
   end
 
-  N_t         = 1.000.*exp.(g_n.*((1980:2017) .- 1980))
-  h_t         = 1.000.*exp.(g_h.*((1980:2017) .- 1980))
-  L_t         = 1.000.*exp.(g_l.*((1980:2017) .- 1980))
+
+  N_t         = 1.000.*exp.(g_n.*((1980:2023) .- 1980))
+  h_t         = 1.000.*exp.(g_h.*((1980:2023) .- 1980))
+  L_t         = 1.000.*exp.(g_l.*((1980:2023) .- 1980))
   g_abgp      = g_calAx/(1-θ) + g_h
-  Ag_t        = 1.000.*exp.( g_Ag.*((1980:2017) .- 1980))
-  As_t        = 1.000.*exp.( g_As.*((1980:2017) .- 1980))
-  calAx_t     = 1.000.*exp.( g_calAx.*((1980:2017) .- 1980))
+  Ag_t        = 1.000.*exp.( g_Ag.*((1980:2023)    .- 1980))
+  As_t        = 1.000.*exp.( g_As.*((1980:2023)    .- 1980))
+  calAx_t     = 1.000.*exp.( g_calAx.*((1980:2023) .- 1980))
 
   calAx_hat_t = calAx_t.*(h_t.^(1-θ))
 
@@ -235,7 +237,7 @@ function sim_model_full(params::Vector{Float64};Pg_t::Vector{Float64},Ps_t::Vect
   push!(eq["yt"], y(eq["calAxt"][1],eq["kt"][1],eq["ht"][1],θ))
 
   t = 1
-  for t in 1:(2018-1980) 
+  for t in 1:(2024-1980) 
     sg_t = sg(eq["Pgt"][t],eq["et"][t],eq["Pst"][t],η,χ,γ)
     ss_t = 1 - sg_t
     push!(eq["sst"],ss_t)
@@ -282,7 +284,7 @@ function sim_model_full(params::Vector{Float64};Pg_t::Vector{Float64},Ps_t::Vect
     push!(eq["Ygt"],Yg)
 
     # Break loop here
-    if t == 38
+    if t == 44
         break
     end
 
@@ -389,7 +391,7 @@ sim_eq["cst"][1]
 
 #-------------------------------------------------------
 #Plot the Resulting Series
-year = 1980:2017
+year = 1980:2023
 plot(year, sim_eq["sgt"], label="Model", xlabel="Year", linestyle=:solid, color=:black, lw=2.00, 
     ylabel="Share of Goods in Consumption Expenditure", 
     title="γ=$(round(γ, digits=4)), η=$(round(η, digits=4)), χ=$(round(χ, digits=4))")
@@ -448,21 +450,21 @@ Mhat(t,z;χ,η,γ,ν)         = exp_func(indU(m_t[z],sim_eq["Pgt"][z],sim_eq["Ps
 #---------------------------------------------------------------
 
 #---------------------------------------------------------------
-#Compute the 2017 based EV
-t_base     = 2017
+#Compute the 2023 based EV
+t_base     = 2023
 t_prime    = t_base - 1980 + 1   
-z_prime    = (1980:1:2017) .- 1980 .+ 1
+z_prime    = (1980:1:2023) .- 1980 .+ 1
 
-EV_2017_pc = (Mhat.( t_prime , z_prime ;χ=χ,η=η,γ=γ,ν=ν_t[t_prime]) .+ δ*sim_eq["kt"][ z_prime ])./
+EV_2023_pc = (Mhat.( t_prime , z_prime ;χ=χ,η=η,γ=γ,ν=ν_t[t_prime]) .+ δ*sim_eq["kt"][ z_prime ])./
              (Mhat.( t_prime ,       1 ;χ=χ,η=η,γ=γ,ν=ν_t[t_prime]) .+ δ*sim_eq["kt"][ 1 ])
 
 
-exp_share_2017_base = sim_eq["et"][end]./(Mhat.( t_prime , z_prime ;χ=χ,η=η,γ=γ,ν=ν_t[t_prime]) .+ δ*sim_eq["kt"][ z_prime ])
+exp_share_2023_base = sim_eq["et"][end]./(Mhat.( t_prime , z_prime ;χ=χ,η=η,γ=γ,ν=ν_t[t_prime]) .+ δ*sim_eq["kt"][ z_prime ])
 
 #Compute the 1980 based EV
 t_base     = 1980
 t_prime    = t_base - 1980 + 1
-z_prime    = (1980:1:2017) .- 1980 .+ 1
+z_prime    = (1980:1:2023) .- 1980 .+ 1
 EV_1980_pc = (Mhat.( t_prime , z_prime ;χ=χ,η=η,γ=γ,ν=ν_t[t_prime]) .+ δ*sim_eq["kt"][ z_prime ])./(Mhat.( t_prime , 1 ;χ=χ,η=η,γ=γ,ν=ν_t[t_prime]) .+ δ*sim_eq["kt"][ 1 ])
 
 exp_share_1980_base = sim_eq["et"][1]./(Mhat.( t_prime , z_prime ;χ=χ,η=η,γ=γ,ν=ν_t[t_prime]) .+ δ*sim_eq["kt"][ z_prime ])
@@ -470,7 +472,7 @@ exp_share_1980_base = sim_eq["et"][1]./(Mhat.( t_prime , z_prime ;χ=χ,η=η,γ
 FS         = cumsum( g_D .+ g_n ) 
 FS         = [0;FS]
 
-log_EV_2017 = log.(EV_2017_pc) .+ g_n.*(z_prime .- 1 )
+log_EV_2023 = log.(EV_2023_pc) .+ g_n.*(z_prime .- 1 )
 log_EV_1980 = log.(EV_1980_pc) .+ g_n.*(z_prime .- 1 )
 
 #---------------------------------------------------------------
@@ -478,10 +480,10 @@ tickfont   = font(10)
 guidefont  = font(12)
 legendfont = font(10)
 
-p = plot(1980:2017, log_EV_2017, label="2017-based Fisher-Shell Index",
+p = plot(1980:2023, log_EV_2023, label="2023-based Fisher-Shell Index",
     ylabel="Cummulative Welfare Growth",
     linestyle=:dashdot, lw=2,
-    xticks=1980:5:2020, yticks=0.0:0.2:1.4,
+    xticks=1980:5:2023, yticks=0.0:0.2:1.4,
     minorgridalpha=0.2, color=:black,
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,
@@ -489,10 +491,10 @@ p = plot(1980:2017, log_EV_2017, label="2017-based Fisher-Shell Index",
     legendfont=legendfont
 )
 
-plot!(p, 1980:2017, log_EV_1980, label="1980-based Fisher-Shell Index",
+plot!(p, 1980:2023, log_EV_1980, label="1980-based Fisher-Shell Index",
     linestyle=:dash, lw=2, color=:black)
 
-plot!(p, 1980:2017, FS, label="Chained Fisher-Shell Index",
+plot!(p, 1980:2023, FS, label="Chained Fisher-Shell Index",
     linestyle=:solid, lw=2, minorgrid=true, minorgridalpha=0.2, color=:black)
 
 savefig(joinpath(figuresdir, "FS_BBEV.png"))
@@ -503,11 +505,11 @@ tickfont   = font(10)
 guidefont  = font(12)
 legendfont = font(10)
 
-plot(1980:2017,exp_share_1980_base, 
+plot(1980:2023,exp_share_1980_base, 
     label="1980-based Fisher-Shell Index",
     ylabel="Expenditure Share of Income",
     linestyle=:solid, lw=2,
-    xticks=1980:5:2020, yticks=0.0:0.05:0.80,
+    xticks=1980:5:2025, yticks=0.0:0.05:0.80,
     minorgridalpha=0.2, color=:black,
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,
@@ -515,11 +517,11 @@ plot(1980:2017,exp_share_1980_base,
     legendfont=legendfont)
 savefig(joinpath(figuresdir,"Exp_Share_1980.png"))
 
-plot(1980:2017,exp_share_2017_base, 
-    label="2017-based Fisher-Shell Index",
+plot(1980:2023,exp_share_2023_base, 
+    label="2023-based Fisher-Shell Index",
     ylabel="Expenditure Share of Income",
     linestyle=:solid, lw=2,
-    xticks=1980:5:2020, yticks=0.0:0.05:0.90,
+    xticks=1980:5:2025, yticks=0.0:0.05:0.90,
     minorgridalpha=0.2, color=:black,
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,
@@ -531,14 +533,14 @@ savefig(joinpath(figuresdir,"Exp_Share_2017.png"))
 
 #---------------------------------------------------------------
 #Now Compute Different Base EV Measures
-#Compute the 2017-based EV
-t_base     = 2017
+#Compute the 2023-based EV
+t_base     = 2023
 t_prime    = t_base - 1980 + 1   
 z_prime    = (1980:1:1990) .- 1980 .+ 1
-EV_2017_pc = (Mhat.( t_prime , z_prime ;χ=χ,η=η,γ=γ,ν=ν_t[t_prime]) .+ δ*sim_eq["kt"][ z_prime ])./
+EV_2023_pc = (Mhat.( t_prime , z_prime ;χ=χ,η=η,γ=γ,ν=ν_t[t_prime]) .+ δ*sim_eq["kt"][ z_prime ])./
              (Mhat.( t_prime ,       1 ;χ=χ,η=η,γ=γ,ν=ν_t[t_prime]) .+ δ*sim_eq["kt"][ 1 ])
 
-log_EV_2017 = log.(EV_2017_pc) .+ g_n.*(z_prime .- 1 )
+log_EV_2023 = log.(EV_2023_pc) .+ g_n.*(z_prime .- 1 )
 
 
 #Compute the 2010-based EV
@@ -583,7 +585,7 @@ tickfont   = font(10)
 guidefont  = font(12)
 legendfont = font(10)
 
-p = plot(1980:1990, log_EV_2017, label="2017-based Index",
+p = plot(1980:1990, log_EV_2023, label="2023-based Index",
     ylabel="Accumulated Welfare Growth",
     linestyle=:dash, lw=2.5,
     xticks=1980:2:1992, yticks=0.00:0.05:0.30,
@@ -621,8 +623,8 @@ tickfont   = font(10)
 guidefont  = font(12)
 legendfont = font(10)
 
-t_base      = 2017
-T           = t_base - 1980 + 1   #-> 2017
+t_base      = 2023
+T           = t_base - 1980 + 1   #-> 2023
 
 t_base_2    = 1980
 τ           = t_base_2 - 1980 + 1  #-> 1980 
@@ -640,27 +642,49 @@ y_Laspeyres = (P_Paasche[τ].*e_Laspeyres .+ (sim_eq["yt"] - sim_eq["et"]) )./(P
 
 y_Paasche   = (P_Laspeyres[T].*e_Laspeyres .+ (sim_eq["yt"] - sim_eq["et"]) )./(P_Laspeyres[T].*e_Laspeyres[τ] .+ (sim_eq["yt"][τ] - sim_eq["et"][τ]) )
 
-plot(1980:2017, log.(y_Laspeyres) .+ g_n.*((1980 .- 1980 .+1):(2017 .- 1980 .+1)), 
+plot(1980:2023, log.(y_Laspeyres) .+ g_n.*((1980 .- 1980 .+1):(2023 .- 1980 .+1)), 
     label="Laspeyres", ylabel="GDP Index (Log scale;1980=0)",    
     linestyle=:dash, lw=2.0,
     minorgridalpha=0.2, color=:black,
-    xticks=1980:5:2020,  
+    xticks=1980:5:2025,  
     yticks=0.00:0.20:1.00,  
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,
     legend=(0.15, 0.95),
     legendfont=legendfont)
 
-plot!(1980:2017, log.(y_Paasche) .+ g_n.*(1980 .- 1980 .+1 : 2017 .- 1980 .+1 ), label="Paasche",
+plot!(1980:2023, log.(y_Paasche) .+ g_n.*(1980 .- 1980 .+1 : 2023 .- 1980 .+1 ), label="Paasche",
         linestyle=:dot, color=:black, lw=2.00)
 
-plot!(1980:2017, 0.5.*log.(y_Paasche) .+ 0.5.*log.(y_Laspeyres) .+ g_n.*(1980 .- 1980 .+1 : 2017 .- 1980 .+1 ), label="Fisher-Ideal",
+plot!(1980:2023, 0.5.*log.(y_Paasche) .+ 0.5.*log.(y_Laspeyres) .+ g_n.*(1980 .- 1980 .+1 : 2023 .- 1980 .+1 ), label="Fisher-Ideal",
         linestyle=:solid, color=:black, lw=2.00)
 
 savefig(joinpath(figuresdir,"GDP_sc.png"))
-
 #---------------------------------------------------------------
 
+
+#---------------------------------------------------------------
+#Plot the Consumption Value Added Share
+tickfont   = font(10)
+guidefont  = font(12)
+legendfont = font(10)
+
+plot(1980:2023, VAC_GOOD_SHARE,
+    label    ="Goods Consumption Share", ylabel="% of Total Consumption Value Added",    
+    linestyle=:solid, lw=2.0,
+    minorgridalpha=0.2, color=:black,
+    xticks=1980:5:2025,  
+    yticks=0.00:0.05:1.00,  
+    xtickfont=tickfont, ytickfont=tickfont,
+    xguidefont=guidefont, yguidefont=guidefont,
+    legend=(0.60, 0.95),
+    legendfont=legendfont)
+
+
+
+
+
+stop here
 #---------------------------------------------------------------
 #=
 #---------------------------------------------------------------
