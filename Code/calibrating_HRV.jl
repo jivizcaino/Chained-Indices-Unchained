@@ -22,8 +22,8 @@ data_range = "A1:AU78"
 
 # Read the data from the Excel file
 HRV_data = XLSX.readtable(joinpath(datadir, file_name), sheet_name)
-HRV_df = DataFrame(HRV_data)
-#HRV_df = DataFrame(HRV_data...)
+#HRV_df = DataFrame(HRV_data)
+HRV_df = DataFrame(HRV_data...)
 
 #Get the shares of Goods and Services in Investment and Consumption (X,C) respectively
 VAX_GOOD_SHARE = HRV_df[HRV_df.year .>= 1980, "VAX_GOOD_S"]
@@ -664,24 +664,42 @@ savefig(joinpath(figuresdir,"GDP_sc.png"))
 
 
 #---------------------------------------------------------------
-#Plot the Consumption Value Added Share
+#Plot the Goods Consumption Value Added Share
 tickfont   = font(10)
 guidefont  = font(12)
 legendfont = font(10)
 
 plot(1980:2023, VAC_GOOD_SHARE,
-    label    ="Goods Consumption Share", ylabel="% of Total Consumption Value Added",    
+    ylabel="% of Total Consumption Value Added",    
     linestyle=:solid, lw=2.0,
     minorgridalpha=0.2, color=:black,
-    xticks=1980:5:2025,  
-    yticks=0.00:0.05:1.00,  
+    xticks=1980:2:2025,  
+    yticks=0.00:0.025:0.30,  
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,
-    legend=(0.60, 0.95),
-    legendfont=legendfont)
+    xrotation=45)
 
+savefig(joinpath(figuresdir,"goods_consumption_share.png"))
 
+#---------------------------------------------------------------
+#Plot Investment TFP
+tickfont   = font(10)
+guidefont  = font(12)
+#legendfont = font(10)
 
+calA_X_I   = HRV_df[!,"calA_X_I_TD"]
+
+plot(1947:2023, calA_X_I ,
+    ylabel="TFP Index (1947=1)", 
+    linestyle=:solid, lw=2.0,
+    minorgridalpha=0.2, color=:black,
+    xticks=1947:3:2025,    
+    xtickfont=tickfont, ytickfont=tickfont,
+    xguidefont=guidefont, yguidefont=guidefont,
+    legend=:none,
+    xrotation=45)
+
+savefig(joinpath(figuresdir,"investment_TFP.png"))
 
 
 stop here
