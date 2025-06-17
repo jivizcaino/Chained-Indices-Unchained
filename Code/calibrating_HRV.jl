@@ -701,117 +701,49 @@ plot(1947:2023, calA_X_I ,
 
 savefig(joinpath(figuresdir,"investment_TFP.png"))
 
-
-stop here
 #---------------------------------------------------------------
-#=
+#Plot the Relative Price of Investment
+tickfont   = font(10)
+guidefont  = font(12)
+#legendfont = font(10)
+
+X_P     = HRV_df[!,"X_TOT_P"]
+C_P     = HRV_df[!,"C_TOT_P"]
+rel_P_I = X_P ./ C_P
+
+plot(1947:2023, rel_P_I ,
+    ylabel="Index (1947=1)", 
+    linestyle=:solid, lw=2.0,
+    minorgridalpha=0.2, color=:black,
+    xticks=1947:3:2024,    
+    xtickfont=tickfont, ytickfont=tickfont,
+    xguidefont=guidefont, yguidefont=guidefont,
+    legend=:none,
+    xrotation=45)
+
+savefig(joinpath(figuresdir,"rel_Price_Investment.png"))
+
+
 #---------------------------------------------------------------
-# Export the data to an Excel file
+#Plot the Consumption Share
+tickfont   = font(10)
+guidefont  = font(12)
+#legendfont = font(10)
 
-# Create a dictionary with the data to export
-time_index = 1980:2017
+X_TOT      = HRV_df[!,"X_TOT"]
+C_TOT      = HRV_df[!,"C_TOT"]
+cons_share = C_TOT ./ (C_TOT+X_TOT)
 
-data_to_export = Dict(
-    "Year"    => time_index,
-    "Agt"     => eq["Agt"],
-    "Ast"     => eq["Ast"],
-    "calAxt"  => eq["calAxt"],
-    "Yt"      => eq["Yt"],
-    "Et"      => eq["Et"],
-    "Xt"      => eq["Xt"],
-    "Xst"     => eq["Xst"],
-    "Xgt"     => eq["Xgt"],
-    "Kt"      => eq["Kt"],
-    "Kst"     => eq["Kst"],
-    "Kgt"     => eq["Kgt"],
-    "Cgt"     => eq["Cgt"],    
-    "Cst"     => eq["Cst"],    
-    "Pst"     => eq["Pst"],
-    "Pgt"     => eq["Pgt"],
-    "egt"     => eq["egt"],
-    "est"     => eq["est"],
-    "Lgt"     => eq["Lgt"],
-    "Lst"     => eq["Lst"],
-    "Wt"      => eq["Wt"],
-    "Rt"      => eq["Rt"],
-    "nut"     => nu,
-    "Divisia" => g_D,
-    #"Value of the Problem" => V_K0,
-    "σ_t"    => σ_t 
-)
+plot(1947:2023, cons_share ,
+    ylabel="Share of Total Expenditure", 
+    linestyle=:solid, lw=2.0,
+    minorgridalpha=0.2, color=:black,
+    xticks = 1947:3:2024, 
+    ylim   = (0.40, 1.00), 
+    yticks = 0.40:0.10:1.00,
+    xtickfont=tickfont, ytickfont=tickfont,
+    xguidefont=guidefont, yguidefont=guidefont,
+    legend=:none,
+    xrotation=45)
 
-# Create a new Excel file and write the data
-XLSX.openxlsx("HRV_sol_HRV_chi_Boppart_PopAadj.xlsx", mode="w") do xf
-    sheet = xf[1]  # Get the first sheet
-    row   = 1
-    for (key, values) in data_to_export
-        sheet[row, 1] = key  # Write the variable name
-        for (i, value) in enumerate(values)
-            sheet[row, i + 1] = value  # Write the variable values
-        end
-        row += 1
-    end
-end
-
-
-using XLSX
-
-# Create a new Excel file and write the data
-XLSX.openxlsx("HRV_sol_HRV_chi_Boppart_PopAadj.xlsx", mode="w") do xf
-    sheet = xf[1] 
-    XLSX.rename!(sheet, "Variables")
-
-    # Preserve the order of variables by iterating over the keys in the desired order
-    ordered_keys = ["Year", "Agt", "Ast", "calAxt", "Yt", "Et", "Xt", "Xst", "Xgt", "Kt","Kst", "Kgt", 
-                    "Cgt", "Cst", "Pst", "Pgt", "egt", "est", "Lgt", "Lst", "Wt", "Rt", "nut", "Divisia", "σ_t"]
-
-
-    # Validate that all vectors are non-empty and have the same length
-    num_rows = length(data_to_export["Year"])  # Use "Year" as the reference length
-    for key in ordered_keys
-        if !haskey(data_to_export, key)
-            error("Key '$key' is missing in the data_to_export dictionary.")
-        end
-        if length(data_to_export[key]) != num_rows
-            error("Key '$key' has a different length or is empty.")
-        end
-    end
-
-    # Write the header row
-    for (col, key) in enumerate(ordered_keys)
-        sheet[1, col] = key  # Write the variable name in the first row
-    end
-
-    # Write the data column-wise
-    for (col, key) in enumerate(ordered_keys)
-        values = data_to_export[key]
-        for row in 1:num_rows
-            sheet[row + 1, col] = values[row]  # Write the data starting from the second row
-        end
-    end
-    # Second sheet: Export parameter values
-    sheet2 = XLSX.addsheet!(xf,"Parameters")
-
-    # Define the parameters and their values
-    parameters = Dict(
-        "ωx" => ωx,
-        "εx" => εx,
-        "εc" => εc,
-        "θ"  => θ,
-        "ρ"  => ρ,
-        "δ"  => δ,
-        "χ"  => χ,
-        "η"  => η,
-        "γ"  => γ
-    )
-
-    # Write the parameters to the second sheet
-    row = 1
-    for (key, value) in parameters
-        sheet2[row, 1] = key    
-        sheet2[row, 2] = value  
-        row += 1
-    end
-end
-
-=#
+savefig(joinpath(figuresdir,"consump_expend_share.png"))
