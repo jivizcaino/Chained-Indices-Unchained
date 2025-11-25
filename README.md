@@ -119,8 +119,7 @@ If you use this replication package, please cite:
 
 ## License
 
-This replication package is distributed under the XXXXX.
-See the LICENSE file for details.
+This replication package is distributed under the MIT License. See the LICENSE file for details.
 
 ---
 
