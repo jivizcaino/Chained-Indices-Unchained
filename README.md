@@ -1,7 +1,7 @@
 # Replication Package  
 **Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement**  
 **Authors:** Omar Licandro and Juan I. Vizcaino  
-**This Version:** 25 November 2025
+**This Version:** November 2025
 
 ---
 
@@ -23,6 +23,7 @@ All code is written to be fully **self-contained** and **portable**. It uses rel
 ---
 
 ## Repository structure
+```text
 Chained_Indices_Unchained/
 │
 ├── Code/
@@ -38,7 +39,7 @@ Chained_Indices_Unchained/
 │
 ├── README.md
 └── LICENSE
-
+```
 
 ## Requirements
 - Julia: 1.10 or later (or your actual version)
