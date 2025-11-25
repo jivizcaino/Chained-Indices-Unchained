@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this replication package, please cite it as follows."
+title: "Replication Package for: Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement"
+authors:
+  - family-names: "Licandro"
+    given-names: "Omar"
+  - family-names: "Vizcaino"
+    given-names: "Juan I."
+version: "v0.1.0"
+date-released: November 2025
+repository-code: "https://github.com/<your-username>/<your-repo>"
+preferred-citation:
+  type: article
+  title: "Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement"
+  authors:
+    - family-names: "Licandro"
+      given-names: "Omar"
+    - family-names: "Vizcaino"
+      given-names: "Juan I."
+  year: 2025
+  # Fill in once published:
+  # journal: ""
+  # volume: ""
+  # issue: ""
+  # pages: ""
+  # doi: ""
