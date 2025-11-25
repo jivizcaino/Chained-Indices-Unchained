@@ -51,8 +51,7 @@ All package dependencies are explicitly listed in `Project.toml` and locked via 
 
 ## How to Run the Replication Code
 
-1. Clone this repository
-
+1. Clone this repository 
 Replace <your-username> and <your-repo> with your actual GitHub info:
 
 ```bash
@@ -68,7 +67,7 @@ julia --project=.
 
 (or start Julia and run `] activate .>` in the REPL)
 
-1. Instantiate the environment
+3.Instantiate the environment
 
 Inside Julia:
 
