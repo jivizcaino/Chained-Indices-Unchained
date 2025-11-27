@@ -1,7 +1,7 @@
 # Replication Package  
 **Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement**  
 **Authors:** Omar Licandro and Juan I. Vizcaino  
-**This Version:** 25 November 2025
+**This Version:** November 2025
 
 ---
 
@@ -23,6 +23,7 @@ All code is written to be fully **self-contained** and **portable**. It uses rel
 ---
 
 ## Repository structure
+```text
 Chained_Indices_Unchained/
 │
 ├── Code/
@@ -38,7 +39,7 @@ Chained_Indices_Unchained/
 │
 ├── README.md
 └── LICENSE
-
+```
 
 ## Requirements
 - Julia: 1.10 or later (or your actual version)
@@ -50,8 +51,7 @@ All package dependencies are explicitly listed in `Project.toml` and locked via 
 
 ## How to Run the Replication Code
 
-1. Clone this repository
-
+1. Clone this repository 
 Replace <your-username> and <your-repo> with your actual GitHub info:
 
 ```bash
@@ -67,7 +67,7 @@ julia --project=.
 
 (or start Julia and run `] activate .>` in the REPL)
 
-1. Instantiate the environment
+3.Instantiate the environment
 
 Inside Julia:
 
@@ -110,7 +110,7 @@ If you use this replication package, please cite:
 ### BibTeX
 ```bibtex
 @article{LicandroVizcaino2025,
-  author  = {Licandro, Omar and Vizcáiño, Juan I.},
+  author  = {Licandro, Omar and Vizcaino, J. I.},
   title   = {Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement},
   year    = {2025},
 }
@@ -119,8 +119,7 @@ If you use this replication package, please cite:
 
 ## License
 
-This replication package is distributed under the XXXXX.
-See the LICENSE file for details.
+This replication package is distributed under the MIT License. See the LICENSE file for details.
 
 ---
 
