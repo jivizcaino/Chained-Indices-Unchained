@@ -18,8 +18,8 @@ using Pkg
 Pkg.activate(@__DIR__)
 Pkg.instantiate()
 
-using XLSX, DataFrames, BlackBoxOptim , Plots; plotlyjs(), Statistics
-using MathJaxRenderer, LaTeXStrings, LsqFit, Random, OrderedCollections, PrettyTables
+using XLSX, DataFrames, BlackBoxOptim , Plots; plotlyjs()
+using Statistics,MathJaxRenderer, LaTeXStrings, LsqFit, Random, OrderedCollections, PrettyTables
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -42,9 +42,7 @@ sheet_name = "Data"
 data_range = "A1:DF78"
 
 # Read the data from the Excel file
-HRV_data = XLSX.readtable(joinpath(datadir, file_name), sheet_name)
-HRV_df = DataFrame(HRV_data)
-#HRV_df = DataFrame(HRV_data...)
+HRV_df = DataFrame(XLSX.readtable(joinpath(datadir, file_name), sheet_name, infer_eltypes=true))
 
 #Get the shares of Goods and Services in Investment and Consumption (X,C) respectively
 VAX_GOOD_SHARE = HRV_df[HRV_df.year .>= 1980, "VAX_GOOD_S"]
@@ -117,6 +115,9 @@ sg(Pg,e,Ps,η,χ,γ) = η*((e/Ps)^(-χ))*((Pg/Ps)^γ)
 e_t_x(t,x; χ, ν_t, Pst)    = (ν_t[t] * (Pst[x]^χ))^(1/(χ-1))
 sg_t_x(t,x;χ,η,γ,Pst,Pgt)  = η*( ( e_t_x(t,x; χ, ν_t, Pst)/Pst[x] )^(-χ) )*((Pgt[x]/Pst[x])^γ)
 cal_v_t_x(t,x;χ,Pst)       = ( Pst[t]/Pst[x] )^(  (χ/(1-χ)) )
+
+#Consumption Expenditure Indices
+e_tilde_tz(t,z;χ,η,γ,e,Pgt,Pst) = (( (e[z]/Pst[z])^χ + (η*χ/γ)*( (Pgt[t]/Pst[t])^γ - (Pgt[z]/Pst[z])^γ ) )^(1/χ))* Pst[t]
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -590,10 +591,10 @@ Ag_0        = 1.000
 As_0        = 1.000
 calAx_0     = 1.000
 
-k0         = κ^(1/(θ-1))*(calAx_0^(1/(θ-1)))
+k0          = κ^(1/(θ-1))*(calAx_0^(1/(θ-1)))
 sim_eq["kt"][1]
 
-e0         = (κ - δ - g_n - g_k)*k0
+e0          = (κ - δ - g_n - g_k)*k0
 sim_eq["et"][1]
 
 y0         = κ*k0
@@ -646,7 +647,7 @@ plot(1947:2023, rel_P_I ,
     left_margin=5Plots.mm,  
     framestyle=:box)
 
-savefig(joinpath(figuresdir,"rel_Price_Investment.png"))
+#savefig(joinpath(figuresdir,"rel_Price_Investment.png"))
 #---------------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -665,7 +666,7 @@ plot(1947:2023, calA_X_I, ylabel="Effective Investment-Specific TFP <br> (1947=1
     left_margin=5Plots.mm,  
     framestyle=:box)
 
-savefig(joinpath(figuresdir,"investment_TFP.png"))
+#savefig(joinpath(figuresdir,"investment_TFP.png"))
 #---------------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -689,7 +690,7 @@ plot(1947:2023, cons_share ,
     left_margin=5Plots.mm,  
     framestyle=:box)
 
-savefig(joinpath(figuresdir,"consump_expend_share.png"))
+#savefig(joinpath(figuresdir,"consump_expend_share.png"))
 #---------------------------------------------------------
 
 #---------------------------------------------------------
@@ -711,7 +712,7 @@ plot(1947:2023, VAC_GOOD_SHARE_long,
     left_margin=5Plots.mm,  
     framestyle=:box)
 
-savefig(joinpath(figuresdir,"goods_consumption_share.png"))
+#savefig(joinpath(figuresdir,"goods_consumption_share.png"))
 #----------------------------------------------------------
 
 #----------------------------------------------------------
@@ -744,7 +745,7 @@ plot(1980:2023, wedge_Pg_Ps, label="Wedge ( (Pg/Ps)-Data / (Pg/Ps)-Model",
 
 plot!(1980:2023, wedge_Pg_Ps_trend, label="Exponential Trend", lw=2, color=:black, linestyle=:solid)
 
-savefig(joinpath(figuresdir, "PgPs_Wedge_Fit.png"))
+#savefig(joinpath(figuresdir, "PgPs_Wedge_Fit.png"))
 
 println("""
 $(repeat("=", 60))
@@ -769,7 +770,7 @@ plot(year, sim_eq["sgt"], label="Model", linestyle=:solid, color=:black, lw=2.00
 
 plot!(year, VAC_GOOD_SHARE, label="Data", legend=(0.800, 0.950), linestyle=:dot, lw=2.00, 
     minorgrid=true, minorgridalpha=0.9, color=:black,left_margin=5Plots.mm,framestyle=:box)
-savefig(joinpath(figuresdir, "sg_t_Model_Fit.png"))
+#savefig(joinpath(figuresdir, "sg_t_Model_Fit.png"))
 #----------------------------------------------------------
 
 #---------------------------------------------------------
@@ -806,7 +807,7 @@ plot!(1980:2023, log.(GDP_data),label = "Chained Index - Data",
     linestyle=:dot, lw=2.0, color=:black,
     legend=(0.15, 0.95))
 
-savefig(joinpath(figuresdir,"GDP_Model_vs_Data.png"))
+#savefig(joinpath(figuresdir,"GDP_Model_vs_Data.png"))
 #---------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -858,7 +859,7 @@ plot!(1981:2023, g_FS ,label = "Model - FS Chained Index",
     left_margin=5Plots.mm,  
     framestyle=:box)
 
-savefig(joinpath(figuresdir,"GDP_Growth_Model_vs_Data_v2.png"))
+#savefig(joinpath(figuresdir,"GDP_Growth_Model_vs_Data_v2.png"))
 #---------------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -997,7 +998,7 @@ plot!(p, 1980:2023, FS, label="Chained Index",
 xaxis!(p, minor_ticks=true, minor_tick_step=1.00)
 yaxis!(p, minor_ticks=true, minor_tick_step=0.01)
 
-savefig(joinpath(figuresdir, "FS_BBEV.png"))
+#savefig(joinpath(figuresdir, "FS_BBEV.png"))
 
 #Differences Between Fixed-Base and Chained Indices
 println("""
@@ -1124,7 +1125,7 @@ plot!(1980:2023, FS , ylabel="Cummulative Growth",
     xrotation=45,
     framestyle=:box)
 
-savefig(joinpath(figuresdir,"prefs_chained_FS.png"))
+#savefig(joinpath(figuresdir,"prefs_chained_FS.png"))
 #---------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -1166,7 +1167,7 @@ plot!(1980:2023,se_1980_z,label="se(1980,z)",
 plot!(1980:2023,se_2023_z,label="se(2023,z)",
     linestyle=:dash, lw=2,color=:black)
 
-savefig(joinpath(figuresdir,"se_t.png"))
+#savefig(joinpath(figuresdir,"se_t.png"))
 #---------------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -1202,7 +1203,7 @@ plot!(1980:2023, sg_2023_z, label="sg(2023,z)",
     xrotation=45,
     left_margin=5Plots.mm,  
     framestyle=:box)
-savefig(joinpath(figuresdir, "sg_t_z.png"))
+#savefig(joinpath(figuresdir, "sg_t_z.png"))
 #---------------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -1243,7 +1244,7 @@ plot!(p, 1981:2023, g_FS , label="Chained Index",
 
 xaxis!(p, minor_ticks=true, minor_tick_step=1.00)
 yaxis!(p, minor_ticks=true, minor_tick_step=0.01)
-savefig(joinpath(figuresdir, "FS_GrowthRates_1980_2023.png"))
+#savefig(joinpath(figuresdir, "FS_GrowthRates_1980_2023.png"))
 
 #Decline in the Growth Rate Between 1981 and 2023 for the Chained Index
 decline_growth_rate = (g_FS[end] - g_FS[1]) * 100
@@ -1273,8 +1274,6 @@ ss_t        = sim_eq["sst"]
 g_cg        = sim_eq["cgt"][2:end]./sim_eq["cgt"][1:end-1] .- 1
 g_cs        = sim_eq["cst"][2:end]./sim_eq["cst"][1:end-1] .- 1
 g_x         = x_t[2:end]./x_t[1:end-1] .- 1
-
-
 
 g_D         = s_e[2:end].*( sim_eq["sgt"][2:end].*g_cg .+ sim_eq["sst"][2:end].*g_cs  ) .+ (1 .- s_e[2:end]).*g_x
 g_D_agg     = round.(g_D .+ g_n, digits=5)
@@ -1314,3 +1313,16 @@ SGS_Effect .+ SC_Effect
 
 g_D_agg[end] - g_D_agg[1]
 #------------------------------------------------------------------------
+
+#------------------------------------------------------------------------
+t_base     = 2023
+t_prime    = t_base - 1980 + 1   
+z_prime    = (1980:1:2023) .- 1980 .+ 1
+
+e_tilde_2023_z = e_tilde_tz.(t_prime,z_prime;χ=χ,η=η,γ=γ,e=sim_eq["et"],Pgt=sim_eq["Pgt"],Pst=sim_eq["Pst"])
+
+#Alternative Decomposition of the Growth Rate Decline
+gD_e         = sg_t[2:end].*( g_cg )  .+ (1 .- sg_t[2:end]).*( g_cs ) 
+De           = [0;cumsum( gD_e  .+ g_n )]
+
+[0;gD_e].*((sim_eq["et"]./e_tilde_2023_z).^(χ))
