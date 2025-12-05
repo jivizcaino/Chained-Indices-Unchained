@@ -93,7 +93,9 @@ The script will:
 
 ## Output
 Running ```main.jl``` will create the output figures and save them in:
+
 ```Figures/```
+
 It will also run the SMM structural estimation and print the in the REPL all the calculations reported in the quantitative section of the paper.
 
 ---
