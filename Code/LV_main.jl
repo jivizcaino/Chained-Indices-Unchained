@@ -1315,14 +1315,103 @@ g_D_agg[end] - g_D_agg[1]
 #------------------------------------------------------------------------
 
 #------------------------------------------------------------------------
+#APPENDIX C
+#Base 2023 Expenditure Equivalent Variation
 t_base     = 2023
 t_prime    = t_base - 1980 + 1   
 z_prime    = (1980:1:2023) .- 1980 .+ 1
-
 e_tilde_2023_z = e_tilde_tz.(t_prime,z_prime;χ=χ,η=η,γ=γ,e=sim_eq["et"],Pgt=sim_eq["Pgt"],Pst=sim_eq["Pst"])
+
+#Base 2010 Expenditure Equivalent Variation
+t_base     = 2010
+t_prime    = t_base - 1980 + 1   
+z_prime    = (1980:1:2023) .- 1980 .+ 1
+e_tilde_2010_z = e_tilde_tz.(t_prime,z_prime;χ=χ,η=η,γ=γ,e=sim_eq["et"],Pgt=sim_eq["Pgt"],Pst=sim_eq["Pst"])
+
+#Base 2000 Expenditure Equivalent Variation
+t_base     = 2000
+t_prime    = t_base - 1980 + 1   
+z_prime    = (1980:1:2023) .- 1980 .+ 1
+e_tilde_2000_z = e_tilde_tz.(t_prime,z_prime;χ=χ,η=η,γ=γ,e=sim_eq["et"],Pgt=sim_eq["Pgt"],Pst=sim_eq["Pst"])
+
+#Base 1990 Expenditure Equivalent Variation
+t_base     = 1990
+t_prime    = t_base - 1980 + 1   
+z_prime    = (1980:1:2023) .- 1980 .+ 1
+e_tilde_1990_z = e_tilde_tz.(t_prime,z_prime;χ=χ,η=η,γ=γ,e=sim_eq["et"],Pgt=sim_eq["Pgt"],Pst=sim_eq["Pst"])
+
+#Base 1980 Expenditure Equivalent Variation
+t_base     = 1980
+t_prime    = t_base - 1980 + 1   
+z_prime    = (1980:1:2023) .- 1980 .+ 1
+e_tilde_1980_z = e_tilde_tz.(t_prime,z_prime;χ=χ,η=η,γ=γ,e=sim_eq["et"],Pgt=sim_eq["Pgt"],Pst=sim_eq["Pst"])
 
 #Alternative Decomposition of the Growth Rate Decline
 gD_e         = sg_t[2:end].*( g_cg )  .+ (1 .- sg_t[2:end]).*( g_cs ) 
 De           = [0;cumsum( gD_e  .+ g_n )]
 
-[0;gD_e].*((sim_eq["et"]./e_tilde_2023_z).^(χ))
+ge_2023_z    = [0;gD_e].*((sim_eq["et"]./e_tilde_2023_z).^(χ))
+ge_2010_z    = [0;gD_e].*((sim_eq["et"]./e_tilde_2010_z).^(χ))
+ge_2000_z    = [0;gD_e].*((sim_eq["et"]./e_tilde_2000_z).^(χ))
+ge_1990_z    = [0;gD_e].*((sim_eq["et"]./e_tilde_1990_z).^(χ))
+ge_1980_z    = [0;gD_e].*((sim_eq["et"]./e_tilde_1980_z).^(χ))
+
+plot(1981:2023, gD_e, label="Divisia Index",
+    ylabel="Expenditure Growth Rate",
+    linestyle=:solid, lw=2.5,
+    xticks=1980:5:2025,yticks=0.015:0.001:0.020,
+    ylims=(0.015,0.020),
+    minorgrid=true,
+    minorgridalpha=0.2, color=:black,
+    xtickfont  = tickfont , ytickfont  = tickfont,
+    xguidefont = guidefont, yguidefont = guidefont,
+    legend     = (0.620, 0.990),
+    legendfont = legendfont,
+    xrotation  = 45,
+    framestyle =:box)
+
+plot!(1981:2023, ge_2023_z[2:end], label="FS Index (base 2023)",
+    linestyle=:dash, lw=2.5, color=:black)
+
+plot!(1981:2023, ge_2010_z[2:end], label="FS Index (base 2010)",
+    linestyle=:dash, lw=2.0, color=:black)
+
+plot!(1981:2023, ge_2000_z[2:end], label="FS Index (base 2000)",
+    linestyle=:dash, lw=1.5, color=:black)
+
+plot!(1981:2023, ge_1990_z[2:end], label="FS Index (base 1990)",
+    linestyle=:dash, lw=1.0, color=:black)
+
+plot!(1981:2023, ge_1980_z[2:end], label="FS Index (base 1980)",
+    linestyle=:dash, lw=0.5, color=:black)
+
+#savefig(joinpath(figuresdir, "ConsExpenditure_GrowthRates_1980_2023.png"))
+
+
+CE_FS              = [0;cumsum( gD_e .+ g_n )]
+CE_FS_z_2023       = [0;cumsum( ge_2023_z[2:end] .+ g_n )]
+CE_FS_z_1980       = [0;cumsum( ge_1980_z[2:end] .+ g_n )]
+
+
+plot(1980:2023, CE_FS, label="Divisia Index",
+    ylabel     = "Cummulative Expenditure Growth",
+    linestyle=:solid, lw=2.0,
+    xticks=1980:5:2025,
+    ylims=(0.000,1.400),
+    yticks=0.000:0.200:1.400,
+    minorgrid  = true,
+    minorgridalpha=0.2, color=:black,
+    xtickfont  = tickfont , ytickfont  = tickfont,
+    xguidefont = guidefont, yguidefont = guidefont,
+    legend     = (0.150, 0.950),
+    legendfont = legendfont,
+    xrotation  = 45,
+    framestyle =:box)
+
+plot!(1980:2023, CE_FS_z_2023 , label="FS Index (base 2023)",
+    linestyle=:dash, lw=2.0, color=:black)
+
+plot!(1980:2023, CE_FS_z_1980 , label="FS Index (base 1980)",
+    linestyle=:dot, lw=2.0, color=:black)
+
+#savefig(joinpath(figuresdir, "ConsExpenditure_FS_Indices_1980_2023.png"))
