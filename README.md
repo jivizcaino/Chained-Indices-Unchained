@@ -1,8 +1,7 @@
 # Replication Package  
 **Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement**  
-**Authors:** Omar Licandro and Juan I. Vizcaino  
-**This Version:** November 2025
-
+**Authors:** Omar Licandro and Juan Ignacio Vizcaino  
+**This Version:** February 2026
 ---
 
 ## Packege Overview
