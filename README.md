@@ -7,7 +7,7 @@
 ## Packege Overview
 This repository contains the complete replication package for the paper:
 
-> **Licandro, O. and Vizcaino, J. I. (2025)**  
+> **Licandro, O. and Vizcaino, J. I. (2026)**  
 > *Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement.*
 
 The package includes:
