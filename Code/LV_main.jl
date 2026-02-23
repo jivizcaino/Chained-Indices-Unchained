@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 #Replication code for: Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement
 #By:                   Omar Licandro and Juan I. Vizcaino
-#This Version:         25/11/2025
+#This Version:         23/02/2026
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -13,13 +13,23 @@ figuresdir = abspath(joinpath(currentdir, "..", "Figures"))
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
+#Configuration 
+# Set to true to save figures, false to only display
+save_figures = false
+
+# Set to true to run SMM estimation, false to use pre-estimated parameters
+run_smm      = false
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
 # Activate local project (Code/Project.toml)
 using Pkg
 Pkg.activate(@__DIR__)
 Pkg.instantiate()
 
-using XLSX, DataFrames, BlackBoxOptim , Plots; plotlyjs()
-using Statistics,MathJaxRenderer, LaTeXStrings, LsqFit, Random, OrderedCollections, PrettyTables
+using XLSX, DataFrames, BlackBoxOptim ,  Statistics
+using MathJaxRenderer, LaTeXStrings, LsqFit, Random, OrderedCollections, PrettyTables
+using Plots; plotlyjs()
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -39,10 +49,12 @@ using Statistics,MathJaxRenderer, LaTeXStrings, LsqFit, Random, OrderedCollectio
 #Import the HRV Data
 file_name  = "HRV2021_Data.xlsx"
 sheet_name = "Data"
-data_range = "A1:DF78"
+data_range = "A1:DH78"
 
 # Read the data from the Excel file
-HRV_df = DataFrame(XLSX.readtable(joinpath(datadir, file_name), sheet_name, infer_eltypes=true))
+HRV_data = XLSX.readtable(joinpath(datadir, file_name), sheet_name)
+HRV_df = DataFrame(HRV_data)
+#HRV_df = DataFrame(HRV_data...)
 
 #Get the shares of Goods and Services in Investment and Consumption (X,C) respectively
 VAX_GOOD_SHARE = HRV_df[HRV_df.year .>= 1980, "VAX_GOOD_S"]
@@ -70,7 +82,7 @@ N_1980         = HRV_df[HRV_df.year .== 1980, "POP"][1]
 N_2023         = HRV_df[HRV_df.year .== 2023, "POP"][1]
 
 L_1980         = HRV_df[HRV_df.year .== 1980,"LAB_TOT_QI"][1]
-L_2017         = HRV_df[HRV_df.year .== 2023,"LAB_TOT_QI"][1]
+L_2023         = HRV_df[HRV_df.year .== 2023,"LAB_TOT_QI"][1]
 
 C_GOOD_P       = HRV_df[HRV_df.year .>= 1980, "C_GOOD_P"]./HRV_df[HRV_df.year .== 1980, "C_GOOD_P"]
 C_SERV_P       = HRV_df[HRV_df.year .>= 1980, "C_SERV_P"]./HRV_df[HRV_df.year .== 1980, "C_SERV_P"]
@@ -112,12 +124,14 @@ sg(Pg,e,Ps,η,χ,γ) = η*((e/Ps)^(-χ))*((Pg/Ps)^γ)
 
 #------------------------------------------------------------------------------
 #Functions Used to Compute the Equivalent Variation Measures
-e_t_x(t,x; χ, ν_t, Pst)    = (ν_t[t] * (Pst[x]^χ))^(1/(χ-1))
+e_t_x(t,x; χ, ν_t, Pst)    = (ν_t[t]*(Pst[x]^χ))^(1/(χ-1))
 sg_t_x(t,x;χ,η,γ,Pst,Pgt)  = η*( ( e_t_x(t,x; χ, ν_t, Pst)/Pst[x] )^(-χ) )*((Pgt[x]/Pst[x])^γ)
 cal_v_t_x(t,x;χ,Pst)       = ( Pst[t]/Pst[x] )^(  (χ/(1-χ)) )
 
-#Consumption Expenditure Indices
-e_tilde_tz(t,z;χ,η,γ,e,Pgt,Pst) = (( (e[z]/Pst[z])^χ + (η*χ/γ)*( (Pgt[t]/Pst[t])^γ - (Pgt[z]/Pst[z])^γ ) )^(1/χ))* Pst[t]
+#Functions Used to Compute Indices for Real Consumption Expenditure
+g_D_e(sg,g_cg,g_cs)                 = ( sg*g_cg + (1 - sg)*g_cs  ) 
+g_e_t_x(t,x;χ,ν_t,Pst,sg,g_cg,g_cs) = g_D_e(sg,g_cg,g_cs)*((e_t_x(x,x; χ, ν_t, Pst)/e_t_x(t,x; χ, ν_t, Pst))*(Pst[t]/Pst[x]))^(χ) 
+aux_e_t_x(t,x;χ,ν_t,Pst)            = ( (e_t_x(x,x; χ, ν_t, Pst) / e_t_x(t,x; χ,ν_t, Pst) )*(Pst[t]/Pst[x]))^(χ)
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -126,7 +140,7 @@ g_Ag        = log(Ag_2023/Ag_1980)/(2023-1980)
 g_As        = log(As_2023/As_1980)/(2023-1980)
 g_calAx     = log(calAx_2023/calAx_1980)/(2023-1980)
 g_n         = (log(N_2023/N_1980))/(2023-1980)
-g_l         = (log(L_2017/L_1980))/(2023-1980)
+g_l         = (log(L_2023/L_1980))/(2023-1980)
 
 g_h         = g_l - g_n
 #------------------------------------------------------------------------------
@@ -210,321 +224,329 @@ table_string = String(take!(io))
 println(table_string)
 #------------------------------------------------------------------------------
 
-#------------------------------------------------------------------------------
-# Calibrate the Parameters of the Model Using a SMM
-##Note 1: We set the model to be in ABGP from 1980 onwards
-##Note 2: Recall that HRV calibration is: χ=0.550,η=0.440,γ=0.690
-
 ### Define the Function that Simulates the Model
+### Note 1: We set the model to be in ABGP from 1980 onwards
+#------------------------------------------------------------------------------
 function sim_model_full(params::Vector{Float64};Pg_t::Vector{Float64},Ps_t::Vector{Float64},
-                                    θ::Float64,ρ::Float64,δ::Float64,g_calAx::Float64,g_As::Float64,g_Ag::Float64,
-                                    g_h::Float64,g_l::Float64,g_n::Float64)
+                                        θ::Float64,ρ::Float64,δ::Float64,g_calAx::Float64,g_As::Float64,g_Ag::Float64,
+                                        g_h::Float64,g_l::Float64,g_n::Float64)
+        
+    χ = params[1]
+    η = params[2]
+    γ = params[3]
+
+    # Impose the Parameter Restriction From HRV
+    if !(1 > γ > χ > 0)
+        eq = Dict{String, Vector{Float64}}()
+        for var in ["Yt" , "Xt" , "Et" , "Kt", 
+                    "yt",  "et" , "kt" , "ht", "sst", "sgt", 
+                    "cst", "cgt", "Cst", "Cgt","Xst", "Xgt", "Pst", "Pgt", "Kst", "Kgt", 
+                    "Lt" , "Nt" , "Ht" ,
+                    "Lst", "Lgt", "Yst", "Ygt", "Wt", "Rt", 
+                    "Agt", "Ast", "Axt", "calAxt", "calAxhat"]
+            eq[var] = fill(1e6, length(1980:2023))
+        end
+        return eq
+    end
+
+
+    N_t         = 1.000.*exp.(g_n.*((1980:2023) .- 1980))
+    h_t         = 1.000.*exp.(g_h.*((1980:2023) .- 1980))
+    L_t         = 1.000.*exp.(g_l.*((1980:2023) .- 1980))
+    g_abgp      = g_calAx/(1-θ) + g_h
+    Ag_t        = 1.000.*exp.( g_Ag.*((1980:2023)    .- 1980))
+    As_t        = 1.000.*exp.( g_As.*((1980:2023)    .- 1980))
+    calAx_t     = 1.000.*exp.( g_calAx.*((1980:2023) .- 1980))
+
+    calAx_hat_t = calAx_t.*(h_t.^(1-θ))
+
+    g_ps        = g_calAx - g_As 
+    n           = g_n
+
+    #Compute the k0,e0 that puts the Dynamic System in ABGP from t0
+    k0_max     = 100.0 
+    k0_min     = 0.001 
+    k0_mid     = []
+    err_ge     = Inf
+    iter       = 0 
+
+    while abs(err_ge) .> 1e-10 && iter < 100
+        k0_mid = (k0_max + k0_min)/2
+        err_ge = dedt_e(calAx_hat_t[1],k0_mid,θ,ρ,δ,χ,g_ps) - g_abgp
+
+        if err_ge > 0
+            k0_min = k0_mid
+        else
+            k0_max = k0_mid
+        end
+        k0_mid = (k0_max + k0_min)/2
+        iter += 1
+    end
+    k0 = k0_mid
+
+    e0_max = k0*10 
+    e0_min = k0/10 
+    e0_mid = []
+
+    err_gk = Inf
+    iter   = 0 
+
+    #Find e0
+    while abs(err_gk) .> 1e-10 && iter < 100
+        e0_mid = (e0_max + e0_min)/2
+        err_gk = dkdt(calAx_hat_t[1],k0,e0_mid,δ,n,θ)/k0  - g_abgp
+
+        if err_gk > 0
+            e0_min = e0_mid
+        else
+            e0_max = e0_mid
+        end
+
+        iter += 1
+    end
+
+    e0   = e0_mid
+
+    vars = ["Yt" , "Xt" , "Et" , "Kt" , "yt",  "et" , "kt" , "ht", "sst", "sgt", 
+            "cst", "cgt", "Cst", "Cgt","Xst", "Xgt", "Pst", "Pgt", "Kst", "Kgt", 
+            "Lt" , "Nt" , "Ht" , "Lst", "Lgt", "Yst", "Ygt", "Wt", "Rt", 
+            "Agt", "Ast", "Axt", "calAxt", "calAxhat"]
+
+    eq = Dict{String, Vector{Any}}()
+    for var in vars
+        eq[var] = Vector{Any}()
+    end
+
+    push!(eq["et"] , e0)
+    push!(eq["kt"] , k0)
+    push!(eq["ht"] , h_t[1])
+    push!(eq["Agt"], Ag_t[1])
+    push!(eq["Ast"], As_t[1])
+    push!(eq["calAxt"],calAx_t[1])
+    push!(eq["calAxhat"],calAx_hat_t[1])
+    push!(eq["Pst"], Ps_t[1])
+    push!(eq["Pgt"], Pg_t[1])
+    push!(eq["Lt"], L_t[1])
+    push!(eq["Nt"], N_t[1])
+    push!(eq["yt"], y(eq["calAxt"][1],eq["kt"][1],eq["ht"][1],θ))
     
-  χ = params[1]
-  η = params[2]
-  γ = params[3]
+    t = 1
+    for t in 1:(2024-1980) 
 
-  # Impose the Parameter Restriction From HRV
-  if !(1 > γ > χ > 0)
-      eq = Dict{String, Vector{Float64}}()
-      for var in ["Yt" , "Xt" , "Et" , "Kt", 
-                  "yt",  "et" , "kt" , "ht", "sst", "sgt", 
-                  "cst", "cgt", "Cst", "Cgt","Xst", "Xgt", "Pst", "Pgt", "Kst", "Kgt", 
-                  "Lt" , "Nt" , "Ht" ,
-                  "Lst", "Lgt", "Yst", "Ygt", "Wt", "Rt", 
-                  "Agt", "Ast", "Axt", "calAxt", "calAxhat"]
-          eq[var] = fill(1e6, length(1980:2023))
-      end
-      return eq
-  end
+        sg_t = sg(eq["Pgt"][t],eq["et"][t],eq["Pst"][t],η,χ,γ)
+        ss_t = 1 - sg_t
+        push!(eq["sst"],ss_t)
+        push!(eq["sgt"],sg_t)
 
+        push!(eq["Yt"], eq["yt"][t]*eq["Nt"][t])
+        push!(eq["Kt"], eq["kt"][t]*eq["Nt"][t])
+        push!(eq["Et"], eq["et"][t]*eq["Nt"][t])
+        X_t   = eq["Yt"][t] - eq["Et"][t]
+        push!(eq["Xt"],X_t)
 
-  N_t         = 1.000.*exp.(g_n.*((1980:2023) .- 1980))
-  h_t         = 1.000.*exp.(g_h.*((1980:2023) .- 1980))
-  L_t         = 1.000.*exp.(g_l.*((1980:2023) .- 1980))
-  g_abgp      = g_calAx/(1-θ) + g_h
-  Ag_t        = 1.000.*exp.( g_Ag.*((1980:2023)    .- 1980))
-  As_t        = 1.000.*exp.( g_As.*((1980:2023)    .- 1980))
-  calAx_t     = 1.000.*exp.( g_calAx.*((1980:2023) .- 1980))
+        Xs_t   = eq["Xt"][t]/((1 + (ωx/(1-ωx))*(eq["Agt"][t]/eq["Ast"][t])^(εx)))
+        push!(eq["Xst"],Xs_t)
+        Xg_t   = X_t - Xs_t
+        push!(eq["Xgt"],Xg_t)
 
-  calAx_hat_t = calAx_t.*(h_t.^(1-θ))
+        cs_t   = (eq["sst"][t]*eq["et"][t])/eq["Pst"][t] 
+        cg_t   = (eq["sgt"][t]*eq["et"][t])/eq["Pgt"][t]  
 
-  g_ps        = g_calAx - g_As 
-  n           = g_n
+        push!(eq["cst"],cs_t)
+        push!(eq["cgt"],cg_t)
+        push!(eq["Cst"],eq["cst"][t]*eq["Nt"][t])
+        push!(eq["Cgt"],eq["cgt"][t]*eq["Nt"][t])
 
-  #Compute the k0,e0 that puts the Dynamic System in ABGP from t0
-  k0_max     = 100.0 
-  k0_min     = 0.001 
-  k0_mid     = []
-  err_ge     = Inf
-  iter       = 0 
+        push!(eq["Rt"],θ*eq["calAxt"][t]*eq["Kt"][t]^(θ-1))
+        push!(eq["Wt"],(1-θ)*eq["calAxt"][t]*eq["Kt"][t]^θ)
 
-  while abs(err_ge) .> 1e-10 && iter < 100
-    k0_mid = (k0_max + k0_min)/2
-    err_ge = dedt_e(calAx_hat_t[1],k0_mid,θ,ρ,δ,χ,g_ps) - g_abgp
+        Ls = (eq["Xt"][t]/eq["Yt"][t])*(1/(((eq["Pgt"][t]*eq["Xgt"][t])/(eq["Pst"][t]*eq["Xst"][t]))+1))+(eq["Et"][t]/eq["Yt"][t])*(1/(((eq["Pgt"][t]*eq["Cgt"][t])  /(eq["Pst"][t]*eq["Cst"][t]))    +1))   
+        if !isfinite(Ls) || Ls < 0 || Ls > 1
+            return Dict("sgt" => fill(1e6, 44))
+        end
+        Lg = 1-Ls
 
-    if err_ge > 0
-        k0_min = k0_mid
-    else
-        k0_max = k0_mid
-    end
-    k0_mid = (k0_max + k0_min)/2
-    iter += 1
-  end
-  k0 = k0_mid
+        push!(eq["Lst"],Ls)
+        push!(eq["Lgt"],Lg)
 
-  e0_max = k0*10 
-  e0_min = k0/10 
-  e0_mid = []
+        Ks = eq["Kt"][t]*Ls
+        Kg = eq["Kt"][t]*Lg
 
-  err_gk = Inf
-  iter   = 0 
+        push!(eq["Kst"],Ks)
+        push!(eq["Kgt"],Kg)
 
-  #Find e0
-  while abs(err_gk) .> 1e-10 && iter < 100
-    e0_mid = (e0_max + e0_min)/2
-    err_gk = dkdt(calAx_hat_t[1],k0,e0_mid,δ,n,θ)/k0  - g_abgp
+        Ys = eq["Ast"][t]*(Ks^θ)*(Ls^(1-θ))
+        Yg = eq["Agt"][t]*(Kg^θ)*(Lg^(1-θ))
 
-    if err_gk > 0
-        e0_min = e0_mid
-    else
-        e0_max = e0_mid
-    end
+        push!(eq["Yst"],Ys)
+        push!(eq["Ygt"],Yg)
 
-    iter += 1
-  end
+        # Break loop here
+        if t == 44
+            break
+        end
 
-  e0   = e0_mid
+        push!(eq["Pst"], Ps_t[t+1])
+        push!(eq["Pgt"], Pg_t[t+1])
 
-  vars = ["Yt" , "Xt" , "Et" , "Kt" , "yt",  "et" , "kt" , "ht", "sst", "sgt", 
-          "cst", "cgt", "Cst", "Cgt","Xst", "Xgt", "Pst", "Pgt", "Kst", "Kgt", 
-          "Lt" , "Nt" , "Ht" , "Lst", "Lgt", "Yst", "Ygt", "Wt", "Rt", 
-          "Agt", "Ast", "Axt", "calAxt", "calAxhat"]
+        push!(eq["calAxt"],calAx_t[t+1])
+        push!(eq["calAxhat"],calAx_hat_t[t+1])
 
-  eq = Dict{String, Vector{Any}}()
-  for var in vars
-      eq[var] = Vector{Any}()
-  end
+        push!(eq["Agt"], Ag_t[t+1])
+        push!(eq["Ast"], As_t[t+1])
 
-  push!(eq["et"] , e0)
-  push!(eq["kt"] , k0)
-  push!(eq["ht"] , h_t[1])
-  push!(eq["Agt"], Ag_t[1])
-  push!(eq["Ast"], As_t[1])
-  push!(eq["calAxt"],calAx_t[1])
-  push!(eq["calAxhat"],calAx_hat_t[1])
-  push!(eq["Pst"], Ps_t[1])
-  push!(eq["Pgt"], Pg_t[1])
-  push!(eq["Lt"], L_t[1])
-  push!(eq["Nt"], N_t[1])
-  push!(eq["yt"], y(eq["calAxt"][1],eq["kt"][1],eq["ht"][1],θ))
- 
-  t = 1
-  for t in 1:(2024-1980) 
+        push!(eq["ht"], h_t[t+1])
+        push!(eq["Lt"], L_t[t+1])
+        push!(eq["Nt"], N_t[t+1])
 
-    sg_t = sg(eq["Pgt"][t],eq["et"][t],eq["Pst"][t],η,χ,γ)
-    ss_t = 1 - sg_t
-    push!(eq["sst"],ss_t)
-    push!(eq["sgt"],sg_t)
+        g_e  = dedt_e(eq["calAxhat"][t],eq["kt"][t],θ,ρ,δ,χ,g_ps)  
+        if !isfinite(g_e) || abs(g_e) > 1.0
+            return Dict("sgt" => fill(1e6, 44))
+        end
+        e    = eq["et"][t]*exp(g_e)
+        push!(eq["et"],e)
 
-    push!(eq["Yt"], eq["yt"][t]*eq["Nt"][t])
-    push!(eq["Kt"], eq["kt"][t]*eq["Nt"][t])
-    push!(eq["Et"], eq["et"][t]*eq["Nt"][t])
-    X_t   = eq["Yt"][t] - eq["Et"][t]
-    push!(eq["Xt"],X_t)
+        g_k  = dkdt(eq["calAxhat"][t],eq["kt"][t],eq["et"][t],δ,n,θ)/eq["kt"][t]
+        if !isfinite(g_k) || abs(g_k) > 1.0
+            return Dict("sgt" => fill(1e6, 44))
+        end
+        k_t  = eq["kt"][t]*exp(g_k)
 
-    Xs_t   = eq["Xt"][t]/((1 + (ωx/(1-ωx))*(eq["Agt"][t]/eq["Ast"][t])^(εx)))
-    push!(eq["Xst"],Xs_t)
-    Xg_t   = X_t - Xs_t
-    push!(eq["Xgt"],Xg_t)
-
-    cs_t   = (eq["sst"][t]*eq["et"][t])/eq["Pst"][t] 
-    cg_t   = (eq["sgt"][t]*eq["et"][t])/eq["Pgt"][t]  
-
-    push!(eq["cst"],cs_t)
-    push!(eq["cgt"],cg_t)
-    push!(eq["Cst"],eq["cst"][t]*eq["Nt"][t])
-    push!(eq["Cgt"],eq["cgt"][t]*eq["Nt"][t])
-
-    push!(eq["Rt"],θ*eq["calAxt"][t]*eq["Kt"][t]^(θ-1))
-    push!(eq["Wt"],(1-θ)*eq["calAxt"][t]*eq["Kt"][t]^θ)
-
-    Ls = (eq["Xt"][t]/eq["Yt"][t])*(1/(((eq["Pgt"][t]*eq["Xgt"][t])/(eq["Pst"][t]*eq["Xst"][t]))+1))+(eq["Et"][t]/eq["Yt"][t])*(1/(((eq["Pgt"][t]*eq["Cgt"][t])  /(eq["Pst"][t]*eq["Cst"][t]))    +1))   
-    if !isfinite(Ls) || Ls < 0 || Ls > 1
-        return Dict("sgt" => fill(1e6, 44))
-    end
-    Lg = 1-Ls
-
-    push!(eq["Lst"],Ls)
-    push!(eq["Lgt"],Lg)
-
-    Ks = eq["Kt"][t]*Ls
-    Kg = eq["Kt"][t]*Lg
-
-    push!(eq["Kst"],Ks)
-    push!(eq["Kgt"],Kg)
-
-    Ys = eq["Ast"][t]*(Ks^θ)*(Ls^(1-θ))
-    Yg = eq["Agt"][t]*(Kg^θ)*(Lg^(1-θ))
-
-    push!(eq["Yst"],Ys)
-    push!(eq["Ygt"],Yg)
-
-    # Break loop here
-    if t == 44
-        break
+        push!(eq["kt"], k_t)
+        push!(eq["yt"], y(eq["calAxt"][t+1],eq["kt"][t+1],eq["ht"][t+1],θ))
     end
 
-    push!(eq["Pst"], Ps_t[t+1])
-    push!(eq["Pgt"], Pg_t[t+1])
+    σ_t   = (1-γ) .- ((η.*((eq["Pgt"]./eq["Pst"]).^γ))./((eq["et"]./eq["Pst"]).^χ .- η.*((eq["Pgt"]./eq["Pst"]).^γ))).*(γ-χ)
 
-    push!(eq["calAxt"],calAx_t[t+1])
-    push!(eq["calAxhat"],calAx_hat_t[t+1])
-
-    push!(eq["Agt"], Ag_t[t+1])
-    push!(eq["Ast"], As_t[t+1])
-
-    push!(eq["ht"], h_t[t+1])
-    push!(eq["Lt"], L_t[t+1])
-    push!(eq["Nt"], N_t[t+1])
-
-    g_e  = dedt_e(eq["calAxhat"][t],eq["kt"][t],θ,ρ,δ,χ,g_ps)  
-    if !isfinite(g_e) || abs(g_e) > 1.0
-        return Dict("sgt" => fill(1e6, 44))
+    if any(x -> x < 0, σ_t)
+        eq["sgt"] = fill(1e6, length(eq["sgt"]))
     end
-    e    = eq["et"][t]*exp(g_e)
-    push!(eq["et"],e)
 
-    g_k  = dkdt(eq["calAxhat"][t],eq["kt"][t],eq["et"][t],δ,n,θ)/eq["kt"][t]
-    if !isfinite(g_k) || abs(g_k) > 1.0
-        return Dict("sgt" => fill(1e6, 44))
-    end
-    k_t  = eq["kt"][t]*exp(g_k)
-
-    push!(eq["kt"], k_t)
-    push!(eq["yt"], y(eq["calAxt"][t+1],eq["kt"][t+1],eq["ht"][t+1],θ))
-  end
-
-  σ_t   = (1-γ) .- ((η.*((eq["Pgt"]./eq["Pst"]).^γ))./((eq["et"]./eq["Pst"]).^χ .- η.*((eq["Pgt"]./eq["Pst"]).^γ))).*(γ-χ)
-
-  if any(x -> x < 0, σ_t)
-    eq["sgt"] = fill(1e6, length(eq["sgt"]))
-  end
-
-  return eq
+    return eq
 end
 #------------------------------------------------------------------------------
-
 #------------------------------------------------------------------------------
-### Pass Some Parameters to the Simulation Function
-sim_model(params) = sim_model_full(params;Pg_t=Pg_t,Ps_t=Ps_t,θ=θ,ρ=ρ,δ=δ,g_calAx=g_calAx,g_As=g_As,g_Ag=g_Ag,g_h=g_h,g_l=g_l,g_n=g_n)
+if run_smm
+    println("Running SMM Estimation...")
+    # Calibrate the Parameters of the Model Using a SMM
+    ##Note 2: Recall that HRV calibration is: χ=0.550,η=0.440,γ=0.690
 
-### Define the SSE Function to Minimize
-function SSE(params;cons_exp_share_data)
-    sim_eq     = sim_model(params)
-    # Check for NaN or Inf in sim_eq["sgt"]
-    if any(x -> isnan(x) || isinf(x), sim_eq["sgt"])
-        @show "NaN or Inf detected in sim_eq['sgt']"
-        return 9e12
-    else SSE =  1e20*( ( sum( 100.0.*(sim_eq["sgt"] .- cons_exp_share_data) ).^2 ) ) #Sum of Squared Errors 
-        #@show SSE
-        return SSE
+
+    
+
+
+    ### Pass Some Parameters to the Simulation Function
+    sim_model(params) = sim_model_full(params;Pg_t=Pg_t,Ps_t=Ps_t,θ=θ,ρ=ρ,δ=δ,g_calAx=g_calAx,g_As=g_As,g_Ag=g_Ag,g_h=g_h,g_l=g_l,g_n=g_n)
+
+    ### Define the SSE Function to Minimize
+    function SSE(params;cons_exp_share_data)
+        sim_eq     = sim_model(params)
+        # Check for NaN or Inf in sim_eq["sgt"]
+        if any(x -> isnan(x) || isinf(x), sim_eq["sgt"])
+            @show "NaN or Inf detected in sim_eq['sgt']"
+            return 9e12
+        else SSE =  1e20*( ( sum( 100.0.*(sim_eq["sgt"] .- cons_exp_share_data) ).^2 ) ) #Sum of Squared Errors 
+            #@show SSE
+            return SSE
+        end
     end
+
+    ### Define the Parameter Space for Optimization
+    ParamSpace     = [(0.001,1.000),  #χ  
+                    (0.001,1.000),  #η
+                    (0.001,1.000)]  #γ
+
+    ### Define different sees to start the optimization process
+    ### Note 3: We will pick the parameter set with the lowest SSE across different seeds 
+    seeds = [1234, 5678, 9101, 1121, 3141, 5926, 5358, 9793, 2384, 6264]
+    optimization_results = OrderedDict()
+
+    ### Run the Optimization for  Different Seeds
+    for seed in seeds
+        println("\n" * "="^80)
+        println("Running optimization with seed: $seed")
+        println("="^80)
+        
+        opt_problem = bbsetup(params -> SSE(params;cons_exp_share_data=VAC_GOOD_SHARE);
+                            SearchRange=ParamSpace,
+                            TraceMode=:compact,  # Use compact to reduce output clutter
+                            Method                  =:adaptive_de_rand_1_bin,
+                            PopulationSize          = 100,
+                            MaxFuncEvals            = 2_000_000,
+                            FitnessTolerance        = 1e-20,
+                            MaxStepsWithoutProgress = 500_000,
+                            rng  = MersenneTwister(seed))
+        
+        opt_results = bboptimize(opt_problem)
+        
+        # Store results
+        optimization_results[seed] = OrderedDict(
+            "params" => best_candidate(opt_results),
+            "fitness" => best_fitness(opt_results),
+            "seed"    => seed,
+            "χ"       => best_candidate(opt_results)[1],
+            "η"       => best_candidate(opt_results)[2],
+            "γ"       => best_candidate(opt_results)[3]
+        )
+        
+        println("Seed $seed: Fitness = $(best_fitness(opt_results))")
+        println("Parameters: χ=$(round(best_candidate(opt_results)[1], digits=6)), "*
+                "η=$(round(best_candidate(opt_results)[2], digits=6)), "*
+                "γ=$(round(best_candidate(opt_results)[3], digits=6))")
+    end
+
+    ### Find the best result across all seeds
+    best_seed   = argmin([optimization_results[s]["fitness"] for s in seeds])
+    best_result = optimization_results[seeds[best_seed]]
+
+    println("""
+    $(repeat("=", 80))
+    BEST RESULT ACROSS ALL SEEDS
+    $(repeat("=", 80))
+    Best seed:    $(best_result["seed"])
+    Best fitness: $(best_result["fitness"])
+    Best parameters:
+    χ = $(round(best_result["χ"], digits=6))
+    η = $(round(best_result["η"], digits=6))
+    γ = $(round(best_result["γ"], digits=6))
+    $(repeat("=", 80))
+ """)
+
+    ### Extract best parameters
+    χ, η, γ = best_result["params"]
+    χ, η, γ = round(χ,digits=3), round(η,digits=3), round(γ,digits=3)
+    #------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------
+    #TABLE 2 - Calibrated Parameters
+    println("""
+    $(repeat("=", 80))
+    Preference Parameters Estimated via SMM
+    $(repeat("=", 80))
+
+    Parameters:
+    χ = $(round(best_result["χ"], digits=6))
+    η = $(round(best_result["η"], digits=6))
+    γ = $(round(best_result["γ"], digits=6))
+    $(repeat("=", 80))
+    """)
+    #------------------------------------------------------------------------------
+else
+    println("Skipping SMM estimation, using pre-estimated parameters...")
+    #=
+    ================================================================================
+    BEST RESULT ACROSS ALL SEEDS
+    ================================================================================
+    Best seed:    1121
+    Best fitness: 8.697191480061655e-9
+    Best parameters:
+    χ = 0.360129
+    η = 0.251054
+    γ = 0.714119
+    ================================================================================
+    =#
+    χ, η, γ = 0.360129,0.251054,0.714119
+    χ, η, γ = round(χ,digits=3), round(η,digits=3), round(γ,digits=3)
 end
-
-### Define the Parameter Space for Optimization
-ParamSpace     = [(0.001,1.000),  #χ  
-                  (0.001,1.000),  #η
-                  (0.001,1.000)]  #γ
-
-### Define different sees to start the optimization process
-### Note 3: We will pick the parameter set with the lowest SSE across different seeds 
-seeds = [1234, 5678, 9101, 1121, 3141, 5926, 5358, 9793, 2384, 6264]
-optimization_results = OrderedDict()
-
-### Run the Optimization for  Different Seeds
-for seed in seeds
-    println("\n" * "="^80)
-    println("Running optimization with seed: $seed")
-    println("="^80)
-    
-    opt_problem = bbsetup(params -> SSE(params;cons_exp_share_data=VAC_GOOD_SHARE);
-                         SearchRange=ParamSpace,
-                         TraceMode=:compact,  # Use compact to reduce output clutter
-                         Method                  =:adaptive_de_rand_1_bin,
-                         PopulationSize          = 100,
-                         MaxFuncEvals            = 2_000_000,
-                         FitnessTolerance        = 1e-20,
-                         MaxStepsWithoutProgress = 500_000,
-                         rng  = MersenneTwister(seed))
-    
-    opt_results = bboptimize(opt_problem)
-    
-    # Store results
-    optimization_results[seed] = OrderedDict(
-        "params" => best_candidate(opt_results),
-        "fitness" => best_fitness(opt_results),
-        "seed"    => seed,
-        "χ"       => best_candidate(opt_results)[1],
-        "η"       => best_candidate(opt_results)[2],
-        "γ"       => best_candidate(opt_results)[3]
-    )
-    
-    println("Seed $seed: Fitness = $(best_fitness(opt_results))")
-    println("Parameters: χ=$(round(best_candidate(opt_results)[1], digits=6)), "*
-            "η=$(round(best_candidate(opt_results)[2], digits=6)), "*
-            "γ=$(round(best_candidate(opt_results)[3], digits=6))")
-end
-
-### Find the best result across all seeds
-best_seed   = argmin([optimization_results[s]["fitness"] for s in seeds])
-best_result = optimization_results[seeds[best_seed]]
-
-println("""
-$(repeat("=", 80))
-BEST RESULT ACROSS ALL SEEDS
-$(repeat("=", 80))
-Best seed:    $(best_result["seed"])
-Best fitness: $(best_result["fitness"])
-Best parameters:
-  χ = $(round(best_result["χ"], digits=6))
-  η = $(round(best_result["η"], digits=6))
-  γ = $(round(best_result["γ"], digits=6))
-$(repeat("=", 80))
-""")
-
-### Extract best parameters
-χ, η, γ = best_result["params"]
-χ, η, γ = round(χ,digits=3), round(η,digits=3), round(γ,digits=3)
-#------------------------------------------------------------------------------
-
-#=
-================================================================================
-BEST RESULT ACROSS ALL SEEDS
-================================================================================
-Best seed:    1121
-Best fitness: 8.697191480061655e-9
-Best parameters:
-  χ = 0.360129
-  η = 0.251054
-  γ = 0.714119
-================================================================================
-=#
-χ, η, γ = 0.360129,0.251054,0.714119
-χ, η, γ = round(χ,digits=3), round(η,digits=3), round(γ,digits=3)
-#------------------------------------------------------------------------------
-#TABLE 2 - Calibrated Parameters
-println("""
-$(repeat("=", 80))
-Preference Parameters Estimated via SMM
-$(repeat("=", 80))
-
-Parameters:
-  χ = $(round(best_result["χ"], digits=6))
-  η = $(round(best_result["η"], digits=6))
-  γ = $(round(best_result["γ"], digits=6))
-$(repeat("=", 80))
-""")
 #------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------
@@ -574,7 +596,7 @@ else
     
     Upper bound: (1-γ)/(1-χ) = $(round((1-γ)/(1-χ), digits=4))
     Max sg(t):   $(round(maximum(sim_eq["sgt"]), digits=4))
-    
+    Min sg(t):   $(round(minimum(sim_eq["sgt"]), digits=4))
     Years where violated: $(findall(((1-γ)/(1-χ)) .<= sim_eq["sgt"]) .+ 1979)
     $(repeat("=", 60))
     """)
@@ -591,10 +613,10 @@ Ag_0        = 1.000
 As_0        = 1.000
 calAx_0     = 1.000
 
-k0          = κ^(1/(θ-1))*(calAx_0^(1/(θ-1)))
+k0         = κ^(1/(θ-1))*(calAx_0^(1/(θ-1)))
 sim_eq["kt"][1]
 
-e0          = (κ - δ - g_n - g_k)*k0
+e0         = (κ - δ - g_n - g_k)*k0
 sim_eq["et"][1]
 
 y0         = κ*k0
@@ -647,7 +669,10 @@ plot(1947:2023, rel_P_I ,
     left_margin=5Plots.mm,  
     framestyle=:box)
 
-#savefig(joinpath(figuresdir,"rel_Price_Investment.png"))
+if save_figures
+    savefig(joinpath(figuresdir,"rel_Price_Investment.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "rel_Price_Investment.png"))
+end
 #---------------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -666,7 +691,11 @@ plot(1947:2023, calA_X_I, ylabel="Effective Investment-Specific TFP <br> (1947=1
     left_margin=5Plots.mm,  
     framestyle=:box)
 
-#savefig(joinpath(figuresdir,"investment_TFP.png"))
+if save_figures
+    savefig(joinpath(figuresdir,"investment_TFP.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "investment_TFP.png"))
+end
+
 #---------------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -690,7 +719,10 @@ plot(1947:2023, cons_share ,
     left_margin=5Plots.mm,  
     framestyle=:box)
 
-#savefig(joinpath(figuresdir,"consump_expend_share.png"))
+if save_figures
+    savefig(joinpath(figuresdir,"consump_expend_share.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "consump_expend_share.png"))
+end
 #---------------------------------------------------------
 
 #---------------------------------------------------------
@@ -712,7 +744,10 @@ plot(1947:2023, VAC_GOOD_SHARE_long,
     left_margin=5Plots.mm,  
     framestyle=:box)
 
-#savefig(joinpath(figuresdir,"goods_consumption_share.png"))
+if save_figures
+    savefig(joinpath(figuresdir,"goods_consumption_share.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "goods_consumption_share.png"))
+end
 #----------------------------------------------------------
 
 #----------------------------------------------------------
@@ -728,10 +763,10 @@ plot(1980:2023,Pg_t_data./Ps_t_data, label="(Pg/Ps) - Data",
     xticks=1980:5:2025, yticks=0.000:0.100:1.000,
     left_margin=6Plots.mm,xrotation=45,framestyle=:box)
 
-#model without distortions
+#model WITHOUT distortions
 plot!(1980:2023,Pg_t_undist./Ps_t_undist, label="(Pg/Ps) = (As/Ag)", linestyle=:dot, lw=2.00,color=:black)
 
-#model without distortions
+#model WITH distortions
 plot!(1980:2023,Pg_t./Ps_t, label="(Pg/Ps) = (As/Ag*exp(ζt))", linestyle=:solid, lw=2.00,color=:black)
 
 plot(1980:2023, wedge_Pg_Ps, label="Wedge ( (Pg/Ps)-Data / (Pg/Ps)-Model",
@@ -745,7 +780,10 @@ plot(1980:2023, wedge_Pg_Ps, label="Wedge ( (Pg/Ps)-Data / (Pg/Ps)-Model",
 
 plot!(1980:2023, wedge_Pg_Ps_trend, label="Exponential Trend", lw=2, color=:black, linestyle=:solid)
 
-#savefig(joinpath(figuresdir, "PgPs_Wedge_Fit.png"))
+if save_figures 
+    savefig(joinpath(figuresdir, "PgPs_Wedge_Fit.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "PgPs_Wedge_Fit.png"))
+end
 
 println("""
 $(repeat("=", 60))
@@ -770,7 +808,11 @@ plot(year, sim_eq["sgt"], label="Model", linestyle=:solid, color=:black, lw=2.00
 
 plot!(year, VAC_GOOD_SHARE, label="Data", legend=(0.800, 0.950), linestyle=:dot, lw=2.00, 
     minorgrid=true, minorgridalpha=0.9, color=:black,left_margin=5Plots.mm,framestyle=:box)
-#savefig(joinpath(figuresdir, "sg_t_Model_Fit.png"))
+
+if save_figures 
+    savefig(joinpath(figuresdir, "sg_t_Model_Fit.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "sg_t_Model_Fit.png"))
+end
 #----------------------------------------------------------
 
 #---------------------------------------------------------
@@ -807,7 +849,10 @@ plot!(1980:2023, log.(GDP_data),label = "Chained Index - Data",
     linestyle=:dot, lw=2.0, color=:black,
     legend=(0.15, 0.95))
 
-#savefig(joinpath(figuresdir,"GDP_Model_vs_Data.png"))
+if save_figures 
+    savefig(joinpath(figuresdir,"GDP_Model_vs_Data.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "GDP_Model_vs_Data.png"))
+end
 #---------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -859,7 +904,10 @@ plot!(1981:2023, g_FS ,label = "Model - FS Chained Index",
     left_margin=5Plots.mm,  
     framestyle=:box)
 
-#savefig(joinpath(figuresdir,"GDP_Growth_Model_vs_Data_v2.png"))
+if save_figures 
+    savefig(joinpath(figuresdir,"GDP_Growth_Model_vs_Data_v2.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "GDP_Growth_Model_vs_Data_v2.png"))
+end
 #---------------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -869,7 +917,7 @@ sg_z = sim_eq["sgt"]
 ss_z = sim_eq["sst"]
 se_z = sc[1:end]
 
-#Compute the Marginal Value of Capital
+#Compute the Marginal Value of Capital 
 ν_t  = (sim_eq["et"].^(χ-1))./(sim_eq["Pst"].^χ)
 
 #Compute Net Income Per Capita
@@ -998,7 +1046,10 @@ plot!(p, 1980:2023, FS, label="Chained Index",
 xaxis!(p, minor_ticks=true, minor_tick_step=1.00)
 yaxis!(p, minor_ticks=true, minor_tick_step=0.01)
 
-#savefig(joinpath(figuresdir, "FS_BBEV.png"))
+if save_figures
+    savefig(joinpath(figuresdir, "FS_BBEV.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "FS_BBEV.png"))
+end
 
 #Differences Between Fixed-Base and Chained Indices
 println("""
@@ -1064,14 +1115,17 @@ plot!(1980:2023, FS ,ylabel="Cummulative Growth",
     xrotation=45,
     framestyle=:box)
 
-#savefig(joinpath(figuresdir,"price_chained_FS.png"))
+if save_figures
+    savefig(joinpath(figuresdir,"price_chained_FS.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "price_chained_FS.png"))
+end
 #---------------------------------------------------------
 
 #---------------------------------------------------------
-#Alternative Fisher-Shell Indices
-####Preferences Chained Fisher-Shell Index
+# Alternative Fisher-Shell Indices
+#### Preferences Chained Fisher-Shell Index
 
-##At Prices of 1980
+## At Prices of 1980
 t_base          = 1980
 t_prime         = t_base - 1980 + 1
 z_prime         = (1980:1:2023) .- 1980 .+ 1
@@ -1125,7 +1179,10 @@ plot!(1980:2023, FS , ylabel="Cummulative Growth",
     xrotation=45,
     framestyle=:box)
 
-#savefig(joinpath(figuresdir,"prefs_chained_FS.png"))
+if save_figures
+    savefig(joinpath(figuresdir,"prefs_chained_FS.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "prefs_chained_FS.png"))
+end
 #---------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -1167,7 +1224,10 @@ plot!(1980:2023,se_1980_z,label="se(1980,z)",
 plot!(1980:2023,se_2023_z,label="se(2023,z)",
     linestyle=:dash, lw=2,color=:black)
 
-#savefig(joinpath(figuresdir,"se_t.png"))
+if save_figures
+    savefig(joinpath(figuresdir,"se_t.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "se_t.png"))
+end
 #---------------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -1203,7 +1263,11 @@ plot!(1980:2023, sg_2023_z, label="sg(2023,z)",
     xrotation=45,
     left_margin=5Plots.mm,  
     framestyle=:box)
-#savefig(joinpath(figuresdir, "sg_t_z.png"))
+
+if save_figures
+    savefig(joinpath(figuresdir, "sg_t_z.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "sg_t_z.png"))
+end
 #---------------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -1244,7 +1308,11 @@ plot!(p, 1981:2023, g_FS , label="Chained Index",
 
 xaxis!(p, minor_ticks=true, minor_tick_step=1.00)
 yaxis!(p, minor_ticks=true, minor_tick_step=0.01)
-#savefig(joinpath(figuresdir, "FS_GrowthRates_1980_2023.png"))
+
+if save_figures
+    savefig(joinpath(figuresdir, "FS_GrowthRates_1980_2023.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "FS_GrowthRates_1980_2023.png"))
+end
 
 #Decline in the Growth Rate Between 1981 and 2023 for the Chained Index
 decline_growth_rate = (g_FS[end] - g_FS[1]) * 100
@@ -1260,12 +1328,13 @@ $(repeat("=", 60))
 
 #------------------------------------------------------------------------
 #APPENDIX A.1
-#Decomposition of the Growth Rate Decline 
-πg = sim_eq["Pgt"][2:end]./sim_eq["Pgt"][1:end-1] .- 1
-πs = sim_eq["Pst"][2:end]./sim_eq["Pst"][1:end-1] .- 1
-100*(s_e[2:end].*( (sim_eq["sgt"][end] .- sim_eq["sgt"][1]).*πg[1] .+ (sim_eq["sst"][end] .- sim_eq["sst"][1]).*πs[1] )) 
+#Decomposition of the Decline 
+πg  = sim_eq["Pgt"][2:end]./sim_eq["Pgt"][1:end-1] .- 1
+πs  = sim_eq["Pst"][2:end]./sim_eq["Pst"][1:end-1] .- 1
+πD  = s_e[2:end].*( sim_eq["sgt"][2:end].*πg .+ sim_eq["sst"][2:end].*πs ) 
+100*(πD[1] - πD[end])
 
-#Alternative Decomposition of the Growth Rate Decline
+#Alternative Decomposition of the Decline in the Growth Rate
 x_t         = sim_eq["Xt"]./sim_eq["Nt"]
 s_e         = sim_eq["Et"]./sim_eq["Yt"]
 sg_t        = sim_eq["sgt"]
@@ -1276,142 +1345,62 @@ g_cs        = sim_eq["cst"][2:end]./sim_eq["cst"][1:end-1] .- 1
 g_x         = x_t[2:end]./x_t[1:end-1] .- 1
 
 g_D         = s_e[2:end].*( sim_eq["sgt"][2:end].*g_cg .+ sim_eq["sst"][2:end].*g_cs  ) .+ (1 .- s_e[2:end]).*g_x
-g_D_agg     = round.(g_D .+ g_n, digits=5)
-g_D_agg     = (g_D .+ g_n).*100
-
-d_gD_add    = g_D_agg[2:end] .- g_D_agg[1:end-1]
-d_sg_t      = sim_eq["sgt"][2:end] .- sim_eq["sgt"][1:end-1] 
-ST_Effect   = (s_e[3:end].*(d_sg_t[2:end].*(g_cg[2:end] .- g_cs[2:end]))).*100
-d_g_cs      = g_cs[2:end] .- g_cs[1:end-1] 
-SGS_Effect  = (s_e[3:end].*(1 .- sim_eq["sgt"][3:end]).*d_g_cs).*100
-
-final_SGS_Effect = (g_D_agg[1] .+ cumsum([0;SGS_Effect]))[end] .- (g_D_agg[1] .+ cumsum([0;SGS_Effect]))[1]
-final_ST_Effect =  (g_D_agg[1] .+ cumsum([0;ST_Effect]))[end] .- (g_D_agg[1] .+ cumsum([0;ST_Effect]))[1]
-#------------------------------------------------------------------------
-
-#------------------------------------------------------------------------
-round(final_SGS_Effect, digits=3) .+ round(final_ST_Effect, digits=3)
-
-g_D_agg[end] - g_D_agg[1]
-
-
-abs.(ST_Effect)./(abs.(ST_Effect) .+ abs.(SGS_Effect))
-
-g_D_no_SGS       = s_e[2:end].*( sim_eq["sgt"][2:end].*g_cg .+ sim_eq["sst"][2:end].*g_cs[1]  ) .+ (1 .- s_e[2:end]).*g_x
-g_D_agg_no_SGS    = (g_D_no_SGS .+ g_n).*100
-round(g_D_agg_no_SGS[end] - g_D_agg_no_SGS[1],digits=3)
-
-g_D_no_SCE       = s_e[2:end].*( sim_eq["sgt"][2].*g_cg .+ sim_eq["sst"][2].*g_cs  ) .+ (1 .- s_e[2]).*g_x
-g_D_agg_no_SCE   = (g_D_no_SCE .+ g_n).*100
-round(g_D_agg_no_SCE[end] - g_D_agg_no_SCE[1],digits=3)
-
-g_D_agg .- g_D_agg_no_SCE 
-SC_Effect  = round.( (g_D_agg .- g_D_agg_no_SCE), digits=5) 
-SGS_Effect = round.((g_D_agg .- g_D_agg_no_SGS),digits=3)
-
-SGS_Effect .+ SC_Effect
-
-g_D_agg[end] - g_D_agg[1]
+g_D[end] - g_D[1]
 #------------------------------------------------------------------------
 
 #------------------------------------------------------------------------
 #APPENDIX C
-#Base 2023 Expenditure Equivalent Variation
+#Real Consumption Expenditure Indices
+gD_e_z     = g_D_e.(sim_eq["sgt"][2:end],g_cg,g_cs)
+D_e_z      = cumsum(gD_e_z .+ g_n)
+
+#Base 2023
 t_base     = 2023
 t_prime    = t_base - 1980 + 1   
 z_prime    = (1980:1:2023) .- 1980 .+ 1
-e_tilde_2023_z = e_tilde_tz.(t_prime,z_prime;χ=χ,η=η,γ=γ,e=sim_eq["et"],Pgt=sim_eq["Pgt"],Pst=sim_eq["Pst"])
 
-#Base 2010 Expenditure Equivalent Variation
-t_base     = 2010
-t_prime    = t_base - 1980 + 1   
-z_prime    = (1980:1:2023) .- 1980 .+ 1
-e_tilde_2010_z = e_tilde_tz.(t_prime,z_prime;χ=χ,η=η,γ=γ,e=sim_eq["et"],Pgt=sim_eq["Pgt"],Pst=sim_eq["Pst"])
+g_e_2023_z = [0;gD_e_z].*aux_e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"]) 
+P_e_2023_z = cumsum(g_e_2023_z .+ g_n)
 
-#Base 2000 Expenditure Equivalent Variation
-t_base     = 2000
-t_prime    = t_base - 1980 + 1   
-z_prime    = (1980:1:2023) .- 1980 .+ 1
-e_tilde_2000_z = e_tilde_tz.(t_prime,z_prime;χ=χ,η=η,γ=γ,e=sim_eq["et"],Pgt=sim_eq["Pgt"],Pst=sim_eq["Pst"])
-
-#Base 1990 Expenditure Equivalent Variation
-t_base     = 1990
-t_prime    = t_base - 1980 + 1   
-z_prime    = (1980:1:2023) .- 1980 .+ 1
-e_tilde_1990_z = e_tilde_tz.(t_prime,z_prime;χ=χ,η=η,γ=γ,e=sim_eq["et"],Pgt=sim_eq["Pgt"],Pst=sim_eq["Pst"])
-
-#Base 1980 Expenditure Equivalent Variation
+#Base 1980
 t_base     = 1980
 t_prime    = t_base - 1980 + 1   
 z_prime    = (1980:1:2023) .- 1980 .+ 1
-e_tilde_1980_z = e_tilde_tz.(t_prime,z_prime;χ=χ,η=η,γ=γ,e=sim_eq["et"],Pgt=sim_eq["Pgt"],Pst=sim_eq["Pst"])
 
-#Alternative Decomposition of the Growth Rate Decline
-gD_e         = sg_t[2:end].*( g_cg )  .+ (1 .- sg_t[2:end]).*( g_cs ) 
-De           = [0;cumsum( gD_e  .+ g_n )]
+g_e_1980_z = [0;gD_e_z].*aux_e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"]) 
+P_e_1980_z = cumsum(g_e_1980_z .+ g_n)
+#---------------------------------------------------------------
 
-ge_2023_z    = [0;gD_e].*((sim_eq["et"]./e_tilde_2023_z).^(χ))
-ge_2010_z    = [0;gD_e].*((sim_eq["et"]./e_tilde_2010_z).^(χ))
-ge_2000_z    = [0;gD_e].*((sim_eq["et"]./e_tilde_2000_z).^(χ))
-ge_1990_z    = [0;gD_e].*((sim_eq["et"]./e_tilde_1990_z).^(χ))
-ge_1980_z    = [0;gD_e].*((sim_eq["et"]./e_tilde_1980_z).^(χ))
-
-plot(1981:2023, gD_e, label="Divisia Index",
-    ylabel="Expenditure Growth Rate",
-    linestyle=:solid, lw=2.5,
-    xticks=1980:5:2025,yticks=0.015:0.001:0.020,
-    ylims=(0.015,0.020),
-    minorgrid=true,
-    minorgridalpha=0.2, color=:black,
-    xtickfont  = tickfont , ytickfont  = tickfont,
-    xguidefont = guidefont, yguidefont = guidefont,
-    legend     = (0.620, 0.990),
-    legendfont = legendfont,
-    xrotation  = 45,
-    framestyle =:box)
-
-plot!(1981:2023, ge_2023_z[2:end], label="FS Index (base 2023)",
-    linestyle=:dash, lw=2.5, color=:black)
-
-plot!(1981:2023, ge_2010_z[2:end], label="FS Index (base 2010)",
-    linestyle=:dash, lw=2.0, color=:black)
-
-plot!(1981:2023, ge_2000_z[2:end], label="FS Index (base 2000)",
-    linestyle=:dash, lw=1.5, color=:black)
-
-plot!(1981:2023, ge_1990_z[2:end], label="FS Index (base 1990)",
-    linestyle=:dash, lw=1.0, color=:black)
-
-plot!(1981:2023, ge_1980_z[2:end], label="FS Index (base 1980)",
-    linestyle=:dash, lw=0.5, color=:black)
-
-#savefig(joinpath(figuresdir, "ConsExpenditure_GrowthRates_1980_2023.png"))
-
-
-CE_FS              = [0;cumsum( gD_e .+ g_n )]
-CE_FS_z_2023       = [0;cumsum( ge_2023_z[2:end] .+ g_n )]
-CE_FS_z_1980       = [0;cumsum( ge_1980_z[2:end] .+ g_n )]
-
-
-plot(1980:2023, CE_FS, label="Divisia Index",
-    ylabel     = "Cummulative Expenditure Growth",
+#---------------------------------------------------------------
+### Real Consumption Expenditure Indices - D_e_z, P_e_2023_z,P_e_1980_z
+plot(1981:2023, D_e_z, 
+    label ="Chained Divisia Index",
+    ylabel="Cumulative Growth in <br> Real Consumption Expenditure ",
     linestyle=:solid, lw=2.0,
-    xticks=1980:5:2025,
-    ylims=(0.000,1.400),
-    yticks=0.000:0.200:1.400,
-    minorgrid  = true,
-    minorgridalpha=0.2, color=:black,
-    xtickfont  = tickfont , ytickfont  = tickfont,
-    xguidefont = guidefont, yguidefont = guidefont,
-    legend     = (0.150, 0.950),
-    legendfont = legendfont,
-    xrotation  = 45,
-    framestyle =:box)
+    minorgridalpha=0.5, color=:black,
+    xticks=1980:5:2025, 
+    yticks=0.0:0.2:1.4,
+    ylim=(0.00, 1.40),   
+    xtickfont=tickfont, ytickfont=tickfont,
+    xguidefont=guidefont, yguidefont=guidefont,
+    legendfont=legendfont,
+    legend=(0.15, 0.95),
+    xrotation=45,
+    left_margin=5Plots.mm,  
+    framestyle=:box)
 
-plot!(1980:2023, CE_FS_z_2023 , label="FS Index (base 2023)",
-    linestyle=:dash, lw=2.0, color=:black)
+plot!(1980:2023, P_e_2023_z, 
+    label="FS Index (base 2023)",
+    linestyle=:dash, lw=2.0, 
+    color=:black)
 
-plot!(1980:2023, CE_FS_z_1980 , label="FS Index (base 1980)",
-    linestyle=:dot, lw=2.0, color=:black)
+plot!(1980:2023, P_e_1980_z, 
+    label="FS Index (base 1980)",
+    linestyle=:dot, lw=2.0, 
+    color=:black)
 
-#savefig(joinpath(figuresdir, "ConsExpenditure_FS_Indices_1980_2023.png"))
+if save_figures
+    savefig(joinpath(figuresdir, "consumption_expenditure_indices.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "consumption_expenditure_indices.png"))
+end
+#---------------------------------------------------------------
