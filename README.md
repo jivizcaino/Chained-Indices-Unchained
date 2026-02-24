@@ -1,5 +1,5 @@
 # Replication Package  
-# **Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement**  
+# **___Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement___**  
 
 ## **Authors:** Omar Licandro and Juan Ignacio Vizcaino  
 
