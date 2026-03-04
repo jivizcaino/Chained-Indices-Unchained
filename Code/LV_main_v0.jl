@@ -1,12 +1,13 @@
 #------------------------------------------------------------------------------
 #Replication code for: Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement
 #By:                   Omar Licandro and Juan I. Vizcaino
-#This Version:         04/03/2026
+#This Version:         23/02/2026
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 #Set the Working Directory
 currentdir = @__DIR__
+
 datadir    = abspath(joinpath(currentdir, "..", "Data"))
 figuresdir = abspath(joinpath(currentdir, "..", "Figures"))
 #------------------------------------------------------------------------------
@@ -24,11 +25,11 @@ run_smm      = false
 # Activate local project (Code/Project.toml)
 using Pkg
 Pkg.activate(@__DIR__)
-#Pkg.instantiate()
+Pkg.instantiate()
 
 using XLSX, DataFrames, BlackBoxOptim ,  Statistics
 using MathJaxRenderer, LaTeXStrings, LsqFit, Random, OrderedCollections, PrettyTables
-using Plots; gr()
+using Plots; plotlyjs()
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -52,12 +53,13 @@ data_range = "A1:DH78"
 
 # Read the data from the Excel file
 HRV_data = XLSX.readtable(joinpath(datadir, file_name), sheet_name)
-HRV_df   = DataFrame(HRV_data)
-#HRV_df  = DataFrame(HRV_data...)
+HRV_df = DataFrame(HRV_data)
+#HRV_df = DataFrame(HRV_data...)
 
 #Get the shares of Goods and Services in Investment and Consumption (X,C) respectively
 VAX_GOOD_SHARE = HRV_df[HRV_df.year .>= 1980, "VAX_GOOD_S"]
 VAX_SERV_SHARE = HRV_df[HRV_df.year .>= 1980, "VAX_SERV_S"]
+
 VAC_GOOD_SHARE = HRV_df[HRV_df.year .>= 1980, "VAC_GOOD_S"]
 VAC_SERV_SHARE = HRV_df[HRV_df.year .>= 1980, "VAC_SERV_S"]
 
@@ -80,7 +82,7 @@ N_1980         = HRV_df[HRV_df.year .== 1980, "POP"][1]
 N_2023         = HRV_df[HRV_df.year .== 2023, "POP"][1]
 
 L_1980         = HRV_df[HRV_df.year .== 1980,"LAB_TOT_QI"][1]
-L_2023         = HRV_df[HRV_df.year .== 2023,"LAB_TOT_QI"][1]
+L_2017         = HRV_df[HRV_df.year .== 2023,"LAB_TOT_QI"][1]
 
 C_GOOD_P       = HRV_df[HRV_df.year .>= 1980, "C_GOOD_P"]./HRV_df[HRV_df.year .== 1980, "C_GOOD_P"]
 C_SERV_P       = HRV_df[HRV_df.year .>= 1980, "C_SERV_P"]./HRV_df[HRV_df.year .== 1980, "C_SERV_P"]
@@ -90,7 +92,8 @@ X_TOT_P        = HRV_df[HRV_df.year .>= 1980, "X_TOT_P"] ./HRV_df[HRV_df.year .=
 #------------------------------------------------------------------------------
 # Define the Functions Characterizing the Equilibrium Conditions
 # Recall that L = N*h, where N is the population and h is the avg efficiency units of labor per person
-##Relative Prices
+
+## Relative Prices
 Ps(calAx,As,wedge_s)  = (calAx/As)*wedge_s
 Pg(calAx,Ag,wedge_g)  = (calAx/Ag)*wedge_g
 
@@ -125,139 +128,27 @@ e_t_x(t,x; χ, ν_t, Pst)    = (ν_t[t]*(Pst[x]^χ))^(1/(χ-1))
 sg_t_x(t,x;χ,η,γ,Pst,Pgt)  = η*( ( e_t_x(t,x; χ, ν_t, Pst)/Pst[x] )^(-χ) )*((Pgt[x]/Pst[x])^γ)
 cal_v_t_x(t,x;χ,Pst)       = ( Pst[t]/Pst[x] )^(  (χ/(1-χ)) )
 
-function B_t_z_τ(t::Int, z::Int, τ::Int; χ, η, γ, Pst::AbstractVector, Pgt::AbstractVector)
-    """
-    B_t_z_τ(t, z, τ; χ, η, γ, Pst, Pgt)
-    Compute the bias correction coefficient used in the equivalent variation measure `mhat_t_z_τ`.
-
-    Given preferences evaluated at period `t`, a base price period `z`, and a welfare comparison 
-    period `τ`, this function returns the scalar `B` such that:
-
-        mhat(t, z, τ) = y(τ) + B * ehat(t, z)
-
-    where `ehat(t, z)` is the compensating expenditure at preferences `t` and prices `z`.
-
-    The coefficient is defined as:
-
-        B = (1/χ - 1 - ŝg(t,τ)/γ) * v(z,τ) - (1/χ - 1 - ŝg(t,z)/γ)
-
-    where `ŝg(t,x)` is the goods share in consumption expenditure evaluated at preferences `t`
-    and prices at period `x`, and `v(z,τ) = (Ps[z]/Ps[τ])^(χ/(1-χ))` is the service-price
-    scaling factor.
-
-    # Arguments
-    - `t::Int`: base preference period index
-    - `z::Int`: base price period index
-    - `τ::Int`: welfare comparison period index
-
-    # Keyword Arguments
-    - `χ`: curvature parameter of the expenditure function (0 < χ < γ < 1)
-    - `η`: taste parameter for goods in consumption
-    - `γ`: substitution parameter (χ < γ < 1)
-    - `Pst::AbstractVector`: time series of service prices
-    - `Pgt::AbstractVector`: time series of goods prices
-    """              
-    sghat_t_τ = sg_t_x(t, τ; χ=χ, η=η, γ=γ, Pst=Pst, Pgt=Pgt)
-    sghat_t_z = sg_t_x(t, z; χ=χ, η=η, γ=γ, Pst=Pst, Pgt=Pgt)
-    v_z_τ     = cal_v_t_x(z, τ; χ=χ, Pst=Pst)
-
-    return (1/χ - 1 - sghat_t_τ/γ) * v_z_τ - (1/χ - 1 - sghat_t_z/γ)
-end
-
-function mhat_t_z_τ(t::Int, z::Int, τ::Int;  χ, η, γ, ν_t::AbstractVector, Pst::AbstractVector,  Pgt::AbstractVector,  yt::AbstractVector)
-    """
-    mhat_t_z_τ(t, z, τ; χ, η, γ, ν_t, Pst, Pgt, yt)
-
-    Compute the equivalent variation measure of welfare, expressed in units of net income at
-    period `τ`.
-
-    This is the generalized Fisher-Shell welfare index that adjusts net income `y(τ)` for the
-    difference between actual preferences (period `t`) and base prices (period `z`). The
-    measure is defined as:
-
-    mhat(t, z, τ) = y(τ) + B(t, z, τ) * ehat(t, z)
-
-    where `ehat(t, z) = e(t, z)` is the compensating expenditure evaluated at preferences `t`
-    and prices at period `z`, and `B(t, z, τ)` is the bias correction coefficient from
-    `B_t_z_τ`.
-
-    When `t = z = τ`, this reduces to net income `y(τ)`.
-
-    # Arguments
-    - `t::Int`: base preference period index
-    - `z::Int`: base price period index
-    - `τ::Int`: welfare comparison period index
-
-    # Keyword Arguments
-    - `χ`: curvature parameter of the expenditure function (0 < χ < γ < 1)
-    - `η`: taste parameter for goods in consumption
-    - `γ`: substitution parameter (χ < γ < 1)
-    - `ν_t::AbstractVector`: time series of the marginal utility of wealth
-    - `Pst::AbstractVector`: time series of service prices
-    - `Pgt::AbstractVector`: time series of goods prices
-    - `yt::AbstractVector`: time series of net income per capita
-    """
-
-    ehat_t_z = e_t_x(t, z; χ=χ, ν_t=ν_t, Pst=Pst)
-    B        = B_t_z_τ(t, z, τ; χ=χ, η=η, γ=γ, Pst=Pst, Pgt=Pgt)
-
-    return yt[τ] + B * ehat_t_z
-end
-
 #Functions Used to Compute Indices for Real Consumption Expenditure
 g_D_e(sg,g_cg,g_cs)                 = ( sg*g_cg + (1 - sg)*g_cs  ) 
 g_e_t_x(t,x;χ,ν_t,Pst,sg,g_cg,g_cs) = g_D_e(sg,g_cg,g_cs)*((e_t_x(x,x; χ, ν_t, Pst)/e_t_x(t,x; χ, ν_t, Pst))*(Pst[t]/Pst[x]))^(χ) 
 aux_e_t_x(t,x;χ,ν_t,Pst)            = ( (e_t_x(x,x; χ, ν_t, Pst) / e_t_x(t,x; χ,ν_t, Pst) )*(Pst[t]/Pst[x]))^(χ)
 
-function dev_t_z_τ(t::Int, z::Int, τ::Int; χ, η, γ, ν_t::AbstractVector, Pst::AbstractVector, Pgt::AbstractVector, yt::AbstractVector, g_pg, g_ps)
-        """
-    dev_t_z_τ(t, z, τ; χ, η, γ, ν_t, Pst, Pgt, yt, g_pg, g_ps)
-    Compute the deviation term for the generalized Fisher-Shell growth rate.
+# Deviation term for the generalized Fisher-Shell index
+# t: base preference period, 
+# z: base price period, 
+# τ: period for welfare comparison
+#  se_τ     = e(τ,τ) / y(τ)                        – expenditure share at base (τ,τ)
+#  sg_τ     = sg(τ,τ)                              – goods share at base
+#  se_t_z_τ = cal_v(z,τ) * e(t,z) / y(z)           – scaled expenditure at preferences t, prices z
+#  sg_t_τ   = sg(t,τ)                              – goods share at preferences t, prices τ
 
-    The deviation is defined as:
-
-    dev = (se_τ * sg_τ - v(z,τ) * se(t,z) * sg(t,τ)) * g_pg + (se_τ * (1 - sg_τ) - v(z,τ) * se(t,z) * (1 - sg(t,τ))) * g_ps
-
-    where:
-    - `se_τ     = e(τ,τ) / y(τ)`       – expenditure share at base (τ,τ)
-    - `sg_τ     = sg(τ,τ)`             – goods share at base
-    - `se(t,z)  = e(t,z) / y(z)`       – scaled expenditure at preferences `t`, prices `z`
-    - `sg(t,τ)  = sg(t,τ)`             – goods share at preferences `t`, prices `τ`
-    - `v(z,τ)   = (Ps[z]/Ps[τ])^(χ/(1-χ))` – service-price scaling factor
-
-    # Arguments
-    - `t::Int`: base preference period index
-    - `z::Int`: base price period index
-    - `τ::Int`: welfare comparison period index
-
-    # Keyword Arguments
-    - `χ`: parameter governing income effects  (0 < χ < γ < 1)
-    - `η`: taste parameter for goods in consumption
-    - `γ`: substitution parameter (χ < γ < 1)
-    - `ν_t::AbstractVector`: time series of the marginal utility of wealth
-    - `Pst::AbstractVector`: time series of service prices
-    - `Pgt::AbstractVector`: time series of goods prices
-    - `yt::AbstractVector`: time series of net income per capita
-    - `g_pg`: growth rate of the goods price
-    - `g_ps`: growth rate of the services price
-    """
+function dev_t_z_τ(t, z, τ; χ, η, γ, ν_t, Pst, Pgt, yt, g_pg, g_ps)
     se_τ      = e_t_x(τ, τ; χ=χ, ν_t=ν_t, Pst=Pst) / yt[τ]
     sg_τ      = sg_t_x(τ, τ; χ=χ, η=η, γ=γ, Pst=Pst, Pgt=Pgt)
     se_t_z_τ  = e_t_x(t, z; χ=χ, ν_t=ν_t, Pst=Pst) / yt[τ]
-    #se_t_z_τ  = e_t_x(t, z; χ=χ, ν_t=ν_t, Pst=Pst) / yt[z]
     cal_v_z_τ = cal_v_t_x(z, τ; χ=χ, Pst=Pst)
-    sg_t_τ    = sg_t_x(t, τ; χ=χ, η=η, γ=γ, Pst=Pst, Pgt=Pgt)
-    return ( se_τ*sg_τ - cal_v_z_τ*se_t_z_τ*sg_t_τ ) * g_pg  + ( se_τ*(1 - sg_τ) - cal_v_z_τ*se_t_z_τ*(1 - sg_t_τ) ) * g_ps
-end
-#------------------------------------------------------------------------------
-
-function integrate_trap(g::AbstractVector)
-    T = length(g)
-    out = zeros(eltype(g), T)
-    for i in 2:T
-        out[i] = out[i-1] + 0.5*(g[i-1] + g[i])
-    end
-    return out
+    sg_t_z    = sg_t_x(t, z; χ=χ, η=η, γ=γ, Pst=Pst, Pgt=Pgt)
+    return ( se_τ*sg_τ - cal_v_z_τ*se_t_z_τ*sg_t_z ) * g_pg  + ( se_τ*(1 - sg_τ) - cal_v_z_τ*se_t_z_τ*(1 - sg_t_z) ) * g_ps
 end
 #------------------------------------------------------------------------------
 
@@ -267,7 +158,8 @@ g_Ag        = log(Ag_2023/Ag_1980)/(2023-1980)
 g_As        = log(As_2023/As_1980)/(2023-1980)
 g_calAx     = log(calAx_2023/calAx_1980)/(2023-1980)
 g_n         = (log(N_2023/N_1980))/(2023-1980)
-g_l         = (log(L_2023/L_1980))/(2023-1980)
+g_l         = (log(L_2017/L_1980))/(2023-1980)
+
 g_h         = g_l - g_n
 #------------------------------------------------------------------------------
 
@@ -686,10 +578,10 @@ end
 sim_eq = sim_model_full([χ,η,γ];Pg_t=Pg_t,Ps_t=Ps_t,θ=θ,ρ=ρ,δ=δ,g_calAx=g_calAx,g_As=g_As,g_Ag=g_Ag,g_h=g_h,g_l=g_l,g_n=g_n)
 
 #Compute the Marginal Value of Capital 
-ν_t    = (sim_eq["et"].^(χ-1))./(sim_eq["Pst"].^χ)
+ν_t  = (sim_eq["et"].^(χ-1))./(sim_eq["Pst"].^χ)
 
 #Compute Net Income Per Capita
-m_t    = sim_eq["yt"] - δ*sim_eq["kt"]
+m_t  = sim_eq["yt"] - δ*sim_eq["kt"]
 
 #Check that the Elasticity of Substitution is Always Positive
 σ_t    = (1-γ) .- ((η.*((sim_eq["Pgt"]./sim_eq["Pst"]).^γ))./((sim_eq["et"]./sim_eq["Pst"]).^χ .- η.*((sim_eq["Pgt"]./sim_eq["Pst"]).^γ))).*(γ-χ)
@@ -789,9 +681,9 @@ C_P     = HRV_df[!,"C_TOT_P"]
 rel_P_I = X_P ./ C_P
 
 plot(1947:2023, rel_P_I ,
-    ylabel="Relative Price of Investment\n(1947=1)",
+    ylabel="Relative Price of Investment <br> (1947=1)", 
     linestyle=:solid, lw=2.0,
-    minorgrid=false, color=:black,
+    minorgridalpha=0.5, color=:black,
     xticks=1947:5:2025, 
     yticks=0.000:0.05:1.50,     
     xtickfont=tickfont, ytickfont=tickfont,
@@ -811,9 +703,9 @@ end
 ### Figure 1 (b)
 calA_X_I   = HRV_df[!,"calA_X_I_TD"]
 
-plot(1947:2023, calA_X_I, ylabel="Effective Investment-Specific TFP\n(1947=1)",
+plot(1947:2023, calA_X_I, ylabel="Effective Investment-Specific TFP <br> (1947=1)", 
     linestyle=:solid, lw=2.0,
-    minorgrid=false, color=:black,
+    minorgridalpha=0.5, color=:black,
     xticks=1947:5:2025,ylim=(0.95, 2.35),   
     yticks=1.00:0.25:2.25, 
     xtickfont=tickfont, ytickfont=tickfont,
@@ -827,6 +719,7 @@ if save_figures
     savefig(joinpath(figuresdir,"investment_TFP.png"))
     println("Figure saved to: ", joinpath(figuresdir, "investment_TFP.png"))
 end
+
 #---------------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -837,9 +730,9 @@ C_TOT      = HRV_df[!,"C_TOT"]
 cons_share = C_TOT ./ (C_TOT+X_TOT)
 
 plot(1947:2023, cons_share ,
-    ylabel="Consumption Share in\nTotal Expenditure",
+    ylabel="Consumption Share in <br> Total Expenditure", 
     linestyle=:solid, lw=2.0,
-    minorgrid=false, color=:black,
+    minorgridalpha=0.50, color=:black,
     xticks = 1947:5:2025, 
     ylim   = (0.50, 1.00), 
     yticks = 0.40:0.10:1.00,
@@ -862,9 +755,9 @@ end
 VAC_GOOD_SHARE_long = HRV_df[HRV_df.year .>= 1947, "VAC_GOOD_S"]
 
 plot(1947:2023, VAC_GOOD_SHARE_long,
-    ylabel="Share of Goods in \n Total Consumption Value Added",
+    ylabel="Share of Goods in Total Consumption <br> Value Added",    
     linestyle=:solid, lw=2.0,
-    minorgrid=false, color=:black,
+    minorgridalpha=0.5, color=:black,
     xticks=1947:5:2025,  
     yticks=0.000:0.05:0.400, 
     ylim=(0.08, 0.42), 
@@ -884,25 +777,36 @@ end
 #----------------------------------------------------------
 ### Figure 3 (a)
 #Plot the Relative Price of Goods vs Services
-plot(1980:2023,Pg_t_data./Ps_t_data, label=L"P_{g,t}/P_{s,t} \ \textrm{-} \ Data",
-    ylabel="Relative Price of Goods vs Services \n (1980=1)",
+plot(1980:2023,Pg_t_data./Ps_t_data, label="(Pg/Ps) - Data",
+    ylabel="Relative Price of Goods vs Services <br> (Pg/Ps ; 1980=1)",
     linestyle=:dash, lw=2,
-    minorgrid=false, color=:black,
+    minorgridalpha=0.5, color=:black,
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,legendfont=legendfont,
-    legend=(0.55, 0.90),
+    legend=(0.60, 0.95),
     xticks=1980:5:2025, yticks=0.000:0.100:1.000,
     left_margin=6Plots.mm,xrotation=45,framestyle=:box)
 
-#model WITHOUT wedge
-plot!(1980:2023,Pg_t_undist./Ps_t_undist, label=L"P_{g,t}/P_{s,t} = A_{s,t}/A_{g,t}", linestyle=:dot, lw=2.00,color=:black)
+#model WITHOUT distortions
+plot!(1980:2023,Pg_t_undist./Ps_t_undist, label="(Pg/Ps) = (As/Ag)", linestyle=:dot, lw=2.00,color=:black)
 
-#model WITH wedge
-plot!(1980:2023,Pg_t./Ps_t, label=L"P_{g,t}/P_{s,t} = A_{s,t}/(A_{g,t}e^{\zeta t})", linestyle=:solid, lw=2.00,color=:black)
+#model WITH distortions
+plot!(1980:2023,Pg_t./Ps_t, label="(Pg/Ps) = (As/Ag*exp(ζt))", linestyle=:solid, lw=2.00,color=:black)
+
+plot(1980:2023, wedge_Pg_Ps, label="Wedge ( (Pg/Ps)-Data / (Pg/Ps)-Model",
+     ylabel="Relative Price of Goods vs Services <br> (Pg/Ps ; 1980=1)",
+    linestyle=:dash, lw=2,xticks=1980:5:2025, 
+    minorgridalpha=0.5, color=:black,
+    xtickfont=tickfont, ytickfont=tickfont,
+    xguidefont=guidefont, yguidefont=guidefont,
+    legend=(0.40, 0.95),legendfont=legendfont,
+    left_margin=6Plots.mm,xrotation=45,framestyle=:box)
+
+plot!(1980:2023, wedge_Pg_Ps_trend, label="Exponential Trend", lw=2, color=:black, linestyle=:solid)
 
 if save_figures 
-    savefig(joinpath(figuresdir, "PgPs_Data_vs_HRV_vs_LV.png"))
-    println("Figure saved to: ", joinpath(figuresdir, "PgPs_Data_vs_HRV_vs_LV.png"))
+    savefig(joinpath(figuresdir, "PgPs_Wedge_Fit.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "PgPs_Wedge_Fit.png"))
 end
 
 println("""
@@ -917,17 +821,17 @@ $(repeat("=", 60))
 #----------------------------------------------------------
 ### Figure 3 (b)
 year = 1980:2023
-plot(year, sim_eq["sgt"], label=L"s_{g,t} \textrm{- \ Model}", linestyle=:solid, color=:black, lw=2.00, 
-    ylabel="Share of Goods in Consumption\nExpenditure",
+plot(year, sim_eq["sgt"], label="Model", linestyle=:solid, color=:black, lw=2.00, 
+    ylabel="Share of Goods in Consumption <br> Expenditure", 
     #title="γ=$(round(γ, digits=3)), η=$(round(η, digits=3)), χ=$(round(χ, digits=3))",
     #title= L"\gamma".s,
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,legendfont=legendfont,
-    legend=(0.775, 0.900),
+    legend=(0.15, 0.95),
     xticks=1980:5:2025, yticks=0.0:0.02:0.80,xrotation=45)
 
-plot!(year, VAC_GOOD_SHARE, label=L"s_{g,t} \textrm{- \ Data}",  linestyle=:dot, lw=2.00,
-    minorgrid=false, color=:black,left_margin=5Plots.mm,framestyle=:box)
+plot!(year, VAC_GOOD_SHARE, label="Data", legend=(0.800, 0.950), linestyle=:dot, lw=2.00, 
+    minorgrid=true, minorgridalpha=0.9, color=:black,left_margin=5Plots.mm,framestyle=:box)
 
 if save_figures 
     savefig(joinpath(figuresdir, "sg_t_Model_Fit.png"))
@@ -949,13 +853,12 @@ g_cg        = sim_eq["cgt"][2:end]./sim_eq["cgt"][1:end-1] .- 1
 g_cs        = sim_eq["cst"][2:end]./sim_eq["cst"][1:end-1] .- 1
 g_x         = x_t[2:end]./x_t[1:end-1] .- 1
 
-gD         = s_e[2:end].*( sim_eq["sgt"][2:end].*g_cg .+ sim_eq["sst"][2:end].*g_cs  ) .+ (1 .- s_e[2:end]).*g_x
-gD_agg     = [ 0 ; (gD.+ g_n) ]
-FS         = integrate_trap(gD_agg)
+g_D         = s_e[2:end].*( sim_eq["sgt"][2:end].*g_cg .+ sim_eq["sst"][2:end].*g_cs  ) .+ (1 .- s_e[2:end]).*g_x
+FS          = [0;cumsum( g_D .+ g_n )]
 
-plot(1980:2023, FS , ylabel="GDP Index\n(log scale; 1980=0)",
+plot(1980:2023, FS , ylabel="GDP Index <br> (log scale;1980=0)", 
     linestyle=:solid, lw=2.0,
-    minorgrid=false, color=:black,
+    minorgridalpha=0.5, color=:black,
     xticks=1980:5:2024, yticks=0.0:0.2:1.4,
     ylim=(0.00, 1.40),   
     xtickfont=tickfont, ytickfont=tickfont,
@@ -968,7 +871,7 @@ plot(1980:2023, FS , ylabel="GDP Index\n(log scale; 1980=0)",
 
 plot!(1980:2023, log.(GDP_data),label = "Chained Index - Data",
     linestyle=:dot, lw=2.0, color=:black,
-    legend=(0.15, 0.90))
+    legend=(0.15, 0.95))
 
 if save_figures 
     savefig(joinpath(figuresdir,"GDP_Model_vs_Data.png"))
@@ -978,7 +881,7 @@ end
 
 #---------------------------------------------------------------
 ### Figure 4 (b)
-g_FS          = gD .+ g_n 
+g_FS          = g_D .+ g_n 
 GDP_data_long = HRV_df[!, "GDP_QI"]
 
 # Compute the growth rate (log difference)
@@ -999,12 +902,12 @@ end
 
 g_GDP_long_ma10 = moving_average(g_GDP_long, 11)
 
-plot(1981:2023, g_GDP_long_ma10[1981-1947+1:end],
+plot(1980:2023, g_GDP_long_ma10[1980-1947+1:end],
     label = "Data - 10-year Moving Average", 
     linestyle=:dot, lw=2.0,
-    minorgrid=false, color=:black,
-    xticks=1980:5:2025,
-    yticks=0.00:0.01:0.05,
+    minorgridalpha=0.5, color=:black,
+    xticks=1980:5:2025, 
+    yticks=0.00:0.01:0.05, 
     ylim=(0.00, 0.05),    
     xtickfont=tickfont, ytickfont=guidefont,
     xguidefont=guidefont, yguidefont=guidefont,
@@ -1015,9 +918,9 @@ plot(1981:2023, g_GDP_long_ma10[1981-1947+1:end],
 
 plot!(1981:2023, g_FS ,label = "Model - FS Chained Index", 
     ylabel="GDP Growth Rate",linestyle=:solid, 
-    lw=2.0, color=:black, minorgrid=false,
+    lw=2.0, color=:black, minorgridalpha=0.5,
     xticks=1980:5:2024, yticks=0.010:0.010:0.50,
-    ylim=(0.010,0.050),legend=(0.15, 0.90),   
+    ylim=(0.010,0.050),legend=(0.50, 0.95),   
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,
     legendfont=legendfont,
@@ -1026,8 +929,8 @@ plot!(1981:2023, g_FS ,label = "Model - FS Chained Index",
     framestyle=:box)
 
 if save_figures 
-    savefig(joinpath(figuresdir,"GDP_Growth_Model_vs_Data.png"))
-    println("Figure saved to: ", joinpath(figuresdir, "GDP_Growth_Model_vs_Data.png"))
+    savefig(joinpath(figuresdir,"GDP_Growth_Model_vs_Data_v2.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "GDP_Growth_Model_vs_Data_v2.png"))
 end
 #---------------------------------------------------------------
 
@@ -1044,85 +947,131 @@ se_z = sc[1:end]
 #Compute Net Income Per Capita
 m_t  = sim_eq["yt"] - δ*sim_eq["kt"]
 
-#At Preferences of 2023
-t_base             = 2023
-t_prime            = t_base - 1980 + 1
-τ                  = (1980:1:2023) .- 1980 .+ 1
-m_τ                = sim_eq["yt"][τ]
-
-mhat_2023_2023_τ = mhat_t_z_τ.(t_prime, t_prime, τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"],yt=sim_eq["yt"])
-dev_2023_2023_τ  = dev_t_z_τ.( t_prime, t_prime, τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"],yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
-
-#Sanity Checks
-@assert isapprox(dev_2023_2023_τ[end], 0.0; atol=1e-8)
-@assert isapprox(dev_2023_2023_τ[end], 0.0; atol=1e-8)
-
-gD_2023_2023_τ   = ( m_τ[2:end] ./ mhat_2023_2023_τ[2:end] ) .* ( gD .+ g_n .+ dev_2023_2023_τ[2:end] )
-FS_2023_2023_τ   = integrate_trap([0;gD_2023_2023_τ])
-
-#Based on 2010
-t_base             = 2010
-t_prime            = t_base - 1980 + 1
-τ_prime            = (1980:1:2023) .- 1980 .+ 1
-
-mhat_2010_2010_τ = mhat_t_z_τ.(t_prime, t_prime, τ_prime;  χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"],  Pgt=sim_eq["Pgt"],  yt=sim_eq["yt"])
-dev_2010_2010_τ  = dev_t_z_τ.(t_prime, t_prime, τ_prime; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
-
-gD_2010_2010_τ   = ( m_τ[2:end] ./ mhat_2010_2010_τ[2:end] ) .* ( gD .+ g_n .+ dev_2010_2010_τ[2:end] )
-FS_2010_2010_τ   = integrate_trap([0;gD_2010_2010_τ])
-
-#Based on 2000
-t_base           = 2000
-t_prime          = t_base - 1980 + 1
-τ_prime          = (1980:1:2023) .- 1980 .+ 1
-
-mhat_2000_2000_τ = mhat_t_z_τ.(t_prime, t_prime, τ_prime;  χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"],  Pgt=sim_eq["Pgt"],  yt=sim_eq["yt"])
-dev_2000_2000_τ  = dev_t_z_τ.(t_prime, t_prime, τ_prime; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
-
-gD_2000_2000_τ   = ( m_τ[2:end] ./ mhat_2000_2000_τ[2:end] ) .* ( gD .+ g_n .+ dev_2000_2000_τ[2:end] )
-FS_2000_2000_τ   = integrate_trap([0;gD_2000_2000_τ])
-
-#Based on 1990
-t_base             = 1990
-t_prime            = t_base - 1980 + 1
-τ_prime            = (1980:1:2023) .- 1980 .+ 1
-
-mhat_1990_1990_τ = mhat_t_z_τ.(t_prime, t_prime, τ_prime;  χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"],  yt=sim_eq["yt"])
-mhat_τ           = mhat_t_z_τ.(τ_prime, τ_prime, τ_prime;  χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"],  yt=sim_eq["yt"])
-dev_1990_1990_τ  =   dev_t_z_τ.(t_prime, t_prime, τ_prime; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
-
-gD_1990_1990_τ   = ( m_τ[2:end] ./ mhat_1990_1990_τ[2:end]) .* ( gD .+ g_n .+ dev_1990_1990_τ[2:end] )
-FS_1990_1990_τ   = integrate_trap([0;gD_1990_1990_τ])
-
 #At Preferences of 1980
 t_base             = 1980
 t_prime            = t_base - 1980 + 1
-τ_prime            = (1980:1:2023) .- 1980 .+ 1
+z_prime            = (1980:1:2023) .- 1980 .+ 1
+e_1980_z           = e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"]) 
+e_2023_z           = e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"]) 
+e_1980_z           = e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])
+se_1980_z          = e_1980_z./(sim_eq["yt"][ z_prime ])
+sg_1980_z          = sg_t_x.(t_prime,z_prime;χ=χ,η=η,γ=γ,Pst=sim_eq["Pst"],Pgt=sim_eq["Pgt"])
 
-mhat_1980_1980_τ = mhat_t_z_τ.(t_prime,t_prime,τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"])
-dev_1980_1980_τ  = dev_t_z_τ.( t_prime,t_prime,τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+#At Preferences of 2023
+t_base             = 2023
+t_prime            = t_base - 1980 + 1
+z_prime            = (1980:1:2023) .- 1980 .+ 1
+e_2023_z           = e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])
+se_2023_z          = e_2023_z./(sim_eq["yt"][ z_prime ])
+sg_2023_z          = sg_t_x.(t_prime,z_prime;χ=χ,η=η,γ=γ,Pst=sim_eq["Pst"],Pgt=sim_eq["Pgt"])
 
-gD_1980_1980_τ   = ( m_τ[2:end] ./ mhat_1980_1980_τ[2:end]) .* ( gD .+ g_n .+ dev_1980_1980_τ[2:end] )
-FS_1980_1980_τ   = integrate_trap([0;gD_1980_1980_τ])
+#Compute the Equivalent Variation Measures
+e_t_x(t,x; χ, ν_t, Pst)    = (ν_t[t] * (Pst[x]^χ))^(1/(χ-1))
+sg_t_x(t,x;χ,η,γ,Pst,Pgt)  = η*( ( e_t_x(t,x; χ, ν_t, Pst)/Pst[x] )^(-χ) )*((Pgt[x]/Pst[x])^γ)
+cal_v_t_x(t,x;χ,Pst)       = ( Pst[t]/Pst[x] )^(  (χ/(1-χ)) )
 
-p = plot(1980:2023, FS_2023_2023_τ, label=L"\mathcal{P}_{2023,z} - \textrm{2023‑base \ Fisher‑Shell \ Index}",
-    ylabel="Cumulative Growth", linestyle=:dash, lw=2.0,
+sg_z = sim_eq["sgt"]
+ss_z = sim_eq["sst"]
+se_z = s_e[1:end]
+
+#Based on 2023
+t_base      = 2023
+t_prime     = t_base - 1980 + 1
+z_prime     = (1980:1:2023) .- 1980 .+ 1
+τ_base      = 2023
+τ_prime     = τ_base - 1980 + 1
+
+cal_v_z_2023  = cal_v_t_x.(z_prime,τ_prime;χ,Pst=sim_eq["Pst"])
+se_2023_z     = e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])./sim_eq["yt"][z_prime]
+sg_2023_z     = sg_t_x.(t_prime,τ_prime;χ=χ,η=η,γ=γ,Pst=sim_eq["Pst"],Pgt=sim_eq["Pgt"])
+
+dev_2023_z_2023 = (se_z.*sg_z .- cal_v_z_2023.*se_2023_z.*sg_2023_z).*g_pg .+ 
+                  (se_z.*(1 .- sg_z) .- cal_v_z_2023.*se_2023_z.*(1 .- sg_2023_z)).*g_ps
+
+#Based on 2010
+t_base      = 2010
+t_prime     = t_base - 1980 + 1
+z_prime     = (1980:1:2023) .- 1980 .+ 1
+τ_base      = 2010
+τ_prime     = τ_base - 1980 + 1
+
+cal_v_z_2010  = cal_v_t_x.(z_prime,τ_prime;χ,Pst=sim_eq["Pst"])
+se_2010_z     = e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])./sim_eq["yt"][z_prime]
+sg_2010_z     = sg_t_x.(t_prime,τ_prime;χ=χ,η=η,γ=γ,Pst=sim_eq["Pst"],Pgt=sim_eq["Pgt"])
+
+dev_2010_z_2010 = (se_z.*sg_z        .- cal_v_z_2010.*se_2010_z.*sg_2010_z       ).*g_pg .+ 
+                  (se_z.*(1 .- sg_z) .- cal_v_z_2010.*se_2010_z.*(1 .- sg_2010_z)).*g_ps
+
+
+#Based on 2000
+t_base      = 2000
+t_prime     = t_base - 1980 + 1
+z_prime     = (1980:1:2023) .- 1980 .+ 1
+τ_base      = 2000
+τ_prime     = τ_base - 1980 + 1
+
+cal_v_z_2000  = cal_v_t_x.(z_prime,τ_prime;χ,Pst=sim_eq["Pst"])
+se_2000_z     = e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])./sim_eq["yt"][z_prime]
+sg_2000_z     = sg_t_x.(t_prime,τ_prime;χ=χ,η=η,γ=γ,Pst=sim_eq["Pst"],Pgt=sim_eq["Pgt"])
+
+dev_2000_z_2000 = (se_z.*sg_z        .- cal_v_z_2000.*se_2000_z.*sg_2000_z       ).*g_pg .+ 
+                  (se_z.*(1 .- sg_z) .- cal_v_z_2000.*se_2000_z.*(1 .- sg_2000_z)).*g_ps
+
+#Based on 1990
+t_base      = 1990
+t_prime     = t_base - 1980 + 1
+z_prime     = (1980:1:2023) .- 1980 .+ 1
+τ_base      = 1990
+τ_prime     = τ_base - 1980 + 1
+
+cal_v_z_1990  = cal_v_t_x.(z_prime,τ_prime;χ,Pst=sim_eq["Pst"])
+se_1990_z     = e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])./sim_eq["yt"][z_prime]
+sg_1990_z     = sg_t_x.(t_prime,τ_prime;χ=χ,η=η,γ=γ,Pst=sim_eq["Pst"],Pgt=sim_eq["Pgt"])
+
+dev_1990_z_1990 = (se_z.*sg_z        .- cal_v_z_1990.*se_1990_z.*sg_1990_z       ).*g_pg .+ 
+                  (se_z.*(1 .- sg_z) .- cal_v_z_1990.*se_1990_z.*(1 .- sg_1990_z)).*g_ps
+
+#Based on 1980
+t_base      = 1980
+t_prime     = t_base - 1980 + 1
+z_prime     = (1980:1:2023) .- 1980 .+ 1
+τ_base      = 1980
+τ_prime     = τ_base - 1980 + 1
+
+cal_v_z_1980  = cal_v_t_x.(z_prime,τ_prime;χ,Pst=sim_eq["Pst"])
+se_1980_z     = e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])./sim_eq["yt"][z_prime]
+sg_1980_z     = sg_t_x.(t_prime,τ_prime;χ=χ,η=η,γ=γ,Pst=sim_eq["Pst"],Pgt=sim_eq["Pgt"])
+
+dev_1980_z_1980 = (se_z.*sg_z        .- cal_v_z_1980.*se_1980_z.*sg_1980_z       ).*g_pg .+ 
+                  (se_z.*(1 .- sg_z) .- cal_v_z_1980.*se_1980_z.*(1 .- sg_1980_z)).*g_ps
+
+FS              = [0;cumsum( g_D .+ g_n )]
+FS_2023_z_2023  = [0;cumsum( g_D .+ g_n .+ dev_2023_z_2023[2:end] )]
+FS_2010_z_2010  = [0;cumsum( g_D .+ g_n .+ dev_2010_z_2010[2:end] )]
+FS_2000_z_2000  = [0;cumsum( g_D .+ g_n .+ dev_2000_z_2000[2:end] )]
+FS_1990_z_1990  = [0;cumsum( g_D .+ g_n .+ dev_1990_z_1990[2:end] )]
+FS_1980_z_1980  = [0;cumsum( g_D .+ g_n .+ dev_1980_z_1980[2:end] )]
+
+p = plot(1980:2023, FS_2023_z_2023, label="FS Index (base 2023)",
+    ylabel="Cummulative Growth",linestyle=:dash, lw=2.0,
     xticks=1980:5:2023, yticks=0.00:0.20:1.40,
-    ylims=(0.00, 1.40),
-    minorgrid=false, color=:black,
+    ylims = (0.00,1.40),
+    minorgridalpha=0.2, color=:black,
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,
-    legend=(0.10, 0.920), legendfont=legendfont,
-    xrotation=45, framestyle=:box)
+    legend=(0.15, 0.90),legendfont=legendfont,
+    xrotation=45,framestyle=:box)
 
-plot!(p, 1980:2023, FS_1980_1980_τ, label=L"\mathcal{P}_{1980,z} - \textrm{1980‑base \  Fisher‑Shell \ Index}",
-    linestyle=:dot, lw=2, color=:black)
+plot!(p, 1980:2023, FS_1980_z_1980 , label="FS Index (base 1980)",linestyle=:dot, lw=2, color=:black)
 
-plot!(p, 1980:2023, FS, label=L"\mathcal{D}_{z} \ \ \ \ \ \ - \textrm{Chained \ Divisia \ Index}",
-    linestyle=:solid, lw=2, color=:black)
+plot!(p, 1980:2023, FS, label="Chained Index",
+    linestyle=:solid, lw=2, minorgrid=true, minorgridalpha=0.2, color=:black)
+
+xaxis!(p, minor_ticks=true, minor_tick_step=1.00)
+yaxis!(p, minor_ticks=true, minor_tick_step=0.01)
 
 if save_figures
-    savefig(joinpath(figuresdir,"FS_BBEV.png"))
+    savefig(joinpath(figuresdir, "FS_BBEV.png"))
     println("Figure saved to: ", joinpath(figuresdir, "FS_BBEV.png"))
 end
 
@@ -1131,8 +1080,8 @@ println("""
 $(repeat("=", 60))
 Differences Between Fixed-Base and Chained Indices (2023)
 $(repeat("=", 60))
-FS Index (base 1980) - Chained Index: $(round(FS_1980_1980_τ[end] - FS[end], digits=3))
-FS Index (base 2023) - Chained Index: $(round(FS_2023_2023_τ[end] - FS[end], digits=3))
+FS Index (base 1980) - Chained Index: $(round(FS_1980_z_1980[end] - FS[end], digits=3))
+FS Index (base 2023) - Chained Index: $(round(FS_2023_z_2023[end] - FS[end], digits=3))
 $(repeat("=", 60))
 """)
 #---------------------------------------------------------------
@@ -1140,58 +1089,53 @@ $(repeat("=", 60))
 #---------------------------------------------------------
 ### Figure 5 (b)
 #Alternative Fisher-Shell Indices
-
 ###Price Chained Fisher-Shell Index
+sg_z = sim_eq["sgt"]
+ss_z = sim_eq["sst"]
+se_z = sc[1:end]
+
 #At Preferences of 1980
 t_base             = 1980
 t_prime            = t_base - 1980 + 1
-h                  = (1980:1:2023) .- 1980 .+ 1
-m_h                = sim_eq["yt"][h]
-
-mhat_1980_h_h      = mhat_t_z_τ.(t_prime, h, h; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"])
-mhat_h             = mhat_t_z_τ.(τ_prime, h, h; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"])
-dev_1980_h_h       =  dev_t_z_τ.(t_prime, h, h; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
-
-#Sanity Checks
-@assert isapprox(dev_1980_h_h[1], 0.0; atol=1e-8)
-
-gD_1980_h_h        = ( m_h[2:end] ./ mhat_1980_h_h[2:end] ) .* ( gD .+ g_n .+ dev_1980_h_h[2:end] )
-FS_1980_h_h        = integrate_trap([0;gD_1980_h_h])
+z_prime            = (1980:1:2023) .- 1980 .+ 1
+e_1980_z           = e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])
+se_1980_z          = e_1980_z./(sim_eq["yt"][ z_prime ])
+sg_1980_z          = sg_t_x.(t_prime,z_prime;χ=χ,η=η,γ=γ,Pst=sim_eq["Pst"],Pgt=sim_eq["Pgt"])
 
 #At Preferences of 2023
 t_base             = 2023
 t_prime            = t_base - 1980 + 1
-h                  = (1980:1:2023) .- 1980 .+ 1
-m_h                = sim_eq["yt"][h]
+z_prime            = (1980:1:2023) .- 1980 .+ 1
+e_2023_z           = e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])
+se_2023_z          = e_2023_z./(sim_eq["yt"][ z_prime ])
+sg_2023_z          = sg_t_x.(t_prime,z_prime;χ=χ,η=η,γ=γ,Pst=sim_eq["Pst"],Pgt=sim_eq["Pgt"])
 
-mhat_2023_h_h      = mhat_t_z_τ.(t_prime, h, h; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"])
-mhat_h             = mhat_t_z_τ.(τ_prime, h, h; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"])
-dev_2023_h_h       =  dev_t_z_τ.(t_prime, h, h; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+dev_2023_z = ( se_z.*sg_z .-  se_2023_z.*sg_2023_z ).*g_pg  .+ ( se_z.*(1 .- sg_z) .-  se_2023_z.*(1 .- sg_2023_z) ).*g_ps
+dev_1980_z = ( se_z.*sg_z .-  se_1980_z.*sg_1980_z ).*g_pg  .+ ( se_z.*(1 .- sg_z) .-  se_1980_z.*(1 .- sg_1980_z) ).*g_ps
 
-#Sanity Checks
-@assert isapprox(dev_2023_h_h[end], 0.0; atol=1e-8)
-gD_2023_h_h      = ( m_h[2:end] ./ mhat_2023_h_h[2:end]) .* (gD .+ g_n .+ dev_2023_h_h[2:end] )
-FS_2023_h_h      = integrate_trap([0;gD_2023_h_h])
+FS          = [0;cumsum( g_D .+ g_n )]
+FS_2023_z   = [0;cumsum( g_D .+ g_n .+ dev_2023_z[1:end-1] )]
+FS_1980_z   = [0;cumsum( g_D .+ g_n .+ dev_1980_z[1:end-1] )]
 
-plot(1980:2023, FS_2023_h_h ,
+plot(1980:2023, FS_2023_z ,
     linestyle=:dash, lw=2.0, color=:black,
     xticks = 1980:5:2025,  
-    label=L"\mathcal{\hat{P}}_{2023,z} - \textrm{2023‑base \  Price‑Chained \ FS \ Index}")
+    label = "FS Index (2023 Preferences)")
 
-plot!(1980:2023, FS_1980_h_h ,
+plot!(1980:2023, FS_1980_z ,
     linestyle=:dot, lw=2.0, color=:black,
-    label=L"\mathcal{\hat{P}}_{1980,z} - \textrm{1980‑base \  Price‑Chained \ FS \ Index}",
-    legend=(0.100, 0.920))
+    label = "FS Index (1980 Preferences)",
+    legend=(0.15, 0.92))
 
-plot!(1980:2023, FS ,ylabel="Cumulative Growth",
+plot!(1980:2023, FS ,ylabel="Cummulative Growth", 
     linestyle=:solid, lw=2.0,
-    minorgrid=false, color=:black,
+    minorgridalpha=0.5, color=:black,
     xticks=1980:5:2024, yticks=0.0:0.2:1.4,
-    ylim=(0.00, 1.40),
+    ylim=(0.00, 1.40),   
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,
     legendfont=legendfont,
-    label=L"\mathcal{D}_{z} \ \ \ \ \ \ - \textrm{Chained \ Divisia \ Index}",
+    label = "Chained Index",
     xrotation=45,
     framestyle=:box)
 
@@ -1205,51 +1149,56 @@ end
 # Alternative Fisher-Shell Indices
 #### Preferences Chained Fisher-Shell Index
 ## At Prices of 1980
-z_base          = 1980
-z_prime         = z_base - 1980 + 1
+t_base          = 1980
+t_prime         = t_base - 1980 + 1
+z_prime         = (1980:1:2023) .- 1980 .+ 1
+cal_v_1980_z    = cal_v_t_x.(t_prime,z_prime;χ,Pst=sim_eq["Pst"])
 
-t               = (1980:1:2023) .- 1980 .+ 1
-τ               = (1980:1:2023) .- 1980 .+ 1
-m_τ             = sim_eq["yt"][τ]
+se_1980         = e_t_x.(t_prime,t_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])./(sim_eq["yt"][ t_prime ])
+sg_1980         = sg_t_x.(t_prime,t_prime;χ=χ,η=η,γ=γ,Pst=sim_eq["Pst"],Pgt=sim_eq["Pgt"])
 
-mhat_t_1980_τ   = mhat_t_z_τ.(t, z_prime, τ ;  χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"],  Pgt=sim_eq["Pgt"],  yt=sim_eq["yt"])
-dev_t_1980_τ    =  dev_t_z_τ.(t, z_prime, τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+se_1980_z       = e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])./(sim_eq["yt"][ z_prime ])
+sg_z            = sg_t_x.(z_prime,z_prime;χ=χ,η=η,γ=γ,Pst=sim_eq["Pst"],Pgt=sim_eq["Pgt"])
 
-gD_t_1980_τ     = ( m_τ[2:end] ./ mhat_t_1980_τ[2:end] ) .* ( gD .+ g_n .+ dev_t_1980_τ[2:end] )
-FS_t_1980_τ     = integrate_trap([0;gD_t_1980_τ])
+dev_z_1980      = (se_1980.*sg_1980 .- cal_v_1980_z.*se_1980_z.*sg_z).*g_pg .+ (se_1980.*(1- sg_1980) .- cal_v_1980_z.*se_1980_z.*(1 .- sg_z)).*g_ps    
 
 #At Prices of 2023
-z_base          = 2023
-z_prime         = z_base - 1980 + 1
+t_base          = 2023
+t_prime         = t_base - 1980 + 1   
+z_prime         = (1980:1:2023) .- 1980 .+ 1
 
-t               = (1980:1:2023) .- 1980 .+ 1
-τ               = (1980:1:2023) .- 1980 .+ 1
-m_τ             = sim_eq["yt"][τ]
+cal_v_2023_z    = cal_v_t_x.(t_prime,z_prime;χ,Pst=sim_eq["Pst"])
 
-mhat_t_2023_τ   = mhat_t_z_τ.(t, z_prime, τ ;  χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"],  Pgt=sim_eq["Pgt"],  yt=sim_eq["yt"])
-dev_t_2023_τ    =  dev_t_z_τ.(t, z_prime, τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+se_2023         = e_t_x.(t_prime,t_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])./(sim_eq["yt"][ t_prime ])
+sg_2023         = sg_t_x.(t_prime,t_prime;χ=χ,η=η,γ=γ,Pst=sim_eq["Pst"],Pgt=sim_eq["Pgt"])
 
-gD_t_2023_τ      = ( m_τ[2:end] ./ mhat_t_2023_τ[2:end]) .* ( gD .+ g_n .+ dev_t_2023_τ[2:end] )
-FS_t_2023_τ      = integrate_trap([0;gD_t_2023_τ])
+se_2023_z       = e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])./(sim_eq["yt"][ z_prime ])
+sg_z            = sg_t_x.(z_prime,t_prime;χ=χ,η=η,γ=γ,Pst=sim_eq["Pst"],Pgt=sim_eq["Pgt"])
 
-plot(1980:2023, FS_t_2023_τ ,
+dev_z_2023      = (se_2023.*sg_2023 .- cal_v_2023_z.*se_2023_z.*sg_z).*g_pg .+ (se_2023.*(1- sg_2023) .- cal_v_2023_z.*se_2023_z.*(1 .- sg_z)).*g_ps    
+
+FS              = [0;cumsum( g_D .+ g_n )]
+FS_z_2023       = [0;cumsum( g_D .+ g_n .+ dev_z_2023[1:end-1] )]
+FS_z_1980       = [0;cumsum( g_D .+ g_n .+ dev_z_1980[1:end-1] )]
+
+plot(1980:2023, FS_z_2023 ,
     linestyle=:dash, lw=2.0,color=:black,
-    label=L"\mathcal{\hat{P}}_{2023,z} - \textrm{2023‑base \  Pref‑Chained \ FS \ Index}")
-plot!(1980:2023, FS_t_1980_τ ,
+    label = "FS Index (2023 Prices)")
+plot!(1980:2023, FS_z_1980 ,
     linestyle=:dot, lw=2.0, color=:black,
-    label=L"\mathcal{\hat{P}}_{1980,z} - \textrm{1980‑base \  Pref‑Chained \ FS \ Index}",
-    legend=(0.100, 0.920))
+    label = "FS Index (1980 Prices)",
+    legend=(0.15, 0.90))
     #title="Alternative Fisher-Shell Indices <br> (fixing prices)")
 
-plot!(1980:2023, FS , ylabel="Cumulative Growth",
+plot!(1980:2023, FS , ylabel="Cummulative Growth", 
     linestyle=:solid, lw=2.0,
-    minorgrid=false, color=:black,
+    minorgridalpha=0.5, color=:black,
     xticks=1980:5:2024, yticks=0.0:0.2:1.4,
-    ylim=(0.00, 1.40),
+    ylim=(0.00, 1.40),   
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,
     legendfont=legendfont,
-    label=L"\mathcal{D}_{z} \ \ \ \ \ \ - \textrm{Chained \ Divisia \ Index}",
+    label = "Chained Index",
     xrotation=45,
     framestyle=:box)
 
@@ -1278,12 +1227,12 @@ se_2023_z          = e_2023_z./(sim_eq["yt"][ z_prime ])
 
 sc                 = sim_eq["et"]./sim_eq["yt"]
    
-plot(1980:2023,sc,
-    label=L"s_{e,t}",
-    ylabel="Share of Consumption Expenditure\nin Gross Income",
+plot(1980:2023,sc, 
+    label="se(t)",
+    ylabel="Share of ConsumptionExpenditure <br> in Gross Income",
     linestyle=:solid, lw=2,
     xticks=1980:5:2025, yticks=0.0:0.50:5.00,
-    minorgrid=false, color=:black,
+    minorgridalpha=0.5, color=:black,
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,
     legend=(0.75, 0.92),
@@ -1292,10 +1241,10 @@ plot(1980:2023,sc,
     left_margin=5Plots.mm,  
     framestyle=:box) 
 
-plot!(1980:2023,se_1980_z,label=L"s_{e,1980,z}",
+plot!(1980:2023,se_1980_z,label="se(1980,z)",
     linestyle=:dot, lw=2,color=:black)
 
-plot!(1980:2023,se_2023_z,label=L"s_{e,2023,z}",
+plot!(1980:2023,se_2023_z,label="se(2023,z)",
     linestyle=:dash, lw=2,color=:black)
 
 if save_figures
@@ -1318,21 +1267,21 @@ t_prime    = t_base - 1980 + 1
 z_prime    = (1980:1:2023) .- 1980 .+ 1
 sg_1980_z  = sg_t_x.(t_prime,z_prime;χ=χ,η=η,γ=γ,Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"])    
 
-plot(1980:2023, sim_eq["sgt"], label=L"s_{g,t}",
+plot(1980:2023, sim_eq["sgt"], label="sg(t)",
     linestyle=:solid, lw=2,color=:black)
 
-plot!(1980:2023, sg_1980_z, label=L"s_{g,1980,z}",
+plot!(1980:2023, sg_1980_z, label="sg(1980,z)",
     linestyle=:dot, lw=2,color=:black)
 
-plot!(1980:2023, sg_2023_z, label=L"s_{g,2023,z}",
-    ylabel="Share of Goods in Consumption\nExpenditure",
+plot!(1980:2023, sg_2023_z, label="sg(2023,z)",
+    ylabel="Share of Goods in Consumption <br> Expenditure",
     linestyle=:dash, lw=2,
     xticks=1980:5:2025, yticks=0.000:0.05:0.300,
     ylims=(0.000, 0.300),
-    minorgrid=false, color=:black,
+    minorgridalpha=0.5, color=:black,
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,
-    legend=(0.85, 0.92),
+    legend=(0.75, 0.95),
     legendfont=legendfont,
     xrotation=45,
     left_margin=5Plots.mm,  
@@ -1346,39 +1295,39 @@ end
 
 #---------------------------------------------------------------
 ### Figure 7
-g_FS              = gD .+ g_n 
-g_FS_2023_2023_τ  = gD_2023_2023_τ
-g_FS_2010_2010_τ  = gD_2010_2010_τ
-g_FS_2000_2000_τ  = gD_2000_2000_τ
-g_FS_1990_1990_τ  = gD_1990_1990_τ
-g_FS_1980_1980_τ  = gD_1980_1980_τ
+g_FS              = g_D .+ g_n 
+g_FS_2023_z_2023  = g_D .+ g_n .+ dev_2023_z_2023[2:end]
+g_FS_2010_z_2010  = g_D .+ g_n .+ dev_2010_z_2010[2:end]
+g_FS_2000_z_2000  = g_D .+ g_n .+ dev_2000_z_2000[2:end]
+g_FS_1990_z_1990  = g_D .+ g_n .+ dev_1990_z_1990[2:end]
+g_FS_1980_z_1980  = g_D .+ g_n .+ dev_1980_z_1980[2:end]
 
-p = plot(1981:2023,g_FS_2023_2023_τ, label=L"\mathcal{P}_{2023,z} - \textrm{2023‑base \  FS \ Index}",
+p = plot(1981:2023, g_FS_2023_z_2023, label="FS Index (base 2023)",
     ylabel="Growth Rate",
     linestyle=:dash, lw=2.5,
     xticks=1980:5:2025, yticks=0.00:0.005:0.05,
-    minorgrid=false, color=:black,
+    minorgridalpha=0.2, color=:black,
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,
-    legend=(0.475, 0.400),
+    legend=(0.620, 0.600),
     legendfont=legendfont,
     xrotation=45,
     framestyle=:box)
 
-plot!(p, 1981:2023, g_FS_2010_2010_τ, label=L"\mathcal{P}_{2010,z} - \textrm{\ 2010‑base \  FS \ Index}",
+plot!(p, 1981:2023, g_FS_2010_z_2010, label="FS Index (base 2010)",
     linestyle=:dash, lw=2, color=:black)
 
-plot!(p, 1981:2023, g_FS_2000_2000_τ, label=L"\mathcal{P}_{2000,z} - \textrm{2000‑base \  FS \ Index}",
-    linestyle=:dash, lw=1.5, minorgrid=false, color=:black)
+plot!(p, 1981:2023, g_FS_2000_z_2000, label="FS Index (base 2000)",
+    linestyle=:dash, lw=1.5, minorgrid=true, minorgridalpha=0.2, color=:black)
 
-plot!(p, 1981:2023, g_FS_1990_1990_τ, label=L"\mathcal{P}_{1990,z} - \textrm{1990‑base \  FS \ Index}",
-    linestyle=:dash, lw=1.0, minorgrid=false, color=:black)
+plot!(p, 1981:2023, g_FS_1990_z_1990, label="FS Index (base 1990)",
+    linestyle=:dash, lw=1.0, minorgrid=true, minorgridalpha=0.2, color=:black)
 
-plot!(p, 1981:2023, g_FS_1980_1980_τ, label=L"\mathcal{P}_{1980,z} - \textrm{1980‑base \  FS \ Index}",
-    linestyle=:dash, lw=0.5, minorgrid=false, color=:black)
+plot!(p, 1981:2023, g_FS_1980_z_1980, label="FS Index (base 1980)",
+    linestyle=:dash, lw=0.5, minorgrid=true, minorgridalpha=0.2, color=:black)
 
-plot!(p, 1981:2023, g_FS , label=L"\mathcal{D}_{z} \ \ \ \ \ \ - \textrm{Chained \ Divisia \ Index}",
-    linestyle=:solid, lw=2, minorgrid=false, color=:black)
+plot!(p, 1981:2023, g_FS , label="Chained Index",
+    linestyle=:solid, lw=2, minorgrid=true, minorgridalpha=0.2, color=:black)
 
 xaxis!(p, minor_ticks=true, minor_tick_step=1.00)
 yaxis!(p, minor_ticks=true, minor_tick_step=0.01)
@@ -1425,51 +1374,52 @@ g_D[end] - g_D[1]
 #------------------------------------------------------------------------
 #APPENDIX C
 #Real Consumption Expenditure Indices
+
 gD_e_z     = g_D_e.(sim_eq["sgt"][2:end],g_cg,g_cs)
-D_e_z      = integrate_trap([0;gD_e_z .+ g_n])
+D_e_z      = cumsum(gD_e_z .+ g_n)
 
 #Base 2023
 t_base     = 2023
 t_prime    = t_base - 1980 + 1   
 z_prime    = (1980:1:2023) .- 1980 .+ 1
 
-g_e_2023_z = gD_e_z.*aux_e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])[2:end] 
-P_e_2023_z = integrate_trap([0;g_e_2023_z .+ g_n])
+g_e_2023_z = [0;gD_e_z].*aux_e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"]) 
+P_e_2023_z = cumsum(g_e_2023_z .+ g_n)
 
 #Base 1980
 t_base     = 1980
 t_prime    = t_base - 1980 + 1   
 z_prime    = (1980:1:2023) .- 1980 .+ 1
 
-g_e_1980_z = gD_e_z.*aux_e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])[2:end] 
-P_e_1980_z = integrate_trap([0;g_e_1980_z .+ g_n])
+g_e_1980_z = [0;gD_e_z].*aux_e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"]) 
+P_e_1980_z = cumsum(g_e_1980_z .+ g_n)
 #---------------------------------------------------------------
 
 #---------------------------------------------------------------
 ### Real Consumption Expenditure Indices - D_e_z, P_e_2023_z,P_e_1980_z
-plot(1980:2023, D_e_z, 
-    label =L"\mathcal{D_{e}}_{z} \ \ \ \ \ \ - \textrm{Chained \ Divisia \ Index}",
-    ylabel="Cumulative Growth in\nReal Consumption Expenditure",
+plot(1981:2023, D_e_z, 
+    label ="Chained Divisia Index",
+    ylabel="Cumulative Growth in <br> Real Consumption Expenditure ",
     linestyle=:solid, lw=2.0,
-    minorgrid=false, color=:black,
+    minorgridalpha=0.5, color=:black,
     xticks=1980:5:2025, 
     yticks=0.0:0.2:1.4,
     ylim=(0.00, 1.40),   
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,
     legendfont=legendfont,
-    legend=(0.100, 0.900),
+    legend=(0.15, 0.95),
     xrotation=45,
     left_margin=5Plots.mm,  
     framestyle=:box)
 
 plot!(1980:2023, P_e_2023_z, 
-    label=L"\mathcal{P_{e}}_{2023,z} - \textrm{2023‑base \  FS \ Index}",
+    label="FS Index (base 2023)",
     linestyle=:dash, lw=2.0, 
     color=:black)
 
 plot!(1980:2023, P_e_1980_z, 
-    label=L"\mathcal{P_{e}}_{1980,z} - \textrm{1980‑base \  FS \ Index}",
+    label="FS Index (base 1980)",
     linestyle=:dot, lw=2.0, 
     color=:black)
 
@@ -1478,3 +1428,63 @@ if save_figures
     println("Figure saved to: ", joinpath(figuresdir, "consumption_expenditure_indices.png"))
 end
 #---------------------------------------------------------------
+
+
+
+
+
+#---------------------------------------------------------------
+### Figure 5 (b)
+#Alternative Fisher-Shell Indices
+###Price Chained Fisher-Shell Index
+
+dev_t_z_τ(t, z, τ; χ, η, γ, ν_t, Pst, Pgt, yt, g_pg, g_ps)
+
+#For the prefernece chained index, we fix the base preference oredering at t = t_base
+#dev_(t_base)_(t_base)_i with i in 1980:2023 
+
+#For the price-chained index/fixed-base index, we fix the base preference oredering at t = t_base
+#dev_(t_base)_i_i with i in 1980:2023 
+
+
+#At Preferences of 1980
+t_base             = 1980
+t_prime            = t_base - 1980 + 1
+τ                  = (1980:1:2023)
+τ_prime            = τ .- 1980 .+ 1
+dev_1980_1980_τ    = dev_t_z_τ.(t_prime, t_prime, τ_prime; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+
+#At Preferences of 2023
+t_base             = 2023
+t_prime            = t_base - 1980 + 1
+τ                  = (1980:1:2023)
+τ_prime            = τ .- 1980 .+ 1
+dev_2023_2023_τ    = dev_t_z_τ.(t_prime, t_prime, τ_prime; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+
+#Compute the Indices
+
+D               = [0;cumsum( g_D .+ g_n )]
+FS_2023_2023_τ  = [0;cumsum( g_D .+ g_n .+ dev_2023_2023_τ[1:end-1] )]
+FS_1980_1980_τ  = [0;cumsum( g_D .+ g_n .+ dev_1980_1980_τ[1:end-1] )]
+#---------------------------------------------------------
+# Alternative Fisher-Shell Indices
+#### Price Chained Fisher-Shell Index
+## At Preferences of 1980, but letting prices move
+t_base             = 1980
+t_prime            = t_base - 1980 + 1
+τ                  = (1980:1:2023)
+τ_prime            = τ .- 1980 .+ 1
+z_prime            = (1980:1:2023) .- 1980 .+ 1
+dev_1980_z_τ       = dev_t_z_τ.(t_prime,z_prime,τ_prime; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+
+## At Prices of 2023
+t_base             = 2023
+t_prime            = t_base - 1980 + 1
+τ                  = (1980:1:2023)
+τ_prime            = τ .- 1980 .+ 1
+z_prime            = (1980:1:2023) .- 1980 .+ 1
+dev_2023_z_τ       = dev_t_z_τ.(t_prime,z_prime,τ_prime; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+
+FS                = [0;cumsum( g_D .+ g_n )]
+FS_2023_z_τ       = [0;cumsum( g_D .+ g_n .+ dev_2023_z_τ[1:end-1] )]
+FS_1980_z_τ       = [0;cumsum( g_D .+ g_n .+ dev_1980_z_τ[1:end-1] )]
