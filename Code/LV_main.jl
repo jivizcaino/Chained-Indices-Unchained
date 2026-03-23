@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 #Replication code for: Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement
 #By:                   Omar Licandro and Juan I. Vizcaino
-#This Version:         04/03/2026
+#This Version:         23/03/2026
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -318,25 +318,11 @@ Pg_t  = Pg.(calAx_t,Ag_t,wedge_Pg_Ps_trend)
 #------------------------------------------------------------------------------
 #TABLE 1
 growth_rates = DataFrame(
-Parameter    = ["θ (Capital Share)",
-                "ρ (Discount Rate)",
-                "δ (Depreciation Rate)",
-                "g_n (Population)", 
-                "g_h (Human Capital)", 
-                "g_calAx (Investment TFP)", 
-                "g_As (Services TFP)", 
-                "g_Ag (Goods TFP)",
-                "ζ (Price Wedge)"],
+Parameter    = ["θ (Capital Share)","ρ (Discount Rate)","δ (Depreciation Rate)", "g_n (Population)", "g_h (Human Capital)", 
+                "g_calAx (Investment TFP)", "g_As (Services TFP)", "g_Ag (Goods TFP)", "ζ (Price Wedge)"],
 
-Value       = [round(θ, digits=4),
-               round(ρ, digits=4),
-               round(δ, digits=4),   
-               round(g_n, digits=4), 
-               round(g_h, digits=4), 
-               round(g_calAx, digits=4),
-               round(g_As, digits=4), 
-               round(g_Ag, digits=4),
-               round(g_wedge_Pg_Ps, digits=4)])     
+Value       = [round(θ, digits=4), round(ρ, digits=4), round(δ, digits=4), round(g_n, digits=4), round(g_h, digits=4), 
+               round(g_calAx, digits=4), round(g_As, digits=4), round(g_Ag, digits=4), round(g_wedge_Pg_Ps, digits=4)])     
 
 io = IOBuffer()
 println(io, """
@@ -919,8 +905,6 @@ $(repeat("=", 60))
 year = 1980:2023
 plot(year, sim_eq["sgt"], label=L"s_{g,t} \textrm{- \ Model}", linestyle=:solid, color=:black, lw=2.00, 
     ylabel="Share of Goods in Consumption\nExpenditure",
-    #title="γ=$(round(γ, digits=3)), η=$(round(η, digits=3)), χ=$(round(χ, digits=3))",
-    #title= L"\gamma".s,
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,legendfont=legendfont,
     legend=(0.775, 0.900),
@@ -1115,7 +1099,7 @@ p = plot(1980:2023, FS_2023_2023_τ, label=L"\mathcal{P}_{2023,z} - \textrm{2023
     legend=(0.10, 0.920), legendfont=legendfont,
     xrotation=45, framestyle=:box)
 
-plot!(p, 1980:2023, FS_1980_1980_τ, label=L"\mathcal{P}_{1980,z} - \textrm{1980‑base \  Fisher‑Shell \ Index}",
+plot!(p, 1980:2023, FS_1980_1980_τ, label=L"\mathcal{L}_{1980,z} - \textrm{1980‑base \  Fisher‑Shell \ Index}",
     linestyle=:dot, lw=2, color=:black)
 
 plot!(p, 1980:2023, FS, label=L"\mathcal{D}_{z} \ \ \ \ \ \ - \textrm{Chained \ Divisia \ Index}",
@@ -1180,7 +1164,7 @@ plot(1980:2023, FS_2023_h_h ,
 
 plot!(1980:2023, FS_1980_h_h ,
     linestyle=:dot, lw=2.0, color=:black,
-    label=L"\mathcal{\hat{P}}_{1980,z} - \textrm{1980‑base \  Price‑Chained \ FS \ Index}",
+    label=L"\mathcal{\hat{L}}_{1980,z} - \textrm{1980‑base \  Price‑Chained \ FS \ Index}",
     legend=(0.100, 0.920))
 
 plot!(1980:2023, FS ,ylabel="Cumulative Growth",
@@ -1237,9 +1221,8 @@ plot(1980:2023, FS_t_2023_τ ,
     label=L"\mathcal{\hat{P}}_{2023,z} - \textrm{2023‑base \  Pref‑Chained \ FS \ Index}")
 plot!(1980:2023, FS_t_1980_τ ,
     linestyle=:dot, lw=2.0, color=:black,
-    label=L"\mathcal{\hat{P}}_{1980,z} - \textrm{1980‑base \  Pref‑Chained \ FS \ Index}",
+    label=L"\mathcal{\hat{L}}_{1980,z} - \textrm{1980‑base \  Pref‑Chained \ FS \ Index}",
     legend=(0.100, 0.920))
-    #title="Alternative Fisher-Shell Indices <br> (fixing prices)")
 
 plot!(1980:2023, FS , ylabel="Cumulative Growth",
     linestyle=:solid, lw=2.0,
@@ -1353,31 +1336,31 @@ g_FS_2000_2000_τ  = gD_2000_2000_τ
 g_FS_1990_1990_τ  = gD_1990_1990_τ
 g_FS_1980_1980_τ  = gD_1980_1980_τ
 
-p = plot(1981:2023,g_FS_2023_2023_τ, label=L"\mathcal{P}_{2023,z} - \textrm{2023‑base \  FS \ Index}",
+p = plot(1981:2023,g_FS_2023_2023_τ, label=L"g^{D}_{2023,z} - \textrm{2023‑base \  FS \ Index}",
     ylabel="Growth Rate",
     linestyle=:dash, lw=2.5,
     xticks=1980:5:2025, yticks=0.00:0.005:0.05,
     minorgrid=false, color=:black,
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,
-    legend=(0.475, 0.400),
+    legend=(0.475, 0.500),
     legendfont=legendfont,
     xrotation=45,
     framestyle=:box)
 
-plot!(p, 1981:2023, g_FS_2010_2010_τ, label=L"\mathcal{P}_{2010,z} - \textrm{\ 2010‑base \  FS \ Index}",
+plot!(p, 1981:2023, g_FS_2010_2010_τ, label=L"g^{D}_{2010,z} - \textrm{\ 2010‑base \  FS \ Index}",
     linestyle=:dash, lw=2, color=:black)
 
-plot!(p, 1981:2023, g_FS_2000_2000_τ, label=L"\mathcal{P}_{2000,z} - \textrm{2000‑base \  FS \ Index}",
+plot!(p, 1981:2023, g_FS_2000_2000_τ, label=L"g^{D}_{2000,z}- \textrm{2000‑base \  FS \ Index}",
     linestyle=:dash, lw=1.5, minorgrid=false, color=:black)
 
-plot!(p, 1981:2023, g_FS_1990_1990_τ, label=L"\mathcal{P}_{1990,z} - \textrm{1990‑base \  FS \ Index}",
+plot!(p, 1981:2023, g_FS_1990_1990_τ, label=L"g^{D}_{1990,z} - \textrm{1990‑base \  FS \ Index}",
     linestyle=:dash, lw=1.0, minorgrid=false, color=:black)
 
-plot!(p, 1981:2023, g_FS_1980_1980_τ, label=L"\mathcal{P}_{1980,z} - \textrm{1980‑base \  FS \ Index}",
+plot!(p, 1981:2023, g_FS_1980_1980_τ, label=L"g^{D}_{1980,z} - \textrm{1980‑base \  FS \ Index}",
     linestyle=:dash, lw=0.5, minorgrid=false, color=:black)
 
-plot!(p, 1981:2023, g_FS , label=L"\mathcal{D}_{z} \ \ \ \ \ \ - \textrm{Chained \ Divisia \ Index}",
+plot!(p, 1981:2023, g_FS , label=L"g^{D}_{z} \ \ \ \ \ \ - \textrm{Chained \ Divisia \ Index}",
     linestyle=:solid, lw=2, minorgrid=false, color=:black)
 
 xaxis!(p, minor_ticks=true, minor_tick_step=1.00)
@@ -1442,7 +1425,7 @@ t_prime    = t_base - 1980 + 1
 z_prime    = (1980:1:2023) .- 1980 .+ 1
 
 g_e_1980_z = gD_e_z.*aux_e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])[2:end] 
-P_e_1980_z = integrate_trap([0;g_e_1980_z .+ g_n])
+L_e_1980_z = integrate_trap([0;g_e_1980_z .+ g_n])
 #---------------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -1468,8 +1451,8 @@ plot!(1980:2023, P_e_2023_z,
     linestyle=:dash, lw=2.0, 
     color=:black)
 
-plot!(1980:2023, P_e_1980_z, 
-    label=L"\mathcal{P_{e}}_{1980,z} - \textrm{1980‑base \  FS \ Index}",
+plot!(1980:2023, L_e_1980_z, 
+    label=L"\mathcal{L_{e}}_{1980,z} - \textrm{1980‑base \  FS \ Index}",
     linestyle=:dot, lw=2.0, 
     color=:black)
 
