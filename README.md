@@ -3,7 +3,7 @@
 
 ## **Authors:** Omar Licandro and Juan Ignacio Vizcaino  
 
-### **This Version:** February 2026
+### **This Version:** March 2026
 ---
 
 ## Packege Overview
@@ -106,16 +106,16 @@ It will also run the SMM structural estimation and print the in the REPL all the
 If you use this replication package, please cite:
 
 ```markdown
-> Licandro, O. and Vizcaino, J. I. (2025).  
+> Licandro, O. and Vizcaino, J. I. (2026).  
 > *Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement.*
 ```
 
 ### BibTeX
 ```bibtex
-@article{LicandroVizcaino2025,
+@article{LV_2026,
   author  = {Licandro, Omar and Vizcaino, J. I.},
   title   = {Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement},
-  year    = {2025},
+  year    = {2026},
 }
 ```
 ---
