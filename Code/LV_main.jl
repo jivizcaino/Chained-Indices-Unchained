@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 #Replication code for: Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement
 #By:                   Omar Licandro and Juan I. Vizcaino
-#This Version:         07/04/2026
+#This Version:         14/04/2026
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -320,11 +320,7 @@ Pg_t  = Pg.(calAx_t,Ag_t,wedge_Pg_Ps_trend)
 growth_rates = DataFrame(
 Parameter    = ["θ (Capital Share)","ρ (Discount Rate)","δ (Depreciation Rate)", "g_n (Population)", "g_h (Human Capital)", 
                 "g_calAx (Investment TFP)", "g_As (Services TFP)", "g_Ag (Goods TFP)", "ζ (Price Wedge)"],
-Parameter    = ["θ (Capital Share)","ρ (Discount Rate)","δ (Depreciation Rate)", "g_n (Population)", "g_h (Human Capital)", 
-                "g_calAx (Investment TFP)", "g_As (Services TFP)", "g_Ag (Goods TFP)", "ζ (Price Wedge)"],
 
-Value       = [round(θ, digits=4), round(ρ, digits=4), round(δ, digits=4), round(g_n, digits=4), round(g_h, digits=4), 
-               round(g_calAx, digits=4), round(g_As, digits=4), round(g_Ag, digits=4), round(g_wedge_Pg_Ps, digits=4)])     
 Value       = [round(θ, digits=4), round(ρ, digits=4), round(δ, digits=4), round(g_n, digits=4), round(g_h, digits=4), 
                round(g_calAx, digits=4), round(g_As, digits=4), round(g_Ag, digits=4), round(g_wedge_Pg_Ps, digits=4)])     
 
@@ -729,6 +725,9 @@ gk  = log.(sim_eq["kt"][2:end]) .- log.(sim_eq["kt"][1:end-1])
 ge  = log.(sim_eq["et"][2:end]) .- log.(sim_eq["et"][1:end-1])
 gY  = log.(sim_eq["Yt"][2:end]) .- log.(sim_eq["Yt"][1:end-1])
 gE  = log.(sim_eq["Et"][2:end]) .- log.(sim_eq["Et"][1:end-1])
+
+g_pg = log.(sim_eq["Pgt"][2:end]) .- log.(sim_eq["Pgt"][1:end-1]) 
+g_ps = log.(sim_eq["Pst"][2:end]) .- log.(sim_eq["Pst"][1:end-1]) 
 #----------------------------------------------------------------
 
 #-----------------------------------------------------------------------------------------------------
@@ -1007,7 +1006,7 @@ t_prime            = t_base - 1980 + 1
 m_τ                = sim_eq["yt"][τ]
 
 mhat_2023_2023_τ = mhat_t_z_τ.(t_prime, t_prime, τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"],yt=sim_eq["yt"])
-dev_2023_2023_τ  = dev_t_z_τ.( t_prime, t_prime, τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"],yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+dev_2023_2023_τ  = dev_t_z_τ.( t_prime, t_prime, τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"],yt=sim_eq["yt"], g_pg=g_pg[1], g_ps=g_ps[1])
 
 #Sanity Checks
 @assert isapprox(dev_2023_2023_τ[end], 0.0; atol=1e-8)
@@ -1022,7 +1021,7 @@ t_prime            = t_base - 1980 + 1
 τ_prime            = (1980:1:2023) .- 1980 .+ 1
 
 mhat_2010_2010_τ = mhat_t_z_τ.(t_prime, t_prime, τ_prime;  χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"],  Pgt=sim_eq["Pgt"],  yt=sim_eq["yt"])
-dev_2010_2010_τ  = dev_t_z_τ.(t_prime, t_prime, τ_prime; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+dev_2010_2010_τ  = dev_t_z_τ.(t_prime, t_prime, τ_prime; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg[1], g_ps=g_ps[1])
 
 gD_2010_2010_τ   = ( m_τ[2:end] ./ mhat_2010_2010_τ[2:end] ) .* ( gD .+ g_n .+ dev_2010_2010_τ[2:end] )
 FS_2010_2010_τ   = integrate_trap([0;gD_2010_2010_τ])
@@ -1033,7 +1032,7 @@ t_prime          = t_base - 1980 + 1
 τ_prime          = (1980:1:2023) .- 1980 .+ 1
 
 mhat_2000_2000_τ = mhat_t_z_τ.(t_prime, t_prime, τ_prime;  χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"],  Pgt=sim_eq["Pgt"],  yt=sim_eq["yt"])
-dev_2000_2000_τ  = dev_t_z_τ.(t_prime, t_prime, τ_prime; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+dev_2000_2000_τ  = dev_t_z_τ.(t_prime, t_prime, τ_prime; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg[1], g_ps=g_ps[1])
 
 gD_2000_2000_τ   = ( m_τ[2:end] ./ mhat_2000_2000_τ[2:end] ) .* ( gD .+ g_n .+ dev_2000_2000_τ[2:end] )
 FS_2000_2000_τ   = integrate_trap([0;gD_2000_2000_τ])
@@ -1045,7 +1044,7 @@ t_prime            = t_base - 1980 + 1
 
 mhat_1990_1990_τ = mhat_t_z_τ.(t_prime, t_prime, τ_prime;  χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"],  yt=sim_eq["yt"])
 mhat_τ           = mhat_t_z_τ.(τ_prime, τ_prime, τ_prime;  χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"],  yt=sim_eq["yt"])
-dev_1990_1990_τ  =   dev_t_z_τ.(t_prime, t_prime, τ_prime; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+dev_1990_1990_τ  =   dev_t_z_τ.(t_prime, t_prime, τ_prime; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg[1], g_ps=g_ps[1])
 
 gD_1990_1990_τ   = ( m_τ[2:end] ./ mhat_1990_1990_τ[2:end]) .* ( gD .+ g_n .+ dev_1990_1990_τ[2:end] )
 FS_1990_1990_τ   = integrate_trap([0;gD_1990_1990_τ])
@@ -1056,7 +1055,7 @@ t_prime            = t_base - 1980 + 1
 τ_prime            = (1980:1:2023) .- 1980 .+ 1
 
 mhat_1980_1980_τ = mhat_t_z_τ.(t_prime,t_prime,τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"])
-dev_1980_1980_τ  = dev_t_z_τ.( t_prime,t_prime,τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+dev_1980_1980_τ  = dev_t_z_τ.( t_prime,t_prime,τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg[1], g_ps=g_ps[1])
 
 gD_1980_1980_τ   = ( m_τ[2:end] ./ mhat_1980_1980_τ[2:end]) .* ( gD .+ g_n .+ dev_1980_1980_τ[2:end] )
 FS_1980_1980_τ   = integrate_trap([0;gD_1980_1980_τ])
@@ -1071,7 +1070,6 @@ p = plot(1980:2023, FS_2023_2023_τ, label=L"\mathcal{P}_{2023,z} - \textrm{2023
     legend=(0.10, 0.920), legendfont=legendfont,
     xrotation=45, framestyle=:box)
 
-plot!(p, 1980:2023, FS_1980_1980_τ, label=L"\mathcal{L}_{1980,z} - \textrm{1980‑base \  Fisher‑Shell \ Index}",
 plot!(p, 1980:2023, FS_1980_1980_τ, label=L"\mathcal{L}_{1980,z} - \textrm{1980‑base \  Fisher‑Shell \ Index}",
     linestyle=:dot, lw=2, color=:black)
 
@@ -1107,7 +1105,7 @@ m_h                = sim_eq["yt"][h]
 
 mhat_1980_h_h      = mhat_t_z_τ.(t_prime, h, h; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"])
 mhat_h             = mhat_t_z_τ.(τ_prime, h, h; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"])
-dev_1980_h_h       =  dev_t_z_τ.(t_prime, h, h; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+dev_1980_h_h       =  dev_t_z_τ.(t_prime, h, h; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg[1], g_ps=g_ps[1])
 
 #Sanity Checks
 @assert isapprox(dev_1980_h_h[1], 0.0; atol=1e-8)
@@ -1123,7 +1121,7 @@ m_h                = sim_eq["yt"][h]
 
 mhat_2023_h_h      = mhat_t_z_τ.(t_prime, h, h; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"])
 mhat_h             = mhat_t_z_τ.(τ_prime, h, h; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"])
-dev_2023_h_h       =  dev_t_z_τ.(t_prime, h, h; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+dev_2023_h_h       =  dev_t_z_τ.(t_prime, h, h; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg[1], g_ps=g_ps[1])
 
 #Sanity Checks
 @assert isapprox(dev_2023_h_h[end], 0.0; atol=1e-8)
@@ -1137,7 +1135,6 @@ plot(1980:2023, FS_2023_h_h ,
 
 plot!(1980:2023, FS_1980_h_h ,
     linestyle=:dot, lw=2.0, color=:black,
-    label=L"\mathcal{\hat{L}}_{1980,z} - \textrm{1980‑base \  Price‑Chained \ FS \ Index}",
     label=L"\mathcal{\hat{L}}_{1980,z} - \textrm{1980‑base \  Price‑Chained \ FS \ Index}",
     legend=(0.100, 0.920))
 
@@ -1171,7 +1168,7 @@ t               = (1980:1:2023) .- 1980 .+ 1
 m_τ             = sim_eq["yt"][τ]
 
 mhat_t_1980_τ   = mhat_t_z_τ.(t, z_prime, τ ;  χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"],  Pgt=sim_eq["Pgt"],  yt=sim_eq["yt"])
-dev_t_1980_τ    =  dev_t_z_τ.(t, z_prime, τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+dev_t_1980_τ    =  dev_t_z_τ.(t, z_prime, τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg[1], g_ps=g_ps[1])
 
 gD_t_1980_τ     = ( m_τ[2:end] ./ mhat_t_1980_τ[2:end] ) .* ( gD .+ g_n .+ dev_t_1980_τ[2:end] )
 FS_t_1980_τ     = integrate_trap([0;gD_t_1980_τ])
@@ -1185,7 +1182,7 @@ t               = (1980:1:2023) .- 1980 .+ 1
 m_τ             = sim_eq["yt"][τ]
 
 mhat_t_2023_τ   = mhat_t_z_τ.(t, z_prime, τ ;  χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"],  Pgt=sim_eq["Pgt"],  yt=sim_eq["yt"])
-dev_t_2023_τ    =  dev_t_z_τ.(t, z_prime, τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg, g_ps=g_ps)
+dev_t_2023_τ    =  dev_t_z_τ.(t, z_prime, τ; χ=χ, η=η, γ=γ, ν_t=ν_t, Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"], yt=sim_eq["yt"], g_pg=g_pg[1], g_ps=g_ps[1])
 
 gD_t_2023_τ      = ( m_τ[2:end] ./ mhat_t_2023_τ[2:end]) .* ( gD .+ g_n .+ dev_t_2023_τ[2:end] )
 FS_t_2023_τ      = integrate_trap([0;gD_t_2023_τ])
@@ -1195,7 +1192,6 @@ plot(1980:2023, FS_t_2023_τ ,
     label=L"\mathcal{\hat{P}}_{2023,z} - \textrm{2023‑base \  Pref‑Chained \ FS \ Index}")
 plot!(1980:2023, FS_t_1980_τ ,
     linestyle=:dot, lw=2.0, color=:black,
-    label=L"\mathcal{\hat{L}}_{1980,z} - \textrm{1980‑base \  Pref‑Chained \ FS \ Index}",
     label=L"\mathcal{\hat{L}}_{1980,z} - \textrm{1980‑base \  Pref‑Chained \ FS \ Index}",
     legend=(0.100, 0.920))
 
@@ -1277,7 +1273,6 @@ z_prime    = (1980:1:2023) .- 1980 .+ 1
 sg_1980_z  = sg_t_x.(t_prime,t_prime;χ=χ,η=η,γ=γ,Pst=sim_eq["Pst"], Pgt=sim_eq["Pgt"])    
 
 plot(1980:2023, sim_eq["sgt"], label=L"s_{g,z}",linestyle=:solid, lw=2,color=:black)
-
 plot!(1980:2023, fill(sg_1980_z, length(1980:2023)), label=L"s_{g,1980,z}",
     linestyle=:dot, lw=2,color=:black)
 
@@ -1310,8 +1305,7 @@ g_FS_2000_2000_τ  = gD_2000_2000_τ
 g_FS_1990_1990_τ  = gD_1990_1990_τ
 g_FS_1980_1980_τ  = gD_1980_1980_τ
 
-p = plot(1981:2023,g_FS_2023_2023_τ, label=L"g^{D}_{2023,z} - \textrm{2023‑base \  FS \ Index}",
-p = plot(1981:2023,g_FS_2023_2023_τ, label=L"g^{D}_{2023,z} - \textrm{2023‑base \  FS \ Index}",
+p = plot(1981:2023, g_FS_2023_2023_τ, label=L"g^{D}_{2023,z} - \textrm{2023‑base \  FS \ Index}",
     ylabel="Growth Rate",
     linestyle=:dash, lw=2.5,
     xticks=1980:5:2025, yticks=0.00:0.005:0.05,
@@ -1319,28 +1313,22 @@ p = plot(1981:2023,g_FS_2023_2023_τ, label=L"g^{D}_{2023,z} - \textrm{2023‑ba
     xtickfont=tickfont, ytickfont=tickfont,
     xguidefont=guidefont, yguidefont=guidefont,
     legend=(0.475, 0.500),
-    legend=(0.475, 0.500),
     legendfont=legendfont,
     xrotation=45,
     framestyle=:box)
 
 plot!(p, 1981:2023, g_FS_2010_2010_τ, label=L"g^{D}_{2010,z} - \textrm{\ 2010‑base \  FS \ Index}",
-plot!(p, 1981:2023, g_FS_2010_2010_τ, label=L"g^{D}_{2010,z} - \textrm{\ 2010‑base \  FS \ Index}",
     linestyle=:dash, lw=2, color=:black)
 
-plot!(p, 1981:2023, g_FS_2000_2000_τ, label=L"g^{D}_{2000,z}- \textrm{2000‑base \  FS \ Index}",
 plot!(p, 1981:2023, g_FS_2000_2000_τ, label=L"g^{D}_{2000,z}- \textrm{2000‑base \  FS \ Index}",
     linestyle=:dash, lw=1.5, minorgrid=false, color=:black)
 
 plot!(p, 1981:2023, g_FS_1990_1990_τ, label=L"g^{D}_{1990,z} - \textrm{1990‑base \  FS \ Index}",
-plot!(p, 1981:2023, g_FS_1990_1990_τ, label=L"g^{D}_{1990,z} - \textrm{1990‑base \  FS \ Index}",
     linestyle=:dash, lw=1.0, minorgrid=false, color=:black)
 
 plot!(p, 1981:2023, g_FS_1980_1980_τ, label=L"g^{D}_{1980,z} - \textrm{1980‑base \  FS \ Index}",
-plot!(p, 1981:2023, g_FS_1980_1980_τ, label=L"g^{D}_{1980,z} - \textrm{1980‑base \  FS \ Index}",
     linestyle=:dash, lw=0.5, minorgrid=false, color=:black)
 
-plot!(p, 1981:2023, g_FS , label=L"g^{D}_{z} \ \ \ \ \ \ - \textrm{Chained \ Divisia \ Index}",
 plot!(p, 1981:2023, g_FS , label=L"g^{D}_{z} \ \ \ \ \ \ - \textrm{Chained \ Divisia \ Index}",
     linestyle=:solid, lw=2, minorgrid=false, color=:black)
 
@@ -1366,7 +1354,7 @@ $(repeat("=", 60))
 
 #------------------------------------------------------------------------
 #APPENDIX A.1
-#Decomposition of the Decline 
+#Decomposition of the Decline of the Growth Rate
 πg  = sim_eq["Pgt"][2:end]./sim_eq["Pgt"][1:end-1] .- 1
 πs  = sim_eq["Pst"][2:end]./sim_eq["Pst"][1:end-1] .- 1
 πD  = s_e[2:end].*( sim_eq["sgt"][2:end].*πg .+ sim_eq["sst"][2:end].*πs ) 
@@ -1374,8 +1362,7 @@ $(repeat("=", 60))
 s_e[end]
 100*(πD[1] - πD[end])
 
-
-#Alternative Decomposition of the Decline in the Growth Rate
+#Alternative Decomposition of the Decline of the Growth Rate
 x_t         = sim_eq["Xt"]./sim_eq["Nt"]
 s_e         = sim_eq["Et"]./sim_eq["Yt"]
 sg_t        = sim_eq["sgt"]
@@ -1386,9 +1373,88 @@ g_cs        = sim_eq["cst"][2:end]./sim_eq["cst"][1:end-1] .- 1
 g_x         = x_t[2:end]./x_t[1:end-1] .- 1
 
 g_D         = s_e[2:end].*( sim_eq["sgt"][2:end].*g_cg .+ sim_eq["sst"][2:end].*g_cs  ) .+ (1 .- s_e[2:end]).*g_x
-g_D[end] - g_D[1]
+g_D[end]  - g_D[1]
 #------------------------------------------------------------------------
 
+#------------------------------------------------------------------------
+#APPENDIX A.5
+#Cuantitative Evaluation of Condition (S_g,t0) in Step 1
+#   s_g,t0 < min_{z∈(t0,t1)} [ π_s/(π_s-π_g) · exp(coeff·(t0-z)) ]
+#   where coeff = χ/(1-χ)·π_s - γ·(π_s - π_g)
+
+let
+    z_range        = 1980:1:2023
+    t0, t1         = 1980, 2023
+
+    lhs            = sg_1980_z
+    exponent_coeff = (χ/(1-χ))*πs[1] - γ*(πs[1] - πg[1])
+    prefactor      = πs[1] / (πs[1] - πg[1])
+    rhs_vec        = prefactor .* exp.(exponent_coeff .* (t0 .- z_range))
+    rhs_min        = minimum(rhs_vec)
+
+    println(""" 
+        $(repeat("=", 60))
+        CONDITION (S_g,t0)
+        s_g,t0 < min_z [ π_s/(π_s-π_g) · exp(coeff·(t0-z)) ]
+        
+        $(repeat("=", 60))
+        LHS
+        s_g,t0                                    = $(round(lhs, digits=4))
+
+        Exponent coefficient  [χ/(1-χ)·π_s - γ·(π_s-π_g)]
+        = $(round(exponent_coeff, sigdigits=4))
+        $(exponent_coeff < 0 ?
+        "→ coeff < 0: min approached as z → t0⁺; RHS simplifies to π_s/(π_s-π_g)" :
+        "→ coeff ≥ 0: min attained at z = t1 = $t1")
+
+        RHS components
+        Prefactor  π_s/(π_s-π_g)                  = $(round(prefactor, digits=4))
+        min_z [ π_s/(π_s-π_g)·exp(coeff·(t0-z)) ] = $(round(rhs_min, digits=4))
+
+        Conclusion
+          Condition (S_g,t0) holds (LHS < RHS)?      $(lhs < rhs_min ? "YES ✓" : "NO ✗")
+        $(repeat("=", 60))
+        """)
+end
+
+#------------------------------------------------------------------------
+#Cuantitative Evaluation of Condition (S_g,t1) in Step 1
+#   s_g,t1 < min_{z∈(t0,t1)} [ π_s/(π_s-π_g) · exp(coeff·(t1-z)) ]
+#   where coeff = χ/(1-χ)·π_s - γ·(π_s - π_g)
+
+let
+    z_range        = 1980:1:2023
+    t0, t1         = 1980, 2023
+
+    lhs            = sg_2023_z
+    exponent_coeff = (χ/(1-χ))*πs[end] - γ*(πs[end] - πg[end])
+    prefactor      = πs[end] / (πs[end] - πg[end])
+    rhs_vec        = prefactor .* exp.(exponent_coeff .* (t1 .- z_range))
+    rhs_min        = minimum(rhs_vec)
+
+    println("""
+        $(repeat("=", 60))
+        CONDITION (S_g,t1)
+          s_g,t1 < min_z [ π_s/(π_s-π_g) · exp(coeff·(t1-z)) ]
+        $(repeat("=", 60))
+        LHS
+          s_g,t1                                    = $(round(lhs, digits=4))
+
+        Exponent coefficient  [χ/(1-χ)·π_s - γ·(π_s-π_g)]  (at t1)
+          = $(round(exponent_coeff, sigdigits=4))
+          $(exponent_coeff < 0 ?
+            "→ coeff < 0: min attained at z → t1⁻; RHS → π_s/(π_s-π_g)" :
+            "→ coeff ≥ 0: min attained at z = t0 = $t0")
+
+        RHS components
+          Prefactor  π_s/(π_s-π_g)  (at t1)         = $(round(prefactor, digits=4))
+          min_z [ π_s/(π_s-π_g)·exp(coeff·(t1-z)) ] = $(round(rhs_min, digits=4))
+
+        Conclusion
+          Condition (S_g,t1) holds (LHS < RHS)?      $(lhs < rhs_min ? "YES ✓" : "NO ✗")
+        $(repeat("=", 60))
+        """)
+end
 #------------------------------------------------------------------------
 #APPENDIX C
 #Real Consumption Expenditure Indices
@@ -1403,6 +1469,30 @@ z_prime    = (1980:1:2023) .- 1980 .+ 1
 g_e_2023_z = gD_e_z.*aux_e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])[2:end] 
 P_e_2023_z = integrate_trap([0;g_e_2023_z .+ g_n])
 
+#Base 2010
+t_base     = 2010
+t_prime    = t_base - 1980 + 1   
+z_prime    = (1980:1:2023) .- 1980 .+ 1
+
+g_e_2010_z = gD_e_z.*aux_e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])[2:end] 
+P_e_2010_z = integrate_trap([0;g_e_2010_z .+ g_n])
+
+#Base 2000
+t_base     = 2000
+t_prime    = t_base - 1980 + 1   
+z_prime    = (1980:1:2023) .- 1980 .+ 1
+
+g_e_2000_z = gD_e_z.*aux_e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])[2:end] 
+P_e_2000_z = integrate_trap([0;g_e_2000_z .+ g_n])
+
+#Base 1990
+t_base     = 1990
+t_prime    = t_base - 1980 + 1   
+z_prime    = (1980:1:2023) .- 1980 .+ 1
+
+g_e_1990_z = gD_e_z.*aux_e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])[2:end] 
+P_e_1990_z = integrate_trap([0;g_e_1990_z .+ g_n])
+
 #Base 1980
 t_base     = 1980
 t_prime    = t_base - 1980 + 1   
@@ -1410,7 +1500,53 @@ z_prime    = (1980:1:2023) .- 1980 .+ 1
 
 g_e_1980_z = gD_e_z.*aux_e_t_x.(t_prime,z_prime;χ=χ,ν_t=ν_t,Pst=sim_eq["Pst"])[2:end] 
 L_e_1980_z = integrate_trap([0;g_e_1980_z .+ g_n])
-L_e_1980_z = integrate_trap([0;g_e_1980_z .+ g_n])
+#---------------------------------------------------------------
+
+#---------------------------------------------------------------
+### Real Consumption Expenditure Indices - D_e_z, P_e_2023_z,P_e_1980_z
+ plot(1981:2023, g_e_2023_z, 
+    label =L"g^{D}_{e}_{2023,z}  - \textrm{2023‑base \  FS \ Index}",
+    linestyle=:dash, lw=2.5, 
+    color=:black)
+
+plot!(1981:2023, g_e_2010_z, 
+    label =L"g^{D}_{e}_{2010,z}  - \textrm{2010‑base \  FS \ Index}",
+    linestyle=:dash, lw=2.0, 
+    color=:black)
+
+plot!(1981:2023, g_e_2000_z, 
+    label =L"g^{D}_{e}_{2000,z}  - \textrm{2000‑base \  FS \ Index}",
+    linestyle=:dash, lw=1.5, 
+    color=:black)
+
+plot!(1981:2023, g_e_1990_z, 
+    label =L"g^{D}_{e}_{1990,z}  - \textrm{1990‑base \  FS \ Index}",
+    linestyle=:dash, lw=1.0, 
+    color=:black)
+    
+plot!(1981:2023, g_e_1980_z, 
+    label=L"g^{D}_{e}_{1980,z} - \textrm{1980‑base \  FS \ Index}",
+    linestyle=:dash, lw=0.5, 
+    color=:black)
+plot!(1981:2023, gD_e_z, 
+    label =L"g^{D}_{e}_{z} \ \ \ \ \ \ - \textrm{Chained \ Divisia \ Index}",
+    ylabel="Growth Rate of Real \n Consumption Expenditure",
+    linestyle=:solid, lw=2.0,
+    minorgrid=false, color=:black,
+    xticks=1980:5:2025, 
+    #yticks=0.0:0.2:1.4,
+    ylim=(0.010, 0.025),   
+    xtickfont=tickfont, ytickfont=tickfont,
+    xguidefont=guidefont, yguidefont=guidefont,
+    legendfont=legendfont,
+    legend=(0.100, 0.900),
+    xrotation=45,
+    left_margin=5Plots.mm,  
+    framestyle=:box)
+if save_figures
+    savefig(joinpath(figuresdir, "growth_consumption_expenditure_indices.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "growth_consumption_expenditure_indices.png"))
+end
 #---------------------------------------------------------------
 
 #---------------------------------------------------------------
@@ -1436,15 +1572,61 @@ plot!(1980:2023, P_e_2023_z,
     linestyle=:dash, lw=2.0, 
     color=:black)
 
-plot!(1980:2023, L_e_1980_z, 
-    label=L"\mathcal{L_{e}}_{1980,z} - \textrm{1980‑base \  FS \ Index}",
+
 plot!(1980:2023, L_e_1980_z, 
     label=L"\mathcal{L_{e}}_{1980,z} - \textrm{1980‑base \  FS \ Index}",
     linestyle=:dot, lw=2.0, 
     color=:black)
-
 if save_figures
     savefig(joinpath(figuresdir, "consumption_expenditure_indices.png"))
     println("Figure saved to: ", joinpath(figuresdir, "consumption_expenditure_indices.png"))
 end
 #---------------------------------------------------------------
+
+#---------------------------------------------------------------
+### Growth Rates of Real Consumption Expenditure Indices for Different Base Periods
+ plot(1981:2023, g_e_2023_z, 
+    label =L"g^{D}_{e}_{2023,z}",
+    linestyle=:dash, lw=2.5, 
+    color=:black)
+
+plot!(1981:2023, g_e_2010_z, 
+    label =L"g^{D}_{e}_{2010,z}",
+    linestyle=:dash, lw=2.0, 
+    color=:black)
+
+plot!(1981:2023, g_e_2000_z, 
+    label =L"g^{D}_{e}_{2000,z}",
+    linestyle=:dash, lw=1.5, 
+    color=:black)
+
+plot!(1981:2023, g_e_1990_z, 
+    label =L"g^{D}_{e}_{1990,z}",
+    linestyle=:dash, lw=1.0, 
+    color=:black)
+    
+plot!(1981:2023, g_e_1980_z, 
+    label=L"g^{D}_{e}_{1980,z}",
+    linestyle=:dash, lw=0.5, 
+    color=:black)
+plot!(1981:2023, gD_e_z, 
+    label =L"g^{D}_{e}_{z}",
+    ylabel="Growth Rate of Real \n Consumption Expenditure",
+    linestyle=:solid, lw=2.0,
+    minorgrid=false, color=:black,
+    xticks=1980:5:2025, 
+    #yticks=0.0:0.2:1.4,
+    #ylim=(0.010, 0.025),   
+    xtickfont=tickfont, ytickfont=tickfont,
+    xguidefont=guidefont, yguidefont=guidefont,
+    legendfont=legendfont,
+    legend=(0.800, 0.900),
+    xrotation=45,
+    left_margin=5Plots.mm,  
+    framestyle=:box)
+if save_figures
+    savefig(joinpath(figuresdir, "growth_consumption_expenditure_indices.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "growth_consumption_expenditure_indices.png"))
+end
+#---------------------------------------------------------------
+
