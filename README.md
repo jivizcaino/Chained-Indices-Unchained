@@ -112,7 +112,7 @@ If you use this replication package, please cite:
 
 ### BibTeX
 ```bibtex
-@article{LV_2026,
+@article{LV_CIU_2026,
   author  = {Licandro, Omar and Vizcaino, J. I.},
   title   = {Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement},
   year    = {2026},
