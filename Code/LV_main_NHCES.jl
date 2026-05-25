@@ -1,7 +1,8 @@
 #------------------------------------------------------------------------------
 #Replication code for: Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement
+#Benchmark HRV 2021 Model Under NHCES Preferences
 #By:                   Omar Licandro and Juan I. Vizcaino
-#This Version:         14/04/2026
+#This Version:         05/2026
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -18,10 +19,7 @@ using Pkg
 #Pkg.instantiate()
 
 using XLSX, DataFrames, BlackBoxOptim ,  Statistics
-using OrderedCollections, OrderedCollections, LsqFit,  Random, PrettyTables
-#using MathJaxRenderer
-using LaTeXStrings
-using Plots; gr()
+using OrderedCollections, OrderedCollections, LsqFit,  Random, PrettyTables, LaTeXStrings, Plots; gr()
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -30,7 +28,7 @@ using Plots; gr()
 save_figures = false
 
 # Set to true to run SMM estimation, false to use pre-estimated parameters
-run_smm      = false
+run_smm      = true
 
 # Choose which moment/specification to use for SMM estimation:
 #   :baseline  — matches goods consumption expenditure share (s_g) in levels;
@@ -490,7 +488,6 @@ Pg_t  = Pg.(calAx_t,Ag_t,wedge_Pg_Ps_trend)
 
 #------------------------------------------------------------------------------
 # Simulate the Model Under NHCES Preferences
-# Option A:
 #   Initialize the economy on the aggregate BGP in 1980,
 #   then simulate the true NHCES dynamics thereafter.
 #------------------------------------------------------------------------------
@@ -861,6 +858,7 @@ function sim_model_full_nhces(params::Vector{Float64};Pg_t::Vector{Float64},Ps_t
     return eq
 end
 
+
 #------------------------------------------------------------------------------
 # Alternative simulation: ωc is a FREE parameter (not calibrated to match
 # the initial goods share).  C0 is recovered via solve_C_from_E directly.
@@ -1217,17 +1215,16 @@ function debug_sim_nhces(params::Vector{Float64};
 end
 #------------------------------------------------------------------------------
 
-run_smm = false
-#------------------------------------------------------------------------------
 
+#------------------------------------------------------------------------------
 if run_smm
 
     if smm_spec ∈ (:baseline, :both)
     println("Running SMM Estimation...")
     println("Estimating ηs only; fixing σ = 0.05, ηg = 1, and calibrating ωc to match the 1980 goods share.")
 
-    σ_fixed  = 0.00001
-    ηg       = 1.00000
+    σ_fixed  = 0.010
+    ηg       = 1.000
 
     ### Initial goods expenditure share in the data
     sg0_data = VAC_GOOD_SHARE[1]
@@ -1538,13 +1535,12 @@ else
 
     # TODO: update σ and ηs after running the optimizer (run_smm = true)
     ωc = 0.242602      # pre-estimated; 
-    σ  = 0.0001        # pre-estimated; 
-    ηs = 1.182618      # pre-estimated; 
+    σ  = 0.01          # pre-estimated; 
+    ηs = 1.20000       # pre-estimated; 
 
     # ωc is calibrated internally by sim_model_full_nhces to match VAC_GOOD_SHARE[1].
 end
 #------------------------------------------------------------------------------
-
 
 #-----------------------------------------------------------------------------------------------------
 # Simulate the Model with the Calibrated Parameters
@@ -1580,19 +1576,6 @@ gE      = log.(Et_f[2:end])  .- log.(Et_f[1:end-1])
 
 g_pg    = log.(Pgt_f[2:end]) .- log.(Pgt_f[1:end-1])
 g_ps    = log.(Pst_f[2:end]) .- log.(Pst_f[1:end-1])
-
-
-println("""
-$(repeat("=", 60))
-NHCES ABGP (ABGP = $(round(g_abgp, digits=5)))
-$(repeat("=", 60))
-         t=1980   t=2023
-  gk :   $(round(gk[1],  digits=5))   $(round(gk[end],  digits=5))
-  ge :   $(round(ge[1],  digits=5))   $(round(ge[end],  digits=5))
-  gY :   $(round(gY[1],  digits=5))   $(round(gY[end],  digits=5))
-  gE :   $(round(gE[1],  digits=5))   $(round(gE[end],  digits=5))
-$(repeat("=", 60))
-""")
 #----------------------------------------------------------------
 
 #-----------------------------------------------------------------------------------------------------
@@ -1617,8 +1600,8 @@ plot!(year, VAC_GOOD_SHARE, label=L"s_{g,t} \textrm{- \ Data}",  linestyle=:dot,
     minorgrid=false, color=:black,left_margin=5Plots.mm,framestyle=:box)
 
 if save_figures 
-    savefig(joinpath(figuresdir, "sg_t_Model_Fit.png"))
-    println("Figure saved to: ", joinpath(figuresdir, "sg_t_Model_Fit.png"))
+    savefig(joinpath(figuresdir, "sg_t_Model_Fit_NHCES.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "sg_t_Model_Fit_NHCES.png"))
 end
 #----------------------------------------------------------
 
@@ -1658,8 +1641,8 @@ plot!(1980:2023, log.(GDP_data),label = "Chained Index - Data",
     legend=(0.15, 0.90))
 
 if save_figures 
-    savefig(joinpath(figuresdir,"GDP_Model_vs_Data.png"))
-    println("Figure saved to: ", joinpath(figuresdir, "GDP_Model_vs_Data.png"))
+    savefig(joinpath(figuresdir,"GDP_Model_vs_Data_NHCES.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "GDP_Model_vs_Data_NHCES.png"))
 end
 #---------------------------------------------------------
 
@@ -1713,8 +1696,8 @@ plot!(1981:2023, g_FS ,label = "Model - FS Chained Index",
     framestyle=:box)
 
 if save_figures 
-    savefig(joinpath(figuresdir,"GDP_Growth_Model_vs_Data.png"))
-    println("Figure saved to: ", joinpath(figuresdir, "GDP_Growth_Model_vs_Data.png"))
+    savefig(joinpath(figuresdir,"GDP_Growth_Model_vs_Data_NHCES.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "GDP_Growth_Model_vs_Data_NHCES.png"))
 end
 #---------------------------------------------------------------
 
@@ -1749,20 +1732,15 @@ _sg_hat(t, z) = sg_hat_nhces(t, z;
 
 τ   = (1980:1:2023) .- 1980 .+ 1
 T   = length(τ)
+#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-# NHCES Fisher-Shell Indices — EV definition (eq. 50), Object A
+# NHCES Fisher-Shell Indices — EV definition
 # Fix t = τ at the base year; let z roll from 1980 to 2023:
-#   m̂_{t,z,t} = y_t + (Φ_t(P_t) − Φ_t(P_z)) / ν_t,  t=τ=base year, z∈1980:2023
-# (Object A: rolling reference-price year z, fixed income and preferences at base year t)
-#
-# At z = base year the price correction vanishes: m̂_{t,t,t} = y_t exactly.
-# m̂ is always positive in this calibration.
-#
-# FS index: P_{t,z} = log(m̂_{t,z,t}) − log(m̂_{t,z_0,t})  where z_0 = 1980
+# m̂_{t,z,t} = y_t + (Φ_t(P_t) − Φ_t(P_z)) / ν_t,  t=τ=base year, z∈1980:2023
 #------------------------------------------------------------------------------
 
-# Base year t0 = 2023 — Object A: m̂_{t,z,t}, z rolling (t=τ=2023)
+# Base year t0 = 2023 — m̂_{t,τ,z}, z rolling (t=τ=2023)
 t_base           = 2023
 t_prime          = t_base - 1980 + 1
 mhat_2023_2023_τ = [_mhat(t_prime, t_prime,zi) for zi in τ]
@@ -1770,7 +1748,7 @@ mhat_2023_2023_τ = [_mhat(t_prime, t_prime,zi) for zi in τ]
 FS_2023_2023_τ   = log.(mhat_2023_2023_τ) .- log.(mhat_2023_2023_τ[1])
 g_2023_2023_τ    = diff(FS_2023_2023_τ) 
 
-# Base year t0 = 2010 — Object A: m̂_{t,z,t}, z rolling (t=τ=2010)
+# Base year t0 = 2010 — m̂_{t,τ,z}, z rolling (t=τ=2010)
 t_base           = 2010
 t_prime          = t_base - 1980 + 1
 mhat_2010_2010_τ = [_mhat(t_prime, t_prime,zi) for zi in τ]
@@ -1778,25 +1756,25 @@ mhat_2010_2010_τ = [_mhat(t_prime, t_prime,zi) for zi in τ]
 FS_2010_2010_τ   = log.(mhat_2010_2010_τ) .- log.(mhat_2010_2010_τ[1]) 
 g_2010_2010_τ    = diff(FS_2010_2010_τ) 
 
-# Base year t0 = 2000 — Object A: m̂_{t,z,t}, z rolling (t=τ=2000)
+# Base year t0 = 2000 — m̂_{t,τ,z}, z rolling (t=τ=2000)
 t_base           = 2000
 t_prime          = t_base - 1980 + 1
 mhat_2000_2000_τ = [_mhat(t_prime, t_prime, zi ) for zi in τ]
 @assert isapprox(mhat_2000_2000_τ[t_prime], yt_f[t_prime]; rtol=1e-10)
 FS_2000_2000_τ   = log.(mhat_2000_2000_τ) .- log.(mhat_2000_2000_τ[1]) 
 
-# Base year t0 = 1990 — Object A: m̂_{t,z,t}, z rolling (t=τ=1990)
+# Base year t0 = 1990 — m̂_{t,τ,z}, z rolling (t=τ=1990)
 t_base           = 1990
 t_prime          = t_base - 1980 + 1
 mhat_1990_1990_τ = [_mhat(t_prime, t_prime, zi) for zi in τ]
 @assert isapprox(mhat_1990_1990_τ[t_prime], yt_f[t_prime]; rtol=1e-10)
 FS_1990_1990_τ   = log.(mhat_1990_1990_τ) .- log.(mhat_1990_1990_τ[1]) 
 
-# Base year t0 = 1980 — Object A: m̂_{t,z,t}, z rolling (t=τ=1980)
+# Base year t0 = 1980 — m̂_{t,τ,z}, z rolling (t=τ=1980)
 t_base           = 1980
 t_prime          = t_base - 1980 + 1
 mhat_1980_1980_τ = [_mhat(t_prime, t_prime,zi) for zi in τ]
-@assert isapprox(mhat_1980_1980_τ[1], yt_f[t_prime]; rtol=1e-10)    # at z=t=1980: m̂=y_1980
+@assert isapprox(mhat_1980_1980_τ[1], yt_f[t_prime]; rtol=1e-10)    
 FS_1980_1980_τ   = log.(mhat_1980_1980_τ) .- log.(mhat_1980_1980_τ[1]) 
 g_1980_1980_τ    = diff(FS_1980_1980_τ)
 
@@ -1839,8 +1817,8 @@ plot!(p, 1980:2023, FS, label=L"\mathcal{D}_{z} \ \ \ \ \ \ - \textrm{Chained \ 
     linestyle=:solid, lw=2, color=:black)
 
 if save_figures
-    savefig(joinpath(figuresdir,"FS_BBEV.png"))
-    println("Figure saved to: ", joinpath(figuresdir, "FS_BBEV.png"))
+    savefig(joinpath(figuresdir,"FS_BBEV_NHCES.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "FS_BBEV_NHCES.png"))
 end
 
 #Differences Between Fixed-Base and Chained Indices
@@ -1891,8 +1869,8 @@ plot!(1980:2023,se_2023_z,label=L"s_{e,2023,z}",
     linestyle=:dash, lw=2,color=:black)
 
 if save_figures
-    savefig(joinpath(figuresdir,"se_t.png"))
-    println("Figure saved to: ", joinpath(figuresdir, "se_t.png"))
+    savefig(joinpath(figuresdir,"se_t_NHCES.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "se_t_NHCES.png"))
 end
 #---------------------------------------------------------------
 
@@ -1924,8 +1902,8 @@ plot!(1980:2023, fill(sg_2023_z, length(1980:2023)), label=L"s_{g,2023,z}",
     framestyle=:box)
 
 if save_figures
-    savefig(joinpath(figuresdir, "sg_t_z.png"))
-    println("Figure saved to: ", joinpath(figuresdir, "sg_t_z.png"))
+    savefig(joinpath(figuresdir, "sg_t_z_NHCES.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "sg_t_z_NHCES.png"))
 end
 #---------------------------------------------------------------
 
@@ -1969,10 +1947,12 @@ xaxis!(p, minor_ticks=true, minor_tick_step=1.00)
 yaxis!(p, minor_ticks=true, minor_tick_step=0.01)
 
 if save_figures
-    savefig(joinpath(figuresdir, "FS_GrowthRates_1980_2023.png"))
-    println("Figure saved to: ", joinpath(figuresdir, "FS_GrowthRates_1980_2023.png"))
+    savefig(joinpath(figuresdir, "FS_GrowthRates_1980_2023_NHCES.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "FS_GrowthRates_1980_2023_NHCES.png"))
 end
+#---------------------------------------------------------------
 
+#---------------------------------------------------------------
 #Decline in the Growth Rate Between 1981 and 2023 for the Chained Index
 decline_growth_rate = (g_FS[end] - g_FS[1]) * 100
 
