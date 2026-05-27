@@ -29,6 +29,9 @@ save_figures = false
 
 # Set to true to run SMM estimation, false to use pre-estimated parameters
 run_smm      = false
+
+# Choose σ when run_smm = false. Available values: 0.01, 0.10, 0.20, 0.30, 0.34
+σ_choice     = 0.340
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -855,7 +858,7 @@ if run_smm
 println("Running SMM Estimation...")
 println("Estimating ηs only; fixing σ = 0.05, ηg = 1, and calibrating ωc to match the 1980 goods share.")
 
-    σ_fixed  = 0.010
+    σ_fixed  = 0.340
     ηg       = 1.000
 
     ### Initial goods expenditure share in the data
@@ -908,7 +911,7 @@ println("Estimating ηs only; fixing σ = 0.05, ηg = 1, and calibrating ωc to 
     ### σ is fixed at σ_fixed.
     ### ηg is fixed at 1.
     ParamSpace = [
-        (1.00001, 3.000)    # ηs
+        (1.00001, 5.000)    # ηs
     ]
 
     ### Seeds for repeated global optimization
@@ -931,10 +934,10 @@ println("Estimating ηs only; fixing σ = 0.05, ηg = 1, and calibrating ωc to 
                 SearchRange=ParamSpace,
                 TraceMode=:compact,
                 Method=:adaptive_de_rand_1_bin,
-                PopulationSize=100,
-                MaxFuncEvals=50_000,
-                FitnessTolerance=1e-20,
-                MaxStepsWithoutProgress=500_000,
+                PopulationSize          = 100,
+                MaxFuncEvals            = 50_000,
+                FitnessTolerance        = 1e-20,
+                MaxStepsWithoutProgress = 20_000,
                 rng=MersenneTwister(seed)
             )
 
@@ -1021,12 +1024,29 @@ else
 
     ηg = 1.0
 
-    # TODO: update σ and ηs after running the optimizer (run_smm = true)
-    ωc = 0.242602      # pre-estimated
-    σ  = 0.01          # pre-estimated
-    ηs = 1.20000       # pre-estimated
+    # Pre-estimated parameters for each σ value
+    # σ_choice (set in Configuration block) selects the calibration.
+    # Available σ values: 0.01, 0.10, 0.20, 0.30, 0.34
+    nhces_params = Dict(
+        0.01 => (σ=0.010000, ωc=0.243124, ηs=1.201051),
+        0.10 => (σ=0.100000, ωc=0.245369, ηs=1.418465),
+        0.20 => (σ=0.200000, ωc=0.247977, ηs=1.854578),
+        0.30 => (σ=0.300000, ωc=0.250759, ηs=2.931970),
+        0.34 => (σ=0.340000, ωc=0.251939, ηs=3.991059),
+    )
 
-    # ωc is calibrated internally by sim_model_full_nhces to match VAC_GOOD_SHARE[1].
+    if !haskey(nhces_params, σ_choice)
+        error("σ_choice = $σ_choice is not available. Choose from: $(sort(collect(keys(nhces_params))))")
+    end
+
+    p_sel = nhces_params[σ_choice]
+    σ     = p_sel.σ
+    ωc    = p_sel.ωc
+    ηs    = p_sel.ηs
+
+    println("Selected σ = $σ  →  ωc = $ωc,  ηs = $ηs")
+
+    # ωc is also calibrated internally by sim_model_full_nhces to match VAC_GOOD_SHARE[1].
 end
 #------------------------------------------------------------------------------
 # Simulate the Model with the Calibrated Parameters
@@ -1450,5 +1470,3 @@ Chained Index (2023 - 1981): $(round(decline_growth_rate, digits=2)) percentage 
 $(repeat("=", 60))
 """)
 #---------------------------------------------------------------
-
-

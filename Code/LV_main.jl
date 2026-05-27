@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 #Replication code for: Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement
 #By:                   Omar Licandro and Juan I. Vizcaino
-#This Version:         14/04/2026
+#This Version:         04/2026
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
