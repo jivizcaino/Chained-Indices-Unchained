@@ -25,13 +25,13 @@ using OrderedCollections, OrderedCollections, LsqFit,  Random, PrettyTables, LaT
 #------------------------------------------------------------------------------
 #Configuration 
 # Set to true to save figures, false to only display
-save_figures = false
+save_figures = true
 
 # Set to true to run SMM estimation, false to use pre-estimated parameters
 run_smm      = false
 
 # Choose σ when run_smm = false. Available values: 0.01, 0.10, 0.20, 0.30, 0.34
-σ_choice     = 0.340
+σ_choice     = 0.20
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
