@@ -3,7 +3,7 @@
 
 ## **Authors:** Omar Licandro and Juan Ignacio Vizcaino  
 
-### **This Version:** April 2026
+### **This Version:** May 2026
 ---
 
 ## Packege Overview
@@ -29,6 +29,7 @@ Chained_Indices_Unchained/
 │
 ├── Code/
 │   ├── LV_main.jl           # Main replication script
+    ├── LV_main_NHCES.jl     # Alternative model version under NHCES preferences
 │   ├── Project.toml         # Julia environment (package list)
 │   └── Manifest.toml        # Exact package versions (for full reproducibility)
 │
@@ -80,7 +81,7 @@ Pkg.instantiate()     # installs all required packages
 4. Run the main replication script
 
 ```julia
-include("main.jl")
+include("LV_main.jl")
 ```
 
 The script will:
@@ -93,7 +94,7 @@ The script will:
 ---
 
 ## Output
-Running ```main.jl``` will create the output figures and save them in:
+Running ```LV_main.jl``` will create the output figures and save them in:
 
 ```Figures/```
 
