@@ -27,7 +27,8 @@ using Pkg
 #Pkg.instantiate()
 
 using XLSX, DataFrames, BlackBoxOptim ,  Statistics
-using MathJaxRenderer, LaTeXStrings, LsqFit, Random, OrderedCollections, PrettyTables
+using MathJaxRenderer
+using LaTeXStrings, LsqFit, Random, OrderedCollections, PrettyTables
 using Plots; gr()
 #------------------------------------------------------------------------------
 
