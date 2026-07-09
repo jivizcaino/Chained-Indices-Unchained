@@ -43,8 +43,10 @@ figuresdir = abspath(joinpath(currentdir, "..", "Figures"))
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-# Packages  (no BlackBoxOptim / LsqFit needed: HCD requires no estimation)
+# Packages  (no BlackBoxOptim needed: HCD requires no preference estimation.
+#            LsqFit is used only by the :logistic Engel-curve smoother.)
 using XLSX, DataFrames, Statistics
+using LsqFit
 using LaTeXStrings
 using Plots; gr()
 #------------------------------------------------------------------------------
@@ -66,6 +68,18 @@ share_source        = :data
 #   :abgp   →  ln E_t = g_abgp·(t−1980)  (the model's ABGP consumption path)
 #   :model  →  log.(Float64.(sim_eq["et"]))  (requires `sim_eq` in scope)
 expenditure_source  = :abgp
+
+# SMOOTHED ENGEL CURVE  m̂_g(Ω).  As in Licandro's note, the goods share fed into
+# the indices is a smooth monotone trend fitted through the (Ω_t, s_g,t) pairs,
+# NOT the raw annual share — this removes the business-cycle / measurement wiggles
+# that would otherwise contaminate the Divisia growth rate and the fixed-base
+# share-change terms.
+#   :none      →  use the raw share (no smoothing)
+#   :poly      →  least-squares polynomial of degree `poly_deg` in lnΩ  (base Julia)
+#   :logistic  →  decreasing 4-parameter logistic in lnΩ  (monotone; needs LsqFit)
+smooth_share_method = :logistic
+poly_deg            = 3        # only used when smooth_share_method = :poly
+n_share_iter        = 3        # Ω↔m̂_g(Ω) fixed-point passes (2–3 is plenty; Ω barely moves)
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -82,6 +96,53 @@ function integrate_trap(g::AbstractVector)
         out[i] = out[i-1] + 0.5*(g[i-1] + g[i])
     end
     return out
+end
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# Engel-curve smoothing:  m̂_g(Ω) fitted through the (lnΩ_t, s_g,t) scatter.
+#
+# _fit_share returns a closure  φ(lnΩ) → share  for the chosen method.
+# Polynomial: centred/scaled design for conditioning.
+# Logistic:   decreasing 4-parameter S-curve, monotone by construction.
+#------------------------------------------------------------------------------
+function _fit_share(x::AbstractVector, y::AbstractVector, method::Symbol, deg::Int)
+    if method == :poly
+        μ, σ = mean(x), std(x)
+        z    = (x .- μ) ./ σ
+        V    = reduce(hcat, [z .^ p for p in 0:deg])     # Vandermonde
+        β    = V \ collect(y)                            # OLS
+        return lnΩ -> begin
+            zz = (lnΩ - μ) / σ
+            sum(β[p+1] * zz^p for p in 0:deg)
+        end
+
+    elseif method == :logistic
+        # share(x) = c + L / (1 + exp(k (x - x0))),  L>0, k>0  ⇒  decreasing
+        model(x, p) = p[4] .+ p[1] ./ (1 .+ exp.(p[2] .* (x .- p[3])))
+        p0  = [max(y[1] - y[end], 1e-3), 1.0, mean(x), min(y[end], y[1])]
+        fit = curve_fit(model, collect(x), collect(y), p0)
+        p   = fit.param
+        return lnΩ -> p[4] + p[1] / (1 + exp(p[2] * (lnΩ - p[3])))
+
+    else
+        error("smooth_share_method must be :none, :poly, or :logistic")
+    end
+end
+
+# Fit m̂_g(Ω) and evaluate it, iterating the Ω ↔ share fixed point a few times
+# (Ω depends on the share through eq. 5, so re-fit as the smoothed share updates).
+function smooth_engel_share(sg_raw, lnE, lnPg, lnPs;
+                            method::Symbol, deg::Int, n_iter::Int)
+    method == :none && return Float64.(sg_raw)
+    sg = Float64.(sg_raw)
+    local φ
+    for _ in 1:max(n_iter, 1)
+        lnΩ = lnE .- sg .* lnPg .- (1 .- sg) .* lnPs          # eq. 5, current share
+        φ   = _fit_share(lnΩ, sg_raw, method, deg)           # fit trend through DATA
+        sg  = clamp.(φ.(lnΩ), 1e-6, 1 - 1e-6)                # evaluate smoothed trend
+    end
+    return sg
 end
 #------------------------------------------------------------------------------
 
@@ -137,17 +198,8 @@ Tn    = length(years)
 
 Pg_t  = Pg_t_data
 Ps_t  = Ps_t_data
-
-# Goods consumption-expenditure share
-if share_source == :data
-    sg_t = Float64.(VAC_GOOD_SHARE)
-elseif share_source == :model
-    @assert (@isdefined sim_eq) "share_source = :model requires a PIGL/NHCES `sim_eq` in scope."
-    sg_t = Float64.(sim_eq["sgt"])
-else
-    error("share_source must be :data or :model")
-end
-ss_t = 1 .- sg_t
+lnPg  = log.(Pg_t)
+lnPs  = log.(Ps_t)
 
 # Consumption expenditure per capita (level is irrelevant — it cancels in every index)
 if expenditure_source == :abgp
@@ -160,14 +212,37 @@ else
 end
 E_t = exp.(lnE_t)
 
-# Sectoral per-capita consumption quantities
+# RAW goods consumption-expenditure share (the noisy data)
+if share_source == :data
+    sg_raw = Float64.(VAC_GOOD_SHARE)
+elseif share_source == :model
+    @assert (@isdefined sim_eq) "share_source = :model requires a PIGL/NHCES `sim_eq` in scope."
+    sg_raw = Float64.(sim_eq["sgt"])
+else
+    error("share_source must be :data or :model")
+end
+
+# SMOOTHED share = fitted Engel curve m̂_g(Ω) evaluated along the sample.
+# All indices below use sg_t (the trend), so the wiggles never enter.
+sg_t = smooth_engel_share(sg_raw, lnE_t, lnPg, lnPs;
+                          method = smooth_share_method, deg = poly_deg, n_iter = n_share_iter)
+ss_t = 1 .- sg_t
+
+# Fit quality (smoothed trend vs raw share)
+share_rmse = sqrt(mean((sg_t .- sg_raw).^2))
+share_mono = all(diff(sg_t) .<= 1e-10)   # true if the trend is (weakly) monotone decreasing
+
+
+
+# Sectoral per-capita consumption quantities (built from the SMOOTHED share)
 cg_t = sg_t .* E_t ./ Pg_t
 cs_t = ss_t .* E_t ./ Ps_t
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # HCD real consumption  (note eq. 5):  ln Ω_t = ln E_t − sg_t ln Pg_t − ss_t ln Ps_t
-lnΩ_t = lnE_t .- sg_t .* log.(Pg_t) .- ss_t .* log.(Ps_t)
+# (built from the SMOOTHED share, consistent with the last smoothing pass)
+lnΩ_t = lnE_t .- sg_t .* lnPg .- ss_t .* lnPs
 lnΩ0  = lnΩ_t[1]
 #------------------------------------------------------------------------------
 
@@ -218,6 +293,7 @@ println("""
 $(repeat("=", 64))
 HCD — Consumption Expenditure Indices (cumulative growth, 1980→2023)
 share_source = $(share_source) | expenditure_source = $(expenditure_source) | aggregate = $(aggregate_index)
+Engel-curve smoothing = $(smooth_share_method)$(smooth_share_method == :poly ? " (deg $(poly_deg))" : "")  |  trend RMSE vs data = $(round(share_rmse, digits=4))  |  monotone↓ = $(share_mono)
 $(repeat("=", 64))
   Chained Divisia    D_e                : $(round(D_e[end],       digits=4))
   1980-base (Laspeyres) L_e             : $(round(L_e_1980[end],  digits=4))
@@ -235,6 +311,28 @@ $(repeat("=", 64))
 tickfont   = font(12)
 guidefont  = font(12)
 legendfont = font(12)
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# Figure — Engel curve: raw goods share vs the smoothed trend m̂_g(Ω) used downstream
+plot(years, sg_raw,
+    label = L"s_{g,t} \textrm{ - \ Data}",
+    ylabel = "Share of Goods in Consumption\nExpenditure",
+    seriestype = :scatter, markersize = 3, markercolor = :gray, markerstrokewidth = 0,
+    xticks = 1980:5:2025, minorgrid = false,
+    xtickfont = tickfont, ytickfont = tickfont,
+    xguidefont = guidefont, yguidefont = guidefont,
+    legendfont = legendfont, legend = (0.775, 0.900),
+    xrotation = 45, left_margin = 5Plots.mm, framestyle = :box)
+
+plot!(years, sg_t,
+    label = L"\hat{m}_{g}(\Omega_t) \textrm{ - \ Smoothed \ trend}",
+    linestyle = :solid, lw = 2.0, color = :black)
+
+if save_figures
+    savefig(joinpath(figuresdir, "HCD_goods_share_smoothed.png"))
+    println("Figure saved to: ", joinpath(figuresdir, "HCD_goods_share_smoothed.png"))
+end
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
