@@ -22,6 +22,9 @@ run_smm      = false
 # Set to true to re-estimate η and γ for a given fixed value of χ
 run_smm_fixed_chi = false
 chi_fixed         = 0.36
+
+# Set to true to run the Konus decomposition of the fixed-base bias in the consumption expenditure indices
+run_konus_decomp = false  
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -1714,3 +1717,84 @@ if save_figures
 end
 #---------------------------------------------------------------
 
+
+#-=============================================================================
+# APPEND TO THE END OF  LV_main.jl   (PIGL)
+#
+# Konus INCOME-vs-SUBSTITUTION decomposition of the fixed-base bias in the
+# consumption-expenditure quantity index.  Same object and split as the NHCES
+# block (see that file for the derivation):
+#
+#   G_total       = current-base (2023) − base-base (1980) consumption qty index
+#                 = P_e_2023_z[end] − L_e_1980_z[end]      (already built above)
+#   G_income(ref) = [ s_g^H(p_ref,u_T) − s_g^H(p_ref,u_0) ] · Δln(P_g/P_s)
+#                   with the compensated share's PRICE argument FROZEN at p_ref
+#   G_subst       = G_total − G_income                      (share price response)
+#
+# PIGL compensated goods share at (utility period t, price period z):
+#   sg_t_x(t, z; χ, η, γ, Pst, Pgt)      (already defined in this file; uses ν_t)
+#
+# Uses objects already defined in this file:
+#   P_e_2023_z, L_e_1980_z, sg_t_x, χ, η, γ, ν_t, sim_eq
+#-=============================================================================
+
+if run_konus_decomp
+  const DECOMP_CSV = abspath(joinpath(@__DIR__, "consumption_index_decomposition.csv"))
+  function upsert_decomp_row(path, model, G_total, G_inc_1980, G_inc_2023, G_inc_avg, G_sub_avg)
+      header = "model,G_total,G_income_1980,G_income_2023,G_income_avg,G_subst_avg"
+      newline = join(string.((model, G_total, G_inc_1980, G_inc_2023, G_inc_avg, G_sub_avg)), ",")
+      keep = String[]
+      if isfile(path)
+          for l in readlines(path)
+              (isempty(strip(l)) || l == header || startswith(l, string(model, ","))) && continue
+              push!(keep, l)
+          end
+      end
+      open(path, "w") do io
+          println(io, header)
+          foreach(l -> println(io, l), keep)
+          println(io, newline)
+      end
+      return nothing
+  end
+
+  Pgt      = sim_eq["Pgt"]; Pst = sim_eq["Pst"]
+  i0       = 1
+  iT       = length(Pst)                                     # 1980 → 2023
+  Δln_PgPs = (log(Pgt[iT]) - log(Pgt[i0])) - (log(Pst[iT]) - log(Pst[i0]))   # Δ ln(P_g/P_s)
+
+  # PIGL compensated goods share at (utility period t, price period z)
+  sgh(t, z)  = sg_t_x(t, z; χ=χ, η=η, γ=γ, Pst=Pst, Pgt=Pgt)
+
+  # ---- TOTAL gap : current-base (2023) minus base-base (1980) quantity index ----
+  # read off the exact Fisher–Shell consumption indices already constructed above
+  G_total    = P_e_2023_z[end] - L_e_1980_z[end]
+
+  # ---- INCOME part : freeze the compensated share's price argument at p_ref ------
+  G_income_1980 = (sgh(iT, i0) - sgh(i0, i0)) * Δln_PgPs
+  G_income_2023 = (sgh(iT, iT) - sgh(i0, iT)) * Δln_PgPs
+  G_income_avg  = 0.5 * (G_income_1980 + G_income_2023)
+
+  # ---- SUBSTITUTION part : residual ---------------------------------------------
+  G_subst_avg = G_total - G_income_avg
+
+  upsert_decomp_row(DECOMP_CSV, "PIGL", G_total, G_income_1980, G_income_2023, G_income_avg, G_subst_avg)
+
+  println("""
+  $(repeat("=", 68))
+  PIGL — Konus income/substitution decomposition (consumption, 1980→2023)
+  $(repeat("=", 68))
+    Δ ln(P_g/P_s)                       = $(round(Δln_PgPs, digits=4))
+  $(repeat("-", 68))
+    G_total  (current-base − base-base)  = $(round(G_total, digits=4))
+    G_income (freeze @1980 prices)       = $(round(G_income_1980, digits=4))
+    G_income (freeze @2023 prices)       = $(round(G_income_2023, digits=4))
+    G_income (average)                   = $(round(G_income_avg, digits=4))
+    G_subst  (residual)                  = $(round(G_subst_avg, digits=4))
+  $(repeat("-", 68))
+    income sign  = $(sign(G_income_avg) > 0 ? "+ (as in HCD)" : "−")
+    subst  sign  = $(sign(G_subst_avg)  > 0 ? "+" : "−")   |  flips total? $(sign(G_total) != sign(G_income_avg))
+    → wrote row to $(DECOMP_CSV)
+  $(repeat("=", 68))
+  """)
+end

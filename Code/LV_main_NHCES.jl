@@ -25,10 +25,10 @@ using OrderedCollections, OrderedCollections, LsqFit,  Random, PrettyTables, LaT
 #------------------------------------------------------------------------------
 #Configuration 
 # Set to true to save figures, false to only display
-save_figures = true
+save_figures = false
 
 # Set to true to run SMM estimation, false to use pre-estimated parameters
-run_smm      = true
+run_smm      = false
 
 # Choose σ when run_smm = false. Available values: 0.01, 0.10, 0.20, 0.30, 0.34
 σ_choice     = 0.20
@@ -1470,3 +1470,94 @@ Chained Index (2023 - 1981): $(round(decline_growth_rate, digits=2)) percentage 
 $(repeat("=", 60))
 """)
 #---------------------------------------------------------------
+
+exit(0)
+
+#-==============================================================================
+# APPEND TO THE END OF  LV_main_NHCES.jl
+#
+# Konus INCOME-vs-SUBSTITUTION decomposition of the fixed-base bias in the
+# consumption-expenditure quantity index.
+#
+# Object of interest — the utility-dependence of the consumption Konus COLI,
+# i.e. the gap between the current-base (2023) and base-base (1980) true
+# quantity indices:
+#
+#   G_total = [ lnE(p_T,u_T) − lnE(p_T,u_0) ] − [ lnE(p_0,u_T) − lnE(p_0,u_0) ]
+#           = ΔP(u_T) − ΔP(u_0)          (zero iff preferences are homothetic)
+#
+# Decomposition (exact; G_subst is the residual):
+#   G_income(ref) = [ s_g^H(p_ref,u_T) − s_g^H(p_ref,u_0) ] · Δln(P_g/P_s)
+#                   (compensated share change with its PRICE argument FROZEN
+#                    at p_ref → shares move only with utility: the HCD case)
+#   G_subst       = G_total − G_income     (the share's price response)
+#
+# Prediction: under HCD G_subst ≡ 0; under NHCES the substitution term is what
+# can flip the sign of G_total relative to HCD.
+#
+# Uses objects already defined in this file:
+#   Ehat_nhces, sg_hat_nhces, E_nhces, ν_t, ωc, σ, ηg, ηs, ψ, Pgt_f, Pst_f, ct_f, et_f
+#-==============================================================================
+
+# ---- shared output helper: upsert one row per model into a common CSV --------
+const DECOMP_CSV = abspath(joinpath(@__DIR__, "consumption_index_decomposition.csv"))
+function upsert_decomp_row(path, model, G_total, G_inc_1980, G_inc_2023, G_inc_avg, G_sub_avg)
+    header = "model,G_total,G_income_1980,G_income_2023,G_income_avg,G_subst_avg"
+    newline = join(string.((model, G_total, G_inc_1980, G_inc_2023, G_inc_avg, G_sub_avg)), ",")
+    keep = String[]
+    if isfile(path)
+        for l in readlines(path)
+            (isempty(strip(l)) || l == header || startswith(l, string(model, ","))) && continue
+            push!(keep, l)
+        end
+    end
+    open(path, "w") do io
+        println(io, header)
+        foreach(l -> println(io, l), keep)
+        println(io, newline)
+    end
+    return nothing
+end
+
+# ---- endpoints ---------------------------------------------------------------
+i0 = 1
+iT = length(ct_f)                                    # 1980 → 2023
+Δln_PgPs = (log(Pgt_f[iT]) - log(Pgt_f[i0])) - (log(Pst_f[iT]) - log(Pst_f[i0]))   # Δ ln(P_g/P_s)
+
+# compensated objects at (utility period t, price period z)
+Eh(t, z)  = Ehat_nhces(t, z;    ν_t=ν_t, Pgt=Pgt_f, Pst=Pst_f, ωc=ωc, σ=σ, ηg=ηg, ηs=ηs, ψ=ψ)
+sgh(t, z) = sg_hat_nhces(t, z;  ν_t=ν_t, Pgt=Pgt_f, Pst=Pst_f, ωc=ωc, σ=σ, ηg=ηg, ηs=ηs, ψ=ψ)
+
+# ---- TOTAL gap : current-base (2023) minus base-base (1980) quantity index ----
+G_total = (log(Eh(iT, iT)) - log(Eh(i0, iT))) - (log(Eh(iT, i0)) - log(Eh(i0, i0)))
+
+# ---- INCOME part : freeze the compensated share's price argument at p_ref ------
+G_income_1980 = (sgh(iT, i0) - sgh(i0, i0)) * Δln_PgPs
+G_income_2023 = (sgh(iT, iT) - sgh(i0, iT)) * Δln_PgPs
+G_income_avg  = 0.5 * (G_income_1980 + G_income_2023)
+
+# ---- SUBSTITUTION part : residual ---------------------------------------------
+G_subst_avg = G_total - G_income_avg
+
+upsert_decomp_row(DECOMP_CSV, "NHCES", G_total, G_income_1980, G_income_2023, G_income_avg, G_subst_avg)
+
+# sanity: Eh(t,t) should reproduce actual consumption expenditure e_t
+println("""
+$(repeat("=", 68))
+NHCES — Konus income/substitution decomposition (consumption, 1980→2023)
+$(repeat("=", 68))
+  sanity  Eh(1980,1980)/e_1980   = $(round(Eh(i0,i0)/et_f[i0], digits=4))  (→ 1)
+  sanity  Eh(2023,2023)/e_2023   = $(round(Eh(iT,iT)/et_f[iT], digits=4))  (→ 1)
+  Δ ln(P_g/P_s)                  = $(round(Δln_PgPs, digits=4))
+$(repeat("-", 68))
+  G_total  (current-base − base-base) = $(round(G_total, digits=4))
+  G_income (freeze @1980 prices)      = $(round(G_income_1980, digits=4))
+  G_income (freeze @2023 prices)      = $(round(G_income_2023, digits=4))
+  G_income (average)                  = $(round(G_income_avg, digits=4))
+  G_subst  (residual)                 = $(round(G_subst_avg, digits=4))
+$(repeat("-", 68))
+  income sign  = $(sign(G_income_avg) > 0 ? "+ (as in HCD)" : "−")
+  subst  sign  = $(sign(G_subst_avg)  > 0 ? "+" : "−")   |  flips total? $(sign(G_total) != sign(G_income_avg))
+  → wrote row to $(DECOMP_CSV)
+$(repeat("=", 68))
+""")
