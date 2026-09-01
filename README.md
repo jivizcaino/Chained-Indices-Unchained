@@ -1,22 +1,22 @@
-# Replication Package  
-# **___Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement___**  
+# Replication Package
+# **___Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement___**
+## **Authors:** Omar Licandro and Juan Ignacio Vizcaino
+### **This Version:** September 2026
 
-## **Authors:** Omar Licandro and Juan Ignacio Vizcaino  
-
-### **This Version:** May 2026
 ---
 
-## Packege Overview
+## Package Overview
+
 This repository contains the complete replication package for the paper:
 
 > **Licandro, O. and Vizcaino, J. I. (2026)**  
-> *Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement.*
+> *Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement.*  
+> CESifo Working Paper No. 12946, CESifo, Munich.
 
 The package includes:
-
-- The **Julia replication code**  
-- The **input data** used in the analysis  
-- **Scripts and functions** to compute results and generate figures  
+- The **Julia replication code**
+- The **input data** used in the analysis
+- **Scripts and functions** to compute results and generate figures
 - A folder for **output figures**
 
 All code is written to be fully **self-contained** and **portable**. It uses relative paths and a dedicated Julia project environment, so it should run identically on any machine.
@@ -24,12 +24,13 @@ All code is written to be fully **self-contained** and **portable**. It uses rel
 ---
 
 ## Repository structure
+
 ```text
-Chained_Indices_Unchained/
+Chained-Indices-Unchained/
 │
 ├── Code/
 │   ├── LV_main.jl           # Main replication script
-    ├── LV_main_NHCES.jl     # Alternative model version under NHCES preferences
+│   ├── LV_main_NHCES.jl     # Alternative model version under NHCES preferences
 │   ├── Project.toml         # Julia environment (package list)
 │   └── Manifest.toml        # Exact package versions (for full reproducibility)
 │
@@ -43,8 +44,11 @@ Chained_Indices_Unchained/
 └── LICENSE
 ```
 
+---
+
 ## Requirements
-- Julia: 1.10 or later (or your actual version)
+
+- Julia 1.10 or later
 - Internet connection on first run (to download packages)
 
 All package dependencies are explicitly listed in `Project.toml` and locked via `Manifest.toml`.
@@ -53,23 +57,22 @@ All package dependencies are explicitly listed in `Project.toml` and locked via 
 
 ## How to Run the Replication Code
 
-1. Clone this repository 
-Replace <your-username> and <your-repo> with your actual GitHub info:
+**1. Clone this repository**
 
 ```bash
-git clone https://github.com/<your-username>/<your-repo>.git
-cd <your-repo>/Code
+git clone https://github.com/jivizcaino/Chained-Indices-Unchained.git
+cd Chained-Indices-Unchained/Code
 ```
 
-2. Start Julia with the project environment
+**2. Start Julia with the project environment**
 
 ```bash
 julia --project=.
 ```
 
-(or start Julia and run `] activate .>` in the REPL)
+(or start Julia and run `] activate .` in the REPL)
 
-3.Instantiate the environment
+**3. Instantiate the environment**
 
 Inside Julia:
 
@@ -78,27 +81,32 @@ using Pkg
 Pkg.instantiate()     # installs all required packages
 ```
 
-4. Run the main replication script
+**4. Run the main replication script**
 
 ```julia
 include("LV_main.jl")
 ```
 
 The script will:
-- Load the Excel data from ../Data/
+- Load the Excel data from `../Data/`
 - Run the computations, including the SMM structural estimation
 - Generate the figures
-- Save the figures into ../Figures/
-- Print the in the REPL all the calculations reported in the quantitative section of the paper
+- Save the figures into `../Figures/`
+- Print in the REPL all the calculations reported in the quantitative section of the paper
+
+**5. Run the NHCES version**
+
+```julia
+include("LV_main_NHCES.jl")
+```
+
+This reproduces the results under NHCES preferences reported in the paper.
 
 ---
 
 ## Output
-Running ```LV_main.jl``` will create the output figures and save them in:
 
-```Figures/```
-
-It will also run the SMM structural estimation and print the in the REPL all the calculations reported in the quantitative section of the paper.
+Running `LV_main.jl` creates the output figures and saves them in `Figures/`. It also runs the SMM structural estimation and prints in the REPL all the calculations reported in the quantitative section of the paper. Running `LV_main_NHCES.jl` does the same for the NHCES specification.
 
 ---
 
@@ -106,19 +114,24 @@ It will also run the SMM structural estimation and print the in the REPL all the
 
 If you use this replication package, please cite:
 
-```markdown
-> Licandro, O. and Vizcaino, J. I. (2026).  
-> *Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement.*
-```
+Licandro, O. and Vizcaino, J. I. (2026). *Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement.* CESifo Working Paper No. 12946, CESifo, Munich. https://doi.org/10.65864/5cgh7zi4ku
 
 ### BibTeX
+
 ```bibtex
-@article{LV_CIU_2026,
-  author  = {Licandro, Omar and Vizcaino, J. I.},
-  title   = {Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement},
-  year    = {2026},
+@techreport{LV_CIU_2026,
+  author      = {Licandro, Omar and Vizcaino, Juan Ignacio},
+  title       = {Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement},
+  institution = {CESifo},
+  address     = {Munich},
+  type        = {CESifo Working Paper},
+  number      = {12946},
+  year        = {2026},
+  doi         = {10.65864/5cgh7zi4ku},
+  url         = {https://www.ifo.de/en/cesifo/publications/2026/working-paper/chained-indices-unchained-structural-transformation-and-welfare}
 }
 ```
+
 ---
 
 ## License
