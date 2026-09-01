@@ -1658,7 +1658,7 @@ L_e_1980_z = chain_index([0.0; g_e_1980_z .+ g_n])
 
 #--- Consistency checks -------------------------------------------------
 # (i)  the factor equals one at z = t for every base
-# (ii) closed form and direct form agree to machine precision
+# (ii) closed form and direct form agree
 let Pst = sim_eq["Pst"], Pgt = sim_eq["Pgt"], sgt = sim_eq["sgt"], et = sim_eq["et"]
     bases   = [1980, 1990, 2000, 2010, 2023] .- 1980 .+ 1
     err_one = maximum(abs.(aux_e_cons.(bases, bases; χ=χ, γ=γ, Pst=Pst, Pgt=Pgt, sgt=sgt) .- 1))
@@ -1678,52 +1678,6 @@ end
 # current-base index lies above the chained Divisia and the reference-base index below it.
 #---------------------------------------------------------------
 
-#---------------------------------------------------------------
-### Growth Rates of Real Consumption Expenditure Indices
- plot(1981:2023, g_e_2023_z, 
-    label =L"g^{D}_{e}_{2023,z}  - \textrm{2023‑base \  FS \ Index}",
-    linestyle=:dash, lw=2.5, 
-    color=:black)
-
-plot!(1981:2023, g_e_2010_z, 
-    label =L"g^{D}_{e}_{2010,z}  - \textrm{2010‑base \  FS \ Index}",
-    linestyle=:dash, lw=2.0, 
-    color=:black)
-
-plot!(1981:2023, g_e_2000_z, 
-    label =L"g^{D}_{e}_{2000,z}  - \textrm{2000‑base \  FS \ Index}",
-    linestyle=:dash, lw=1.5, 
-    color=:black)
-
-plot!(1981:2023, g_e_1990_z, 
-    label =L"g^{D}_{e}_{1990,z}  - \textrm{1990‑base \  FS \ Index}",
-    linestyle=:dash, lw=1.0, 
-    color=:black)
-    
-plot!(1981:2023, g_e_1980_z, 
-    label=L"g^{D}_{e}_{1980,z} - \textrm{1980‑base \  FS \ Index}",
-    linestyle=:dash, lw=0.5, 
-    color=:black)
-plot!(1981:2023, gD_e_z, 
-    label =L"g^{D}_{e}_{z} \ \ \ \ \ \ - \textrm{Chained \ Divisia \ Index}",
-    ylabel="Growth Rate of Real \n Consumption Expenditure",
-    linestyle=:solid, lw=2.0,
-    minorgrid=false, color=:black,
-    xticks=1980:5:2025, 
-    #yticks=0.0:0.2:1.4,
-    #ylim=(0.010, 0.025),   
-    xtickfont=tickfont, ytickfont=tickfont,
-    xguidefont=guidefont, yguidefont=guidefont,
-    legendfont=legendfont,
-    legend=(0.100, 0.900),
-    xrotation=45,
-    left_margin=5Plots.mm,  
-    framestyle=:box)
-if save_figures
-    savefig(joinpath(figuresdir, "growth_consumption_expenditure_indices.png"))
-    println("Figure saved to: ", joinpath(figuresdir, "growth_consumption_expenditure_indices.png"))
-end
-#---------------------------------------------------------------
 
 #---------------------------------------------------------------
 ### Real Consumption Expenditure Indices - D_e_z, P_e_2023_z, L_e_1980_z
