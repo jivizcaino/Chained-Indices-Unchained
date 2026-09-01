@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 #Replication code for: Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement
 #By:                   Omar Licandro and Juan I. Vizcaino
-#This Version:         08/2026
+#This Version:         09/2026
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ figuresdir = abspath(joinpath(currentdir, "..", "Figures"))
 #------------------------------------------------------------------------------
 #Configuration 
 # Set to true to save figures, false to only display
-save_figures = false
+save_figures = true
 
 # Set to true to run SMM estimation, false to use pre-estimated parameters
 run_smm      = false
@@ -32,8 +32,8 @@ Pkg.activate(@__DIR__)
 Pkg.instantiate()
 
 using XLSX, DataFrames, BlackBoxOptim ,  Statistics
-#using MathJaxRenderer, 
 using LaTeXStrings, LsqFit, Random, OrderedCollections, PrettyTables
+using MathJaxRenderer 
 using Plots; gr()
 #------------------------------------------------------------------------------
 

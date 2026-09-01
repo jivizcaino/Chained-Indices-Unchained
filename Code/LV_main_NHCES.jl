@@ -2,7 +2,7 @@
 #Replication code for: Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement
 #Benchmark HRV 2021 Model Under NHCES Preferences
 #By:                   Omar Licandro and Juan I. Vizcaino
-#This Version:         08/2026
+#This Version:         09/2026
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -15,8 +15,8 @@ figuresdir = abspath(joinpath(currentdir, "..", "Figures"))
 #------------------------------------------------------------------------------
 # Activate local project (Code/Project.toml)
 using Pkg
-#Pkg.activate(@__DIR__)
-#Pkg.instantiate()
+Pkg.activate(@__DIR__)
+Pkg.instantiate()
 
 using XLSX, DataFrames, BlackBoxOptim ,  Statistics
 using OrderedCollections, OrderedCollections, LsqFit,  Random, PrettyTables, LaTeXStrings, Plots; gr()
@@ -25,7 +25,7 @@ using OrderedCollections, OrderedCollections, LsqFit,  Random, PrettyTables, LaT
 #------------------------------------------------------------------------------
 #Configuration 
 # Set to true to save figures, false to only display
-save_figures = false
+save_figures = true
 
 # Set to true to run SMM estimation, false to use pre-estimated parameters
 run_smm      = false
@@ -1611,230 +1611,3 @@ $(repeat("=", 60))
 """)
 #------------------------------------------------------------------------------
 
-#------------------------------------------------------------------------------
-# Export the model-implied series for the HCD run
-#------------------------------------------------------------------------------
-let path = joinpath(datadir, "NHCES_model_series.csv")
-    open(path, "w") do io
-        println(io, "year,Pg,Ps,sg,e,C")
-        for i in 1:T
-            println(io, join([1979 + i, Pgt_f[i], Pst_f[i], sg_C[i], et_f[i], ct_f[i]], ","))
-        end
-    end
-    println("Model series written to: $path  (σ = $σ, ηs = $ηs, ωc = $ωc)")
-end
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# Compensated goods share underlying the fixed-base consumption expenditure indices
-#
-#   sg_kon(t,z) = goods share at base-t prices and the period-z utility level C_z,
-#                 i.e. the share implicit in Etilde_{t,z} = E(P_t, C_z).
-#
-# Contrast with the intertemporal measure. There the hypothetical share is constant
-# in tau, because quasilinearity pins the consumption bundle and the whole adjustment
-# to the utility target runs through investment. Here there is no investment margin,
-# so attaining the period-z utility level requires moving along the Engel curve and
-# the compensated share varies with z even though prices are fixed at t.
-#------------------------------------------------------------------------------
-function sg_kon_nhces(t::Int, z::Int)
-    C = ct_f[z]
-    E = E_nhces(Pgt_f[t], Pst_f[t], C, ωc, σ, ηg, ηs)
-    return sg_nhces(Pgt_f[t], Pst_f[t], C, E, ωc, σ, ηg, ηs)
-end
-
-sg_kon_2023_z = [sg_kon_nhces(T, z)                 for z in 1:T]
-sg_kon_2010_z = [sg_kon_nhces(2010 - 1980 + 1, z)   for z in 1:T]
-sg_kon_1980_z = [sg_kon_nhces(1, z)                 for z in 1:T]
-
-### Check: at its own base the compensated share equals the actual one
-@assert isapprox(sg_kon_nhces(1, 1), sg_C[1]; rtol=1e-10)
-@assert isapprox(sg_kon_nhces(T, T), sg_C[T]; rtol=1e-10)
-
-println(repeat("=", 62))
-println("Goods share in consumption expenditure: actual vs compensated")
-println(repeat("=", 62))
-println("  actual       s_g      1980 / 2023 : ",
-        round(sg_C[1], digits=4), " / ", round(sg_C[end], digits=4))
-println("  2023-base    sg_kon   1980 / 2023 : ",
-        round(sg_kon_2023_z[1], digits=4), " / ", round(sg_kon_2023_z[end], digits=4))
-println("  1980-base    sg_kon   1980 / 2023 : ",
-        round(sg_kon_1980_z[1], digits=4), " / ", round(sg_kon_1980_z[end], digits=4))
-println(repeat("=", 62))
-
-#------------------------------------------------------------------------------
-# Figure - Goods share in consumption expenditure: actual vs compensated
-plot(1980:2023, sg_C,
-    label  = L"s_{g,z} \ \ \ \ \ \ \ - \textrm{Actual}",
-    ylabel = "Share of Goods in\nConsumption Expenditure",
-    linestyle = :solid, lw = 2.0, color = :black,
-    xticks = 1980:5:2025, minorgrid = false,
-    xtickfont = tickfont, ytickfont = tickfont,
-    xguidefont = guidefont, yguidefont = guidefont,
-    legendfont = legendfont, legend = (0.475, 0.900),
-    xrotation = 45, left_margin = 5Plots.mm, framestyle = :box)
-
-plot!(1980:2023, sg_kon_2023_z,
-    label = L"\hat{s}_{g,2023,z} - \textrm{2023-base \ Index}",
-    linestyle = :dash, lw = 2.0, color = :black)
-
-plot!(1980:2023, sg_kon_1980_z,
-    label = L"\hat{s}_{g,1980,z} - \textrm{1980-base \ Index}",
-    linestyle = :dot, lw = 2.0, color = :black)
-
-if save_figures
-    savefig(joinpath(figuresdir, "NHCES_goods_share_consumption_expenditure.png"))
-    println("Figure saved to: ", joinpath(figuresdir, "NHCES_goods_share_consumption_expenditure.png"))
-end
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# Figure - Cumulative growth: Chained Divisia vs 1980-base vs 2023-base
-plot(1980:2023, D_e_z,
-    label  = L"\mathcal{D_{e}}_{z} \ \ \ \ \ \ - \textrm{Chained \ Divisia \ Index}",
-    ylabel = "Cumulative Growth in\nReal Consumption Expenditure",
-    linestyle = :solid, lw = 2.0, color = :black,
-    xticks = 1980:5:2025, minorgrid = false,
-    xtickfont = tickfont, ytickfont = tickfont,
-    xguidefont = guidefont, yguidefont = guidefont,
-    legendfont = legendfont, legend = (0.100, 0.900),
-    xrotation = 45, left_margin = 5Plots.mm, framestyle = :box)
-
-plot!(1980:2023, P_e_2023_z,
-    label = L"\mathcal{P_{e}}_{2023,z} - \textrm{2023-base  \ Index}",
-    linestyle = :dash, lw = 2.0, color = :black)
-
-plot!(1980:2023, L_e_1980_z,
-    label = L"\mathcal{L_{e}}_{1980,z} - \textrm{1980-base  \ Index}",
-    linestyle = :dot, lw = 2.0, color = :black)
-
-if save_figures
-    savefig(joinpath(figuresdir, "NHCES_consumption_expenditure_indices.png"))
-    println("Figure saved to: ", joinpath(figuresdir, "NHCES_consumption_expenditure_indices.png"))
-end
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# Figure - Growth rates for several base years vs the chained Divisia
-gP_e_2023_z = diff(P_e_2023_z)[2:end]
-gQ_e_2010_z = diff(P_e_2010_z)[2:end]
-gQ_e_2000_z = diff(P_e_2000_z)[2:end]
-gQ_e_1990_z = diff(P_e_1990_z)[2:end]
-gL_e_1980_z = diff(L_e_1980_z)[2:end]
-gD_e_plot   = diff(D_e_z)[2:end]
-
-plot(1982:2023, gP_e_2023_z,
-    label = L"g^{D}_{e}_{2023,z} - \textrm{2023-base \ Index}",
-    linestyle = :dash, lw = 2.5, color = :black,
-    xticks = 1980:5:2025, minorgrid = false,
-    xtickfont = tickfont, ytickfont = tickfont,
-    xguidefont = guidefont, yguidefont = guidefont,
-    legendfont = legendfont, legend = (0.400, 0.900),
-    xrotation = 45, left_margin = 5Plots.mm, framestyle = :box)
-
-plot!(1982:2023, gQ_e_2010_z, label = L"g^{D}_{e}_{2010,z} - \textrm{2010-base  \ Index}",
-    linestyle = :dash, lw = 2.0, color = :black)
-plot!(1982:2023, gQ_e_2000_z, label = L"g^{D}_{e}_{2000,z} - \textrm{2000-base  \ Index}",
-    linestyle = :dash, lw = 1.5, color = :black)
-plot!(1982:2023, gQ_e_1990_z, label = L"g^{D}_{e}_{1990,z} - \textrm{1990-base  \ Index}",
-    linestyle = :dash, lw = 1.0, color = :black)
-plot!(1982:2023, gL_e_1980_z, label = L"g^{D}_{e}_{1980,z} - \textrm{1980-base  \ Index}",
-    linestyle = :dash, lw = 0.5, color = :black)
-plot!(1982:2023, gD_e_plot,
-    label  = L"g^{D}_{e}_{z} \ \ \ \ \ \ - \textrm{Chained \ Divisia \ Index}",
-    ylabel = "Growth Rate of Real \n Consumption Expenditure",
-    linestyle = :solid, lw = 2.0, color = :black)
-
-if save_figures
-    savefig(joinpath(figuresdir, "NHCES_growth_consumption_expenditure_indices.png"))
-    println("Figure saved to: ", joinpath(figuresdir, "NHCES_growth_consumption_expenditure_indices.png"))
-end
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# σ SWEEP — Real consumption expenditure indices across NHCES calibrations
-# Requires nhces_params, i.e. the branch with run_smm_nhces = false.
-#------------------------------------------------------------------------------
-# Runs only when run_smm = false, since nhces_params is defined in that branch.
-if !run_smm
-
-function cons_indices_nhces(σ_i, ηs_i)
-    eq = sim_model_full_nhces([σ_i, ηs_i];
-             Pg_t=Pg_t, Ps_t=Ps_t, θ=θ, ρ=ρ, δ=δ, ψ=ψ,
-             g_calAx=g_calAx, g_As=g_As, g_Ag=g_Ag,
-             g_h=g_h, g_l=g_l, g_n=g_n, sg0_data=VAC_GOOD_SHARE[1])
-    (!haskey(eq, "ct") || any(x -> x > 1e5, eq["sgt"])) && return nothing
-
-    ωc_i = Float64(eq["ωc"][1])
-    Pg   = Float64.(eq["Pgt"]);  Ps = Float64.(eq["Pst"])
-    ct   = Float64.(eq["ct"])
-    sg   = Float64.(eq["sgt"]);  ss = Float64.(eq["sst"])
-    Tl   = length(ct)
-
-    # ∂log E/∂log C = ηg·sg + ηs·ss, evaluated at prices P_t and consumption index C_z
-    function ela(t, z)
-        E = E_nhces(Pg[t], Ps[t], ct[z], ωc_i, σ_i, ηg, ηs_i)
-        s = sg_nhces(Pg[t], Ps[t], ct[z], E, ωc_i, σ_i, ηg, ηs_i)
-        return ηg*s + ηs_i*(1 - s)
-    end
-
-    cg  = Float64.(eq["cgt"]);  cs = Float64.(eq["cst"])
-    smid = chain_share(sg)
-    gD  = smid .* log.(cg[2:end]./cg[1:end-1]) .+ (1 .- smid) .* log.(cs[2:end]./cs[1:end-1])
-    D   = chain_index([0.0; gD .+ g_n])
-
-    aux(t, z) = 0.5 * (ela(t,z-1)/ela(z-1,z-1) + ela(t,z)/ela(z,z))
-    FS(t) = chain_index([0.0; gD .* [aux(t,z) for z in 2:Tl] .+ g_n])
-
-    # HCD limiting case: the base-period bias when the entire share change is
-    # attributed to income effects equals Δs_g · Δln(P_g/P_s), exactly.
-    Δsg  = sg[end] - sg[1]
-    Δlnp = log(Pg[end]/Ps[end]) - log(Pg[1]/Ps[1])
-
-    return (σ = σ_i, ηs = ηs_i, ωc = ωc_i,
-            gapP = FS(Tl)[end] - D[end],
-            gapL = FS(1)[end]  - D[end],
-            Δsg = Δsg, Δlnp = Δlnp, hcd = Δsg*Δlnp)
-end
-
-sweep_nhces = [cons_indices_nhces(nhces_params[k].σ, nhces_params[k].ηs)
-               for k in sort(collect(keys(nhces_params)))]
-
-println("\n" * "="^112)
-println(rpad("σ",7), rpad("ηs",9), rpad("(1-σ)(ηs-ηg)",15),
-        rpad("Δs_g",10), rpad("Δln p",10),
-        rpad("P_e-D_e",10), rpad("L_e-D_e",10), rpad("spread",10),
-        rpad("HCD bound",11), "% of HCD")
-println("="^112)
-for r in sweep_nhces
-    r === nothing && continue
-    spread = r.gapP - r.gapL
-    println(rpad(round(r.σ,  digits=3), 7),
-            rpad(round(r.ηs, digits=4), 9),
-            rpad(round((1-r.σ)*(r.ηs-ηg), digits=4), 15),
-            rpad(round(r.Δsg,  digits=4), 10),
-            rpad(round(r.Δlnp, digits=4), 10),
-            rpad(round(r.gapP, digits=4), 10),
-            rpad(round(r.gapL, digits=4), 10),
-            rpad(round(spread, digits=4), 10),
-            rpad(round(r.hcd, digits=4), 11),
-            round(100*spread/r.hcd, digits=1))
-end
-println("="^112)
-println("HCD bound = Δs_g · Δln(P_g/P_s), the base-period bias when all structural")
-println("transformation is income-driven (σ = 1). Exact, parameter-free.")
-
-# CSV for the paper table
-open(joinpath(datadir, "NHCES_sigma_sweep.csv"), "w") do io
-    println(io, "sigma,eta_s,income_effect,dsg,dlnp,gapP,gapL,spread,hcd_bound,pct_of_hcd")
-    for r in sweep_nhces
-        r === nothing && continue
-        sp = r.gapP - r.gapL
-        println(io, join([r.σ, r.ηs, (1-r.σ)*(r.ηs-ηg), r.Δsg, r.Δlnp,
-                          r.gapP, r.gapL, sp, r.hcd, 100*sp/r.hcd], ","))
-    end
-end
-println("Sweep written to: ", joinpath(datadir, "NHCES_sigma_sweep.csv"))
-
-end  # if !run_smm  (σ sweep)
-#------------------------------------------------------------------------------
