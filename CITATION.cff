@@ -5,22 +5,24 @@ authors:
   - family-names: "Licandro"
     given-names: "Omar"
   - family-names: "Vizcaino"
-    given-names: "Juan I."
-version: "v0.1.0"
-date-released: November 2025
-repository-code: "https://github.com/jivizcaino/Chained-Indices-Unchained.git"
+    given-names: "Juan Ignacio"
+version: "v1.0.0"
+date-released: "2026-09-01"
+license: MIT
+repository-code: "https://github.com/jivizcaino/Chained-Indices-Unchained"
 preferred-citation:
-  type: article
+  type: report
   title: "Chained Indices Unchained: Structural Transformation and the Welfare Foundations of Income Growth Measurement"
   authors:
     - family-names: "Licandro"
       given-names: "Omar"
     - family-names: "Vizcaino"
-      given-names: "Juan I."
-  year: 2025
-  # Fill in once published:
-  # journal: ""
-  # volume: ""
-  # issue: ""
-  # pages: ""
-  # doi: ""
+      given-names: "Juan Ignacio"
+  year: 2026
+  institution:
+    name: "CESifo"
+  location:
+    name: "Munich"
+  number: "12946"
+  doi: "10.65864/5cgh7zi4ku"
+  url: "https://www.ifo.de/en/cesifo/publications/2026/working-paper/chained-indices-unchained-structural-transformation-and-welfare"
